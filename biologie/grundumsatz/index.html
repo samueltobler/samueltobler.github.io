@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grundumsatz Rechner</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --card: #ffffff;
+      --accent: #007bff;
+      --text: #212529;
+      --border: #dee2e6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Helvetica Neue", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: var(--card);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      background-color: #fff;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      background-color: var(--accent);
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 1rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .footnote {
+      font-size: 0.75rem;
+      color: #666;
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Grundumsatz Rechner</h1>
+    <form id="bmrForm">
+      <label for="geschlecht">Geschlecht</label>
+      <select id="geschlecht" required>
+        <option value="m">Männlich</option>
+        <option value="w">Weiblich</option>
+      </select>
+
+      <label for="alter">Alter (Jahre)</label>
+      <input type="number" id="alter" min="1" required>
+
+      <label for="gewicht">Gewicht (kg)</label>
+      <input type="number" id="gewicht" min="1" step="0.1" required>
+
+      <label for="groesse">Grösse (cm)</label>
+      <input type="number" id="groesse" min="50" required>
+
+      <button type="button" onclick="berechneBMR()">Berechnen</button>
+    </form>
+    <div class="result" id="ergebnis"></div>
+    <p class="footnote">Berechnung gemäss Harris-Benedict-Formel.</p>
+  </div>
+
+  <script>
+    function berechneBMR() {
+      const geschlecht = document.getElementById('geschlecht').value;
+      const alter = parseFloat(document.getElementById('alter').value);
+      const gewicht = parseFloat(document.getElementById('gewicht').value);
+      const groesse = parseFloat(document.getElementById('groesse').value);
+
+      if (isNaN(alter) || isNaN(gewicht) || isNaN(groesse)) {
+        document.getElementById('ergebnis').innerText = "Bitte alle Werte korrekt eingeben.";
+        return;
+      }
+
+      let bmr;
+      if (geschlecht === "m") {
+        // Männer: 13.7 × Gewicht + 5 × Grösse − 6.8 × Alter + 66.5
+        bmr = 13.7 * gewicht + 5 * groesse - 6.8 * alter + 66.5;
+      } else {
+        // Frauen: 665.1 + 9.6 × Gewicht + 1.8 × Grösse − 4.7 × Alter
+        bmr = 665.1 + 9.6 * gewicht + 1.8 * groesse - 4.7 * alter;
+      }
+
+      document.getElementById('ergebnis').innerText =
+        "Dein Grundumsatz beträgt ca. " + Math.round(bmr) + " kcal/Tag.";
+    }
+  </script>
+</body>
+</html>
