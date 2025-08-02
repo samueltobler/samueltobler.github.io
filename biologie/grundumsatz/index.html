@@ -113,7 +113,7 @@
       <button type="button" onclick="berechneBMR()">Berechnen</button>
     </form>
     <div class="result" id="ergebnis"></div>
-    <p class="footnote">Berechnung gemäss Harris-Benedict-Formel.</p>
+    <p class="footnote">Berechnung gemäss Mifflin-St.-Jeor-Formel.</p>
   </div>
 
   <script>
@@ -130,11 +130,11 @@
 
       let bmr;
       if (geschlecht === "m") {
-        // Männer: 13.7 × Gewicht + 5 × Grösse − 6.8 × Alter + 66.5
-        bmr = 13.7 * gewicht + 5 * groesse - 6.8 * alter + 66.5;
+        // Männer: 10 × Gewicht + 6.25 × Grösse − 5 × Alter + 5
+        bmr = 10 * gewicht + 6.25 * groesse - 5 * alter + 5;
       } else {
-        // Frauen: 665.1 + 9.6 × Gewicht + 1.8 × Grösse − 4.7 × Alter
-        bmr = 665.1 + 9.6 * gewicht + 1.8 * groesse - 4.7 * alter;
+        // Frauen: 10 × Gewicht + 6.25 × Grösse − 5 × Alter − 161
+        bmr = 10 * gewicht + 6.25 * groesse - 5 * alter - 161;
       }
 
       document.getElementById('ergebnis').innerText =
