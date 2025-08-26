@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abschiedsgrüsse</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    * { margin: 0; }
+    html, body { height: 100%; }
+    body { line-height: 1.5; -webkit-font-smoothing: antialiased; font-family: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    input, button, textarea { font: inherit; }
+    :focus-visible { outline: 2px solid #7c9cff; outline-offset: 2px; }
+
+    :root {
+      --radius: 14px; --btn-h: 44px; --shadow-1: 0 10px 30px rgba(0,0,0,.06); --shadow-2: 0 20px 50px rgba(0,0,0,.10);
+      --bg: #fffaf6; --elev: #ffffff; --text: #2b2633; --muted: #6b6474; --primary: #9b6bff; --primary-600: #7f4dff; --accent: #ff7c6b; --accent-600: #fa5f49;
+      --card-grad: radial-gradient(1200px 700px at 0% -10%, rgba(255,220,196,.55), transparent 50%),
+                   radial-gradient(900px 600px at 100% 10%, rgba(214,199,255,.55), transparent 50%);
+      --app-grad: linear-gradient(180deg, #fff7f0 0%, #fffdfb 40%, #ffffff 100%);
+    }
+
+    body { background: var(--app-grad); color: var(--text); }
+
+    .app { min-height: 100dvh; display: grid; grid-template-rows: auto 1fr; background: var(--card-grad); }
+
+    .appbar { position: sticky; top: 0; background: color-mix(in oklab, var(--elev) 85%, transparent); box-shadow: var(--shadow-1); backdrop-filter: saturate(140%) blur(8px); border-bottom: 1px solid rgba(0,0,0,.06); }
+    .appbar-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 12px 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+    .logo { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: conic-gradient(from 210deg, var(--accent), var(--primary)); color: white; box-shadow: var(--shadow-1); font-size: 22px; }
+
+    .hero { max-width: 1100px; margin: 0 auto; padding: 24px; display: grid; gap: 12px; }
+    .hero p { color: var(--muted); }
+
+    .board { max-width: 1100px; margin: 0 auto; padding: 0 24px 120px; }
+    .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+    .card { grid-column: span 12; border-radius: var(--radius); background: color-mix(in oklab, var(--elev) 95%, transparent); border: 1px solid rgba(0,0,0,.06); box-shadow: var(--shadow-1); overflow: hidden; position: relative; }
+    .card-inner { padding: 18px; display: grid; gap: 10px; }
+    .meta { display: flex; align-items: center; gap: 12px; }
+    .emoji { font-size: 22px; }
+    .who { font-weight: 700; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .msg { font-size: 16px; }
+
+    @media (min-width: 640px) { .card { grid-column: span 6; } }
+    @media (min-width: 980px) { .card { grid-column: span 4; } }
+
+    .fab { position: fixed; right: 24px; bottom: 24px; border-radius: 999px; box-shadow: var(--shadow-2); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: var(--btn-h); padding: 0 16px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-primary { background: linear-gradient(180deg, var(--primary), var(--primary-600)); color: white; }
+    .btn-secondary { background: linear-gradient(180deg, var(--accent), var(--accent-600)); color: white; }
+    .btn-ghost { background: #f2f2f2; }
+    .btn-sm { height: 32px; padding: 0 12px; border-radius: 10px; }
+
+    dialog { border: none; padding: 0; border-radius: 20px; width: min(640px, calc(100vw - 32px)); background: var(--elev); color: var(--text); box-shadow: var(--shadow-2); }
+    dialog::backdrop { background: rgba(0,0,0,.3); }
+    .modal { display: grid; gap: 18px; padding: 20px; }
+    .modal h2 { font-size: 22px; }
+    .f { display: grid; gap: 10px; }
+    .f label { font-weight: 600; }
+    .f input, .f textarea { width: 100%; min-height: var(--btn-h); padding: 10px 14px; border-radius: 12px; border: 1px solid #ccc; }
+    .f textarea { min-height: 120px; resize: vertical; }
+    .modal .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .modal .row .btn { flex: 1; }
+
+    /* Emoji-Picker (Single-Select) */
+    .emoji-picker { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+    .emoji-btn { height: 44px; border-radius: 10px; border: 1px solid rgba(0,0,0,.08); background: color-mix(in oklab, var(--elev) 90%, transparent); box-shadow: var(--shadow-1); font-size: 20px; cursor: pointer; }
+    .emoji-btn[aria-pressed="true"] { outline: 2px solid #7c9cff; background: color-mix(in oklab, var(--elev) 95%, transparent); }
+    @media (max-width: 480px) { .emoji-picker { grid-template-columns: repeat(6, 1fr); } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="appbar">
+      <div class="appbar-inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">❤</div>
+          <div class="title">Abschiedsgrüsse</div>
+        </div>
+        <div style="display:flex; gap:8px; justify-self:end">
+          <button id="adminBtn" class="btn btn-ghost btn-sm" title="Admin-Modus">Admin</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <p>Unsere Wünsche und Tipps für euren Weg!</p>
+    </section>
+
+    <main class="board">
+      <div id="grid" class="grid" role="list"></div>
+    </main>
+  </div>
+
+  <button id="writeFab" class="fab btn btn-primary">+ Schreiben</button>
+
+  <dialog id="writeDialog">
+    <form method="dialog" id="writeForm" class="modal" novalidate>
+      <h2>Nachricht hinzufügen</h2>
+      <div class="f">
+        <label for="password">Passwort</label>
+        <input id="password" name="password" type="password" required />
+      </div>
+      <div class="f">
+        <label for="author">Name</label>
+        <input id="author" name="author" type="text" required />
+      </div>
+      <div class="f">
+        <label for="klasse">Klasse</label>
+        <input id="klasse" name="klasse" type="text" placeholder="z. B. 3b" />
+      </div>
+      <div class="f">
+        <label>Emoji</label>
+        <div id="emojiPicker" class="emoji-picker" role="group" aria-label="Emoji auswählen"></div>
+        <small style="color:var(--muted)">Genau 1 Emoji wählen</small>
+      </div>
+      <div class="f">
+        <label for="message">Nachricht</label>
+        <textarea id="message" name="message" required></textarea>
+      </div>
+      <div class="row">
+        <button value="cancel" class="btn btn-ghost">Abbrechen</button>
+        <button id="saveMsg" value="default" class="btn btn-secondary">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const store = { key: 'abschied_msgs_v4', load() { try {return JSON.parse(localStorage.getItem(this.key))||[]}catch{return[]} }, save(list){ localStorage.setItem(this.key, JSON.stringify(list)) } }
+    const state = { msgs: store.load(), admin: sessionStorage.getItem('abschied_admin')==='1' }
+
+    function uid(){ return Math.random().toString(36).slice(2,10) }
+    function esc(s=''){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])) }
+
+    // Tier-Emojis (Single-Select)
+    const animals=['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐤','🦉','🐴','🦄']
+
+    // Datum schön (2. Dezember 2024)
+    const fmtDE = new Intl.DateTimeFormat('de-CH', { day:'numeric', month:'long', year:'numeric' })
+    function formatDatePretty(iso){ if(!iso) return ''
+      const [y,m,d] = iso.split('-').map(n=>parseInt(n,10));
+      const dt = new Date(Date.UTC(y, (m||1)-1, d||1))
+      return fmtDE.format(dt) }
+
+    const grid=document.getElementById('grid')
+    function render(){ grid.innerHTML=state.msgs.map(card).join('') }
+    function card(m){
+      const delBtn = state.admin ? `<button class="btn btn-ghost btn-sm" data-del="${m.id}" title="Löschen">Löschen</button>` : ''
+      return `<article class="card"><div class="card-inner"><div class="meta"><div class="emoji">${esc(m.emoji)}</div><div><div class="who">${esc(m.who)}</div><div class="sub">Klasse ${esc(m.klasse)} · ${esc(formatDatePretty(m.date))}</div></div></div>${delBtn ? `<div style="justify-self:end">${delBtn}</div>`:''}<div class="msg">${esc(m.text)}</div></div></article>`
+    }
+
+    const writeFab=document.getElementById('writeFab')
+    const writeDialog=document.getElementById('writeDialog')
+    const writeForm=document.getElementById('writeForm')
+    const adminBtn=document.getElementById('adminBtn')
+
+    writeFab.addEventListener('click',()=>writeDialog.showModal())
+
+    // Admin-Modus (einfach, clientseitig): Passwort "bio" aktiviert Löschen
+    function renderAdmin(){ adminBtn.textContent = state.admin ? 'Admin: aktiv' : 'Admin'; render(); attachCardEvents(); }
+    adminBtn.addEventListener('click',()=>{
+      if(state.admin){ state.admin=false; sessionStorage.removeItem('abschied_admin'); renderAdmin(); return }
+      const pw=prompt('Admin-Passwort eingeben:')||''
+      if(pw.trim()==='bio'){ state.admin=true; sessionStorage.setItem('abschied_admin','1'); renderAdmin() }
+      else alert('Falsches Passwort')
+    })
+
+    // Emoji-Picker
+    const emojiPicker = document.getElementById('emojiPicker')
+    function buildEmojiPicker(){
+      emojiPicker.innerHTML = animals.map(e=>`<button type="button" class="emoji-btn" data-emoji="${e}" aria-pressed="false" title="${e}">${e}</button>`).join('')
+      emojiPicker.querySelectorAll('.emoji-btn').forEach(btn=>btn.addEventListener('click',()=>{
+        const isPressed = btn.getAttribute('aria-pressed')==='true'
+        if(isPressed){ btn.setAttribute('aria-pressed','false'); return }
+        // nur eines erlaubt: alle zurücksetzen, dann dieses setzen
+        emojiPicker.querySelectorAll('.emoji-btn').forEach(b=>b.setAttribute('aria-pressed','false'))
+        btn.setAttribute('aria-pressed','true')
+      }))
+    }
+    function getSelectedEmoji(){ const el = emojiPicker.querySelector('.emoji-btn[aria-pressed="true"]'); return el?el.dataset.emoji:'' }
+    function clearEmojiSelection(){ emojiPicker.querySelectorAll('.emoji-btn').forEach(b=>b.setAttribute('aria-pressed','false')) }
+
+    // Erstellen
+    writeForm.addEventListener('submit',e=>{
+      e.preventDefault()
+      const fd=new FormData(writeForm)
+      const pw=fd.get('password').toString().trim()
+      if(pw!=='bio'){ alert('Falsches Passwort'); return }
+      const who=fd.get('author').toString().trim()
+      const klasse=fd.get('klasse').toString().trim()
+      const text=fd.get('message').toString().trim()
+      const emoji=getSelectedEmoji()
+      if(!who||!text){ alert('Bitte alle Pflichtfelder ausfüllen'); return }
+      if(!emoji){ alert('Bitte genau 1 Emoji wählen'); return }
+      const date=new Date().toISOString().slice(0,10)
+      const m={id:uid(),who,klasse,date,emoji,text}
+      state.msgs.unshift(m)
+      store.save(state.msgs)
+      writeDialog.close(); writeForm.reset(); clearEmojiSelection(); render(); attachCardEvents()
+    })
+
+    function attachCardEvents(){
+      if(!state.admin) return
+      state.msgs.forEach(m=>{
+        const btn=document.querySelector(`[data-del="${m.id}"]`)
+        btn && btn.addEventListener('click',()=>{
+          if(!confirm('Diese Nachricht löschen?')) return
+          state.msgs = state.msgs.filter(x=>x.id!==m.id)
+          store.save(state.msgs)
+          render(); attachCardEvents()
+        })
+      })
+    }
+
+    buildEmojiPicker()
+    render()
+    attachCardEvents()
+    renderAdmin()
+  </script>
+</body>
+</html>
