@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Einfache Statistik</title>
+  <meta name="color-scheme" content="dark light">
+  <style>
+    :root {
+      --bg:#0b1220; --text:#e6e7eb; --muted:#8b93a1;
+      --border:rgba(255,255,255,.10); --panel:rgba(255,255,255,.06);
+      --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.30);
+      --accent:#22c55e; --warn:#f59e0b;
+    }
+    @media (prefers-color-scheme: light) {
+      :root { --bg:#f6f7fb; --text:#0b1220; --muted:#5b616e;
+              --border:rgba(0,0,0,.10); --panel:rgba(0,0,0,.04);
+              --shadow:0 8px 24px rgba(0,0,0,.08); }
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);min-height:100dvh;display:grid;place-items:start}
+    .wrap{width:min(900px,92vw);margin:28px auto;display:grid;gap:14px}
+    h1{margin:0 0 4px;font-size:clamp(18px,1.2rem + .6vw,26px);font-weight:750}
+    p.lead{margin:0 0 8px;color:var(--muted);font-size:14px}
+    .card{border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,var(--panel),transparent);box-shadow:var(--shadow)}
+    .pad{padding:14px}
+    textarea{width:100%;min-height:200px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;resize:vertical;line-height:1.45;background:transparent;color:inherit;outline:none}
+    .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+    @media(max-width:560px){.controls{grid-template-columns:1fr 1fr}}
+    label{font-size:12px;color:var(--muted)}
+    select{width:100%;min-height:38px;border:1px solid var(--border);border-radius:10px;background:transparent;color:inherit;padding:6px 8px}
+    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    @media(max-width:420px){.stats{grid-template-columns:1fr}}
+    .stat{border:1px solid var(--border);border-radius:12px;padding:10px;background:transparent}
+    .stat h3{margin:0;font-size:12px;color:var(--muted);font-weight:600}
+    .val{margin-top:4px;font-size:clamp(20px,1.1rem + .5vw,26px);font-weight:750}
+    .foot{margin-top:8px;font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>Einfache Statistik</h1>
+      <p class="lead">Gib Werte ein; Resultate werden automatisch berechnet.</p>
+    </header>
+
+    <section class="card pad">
+      <label for="input">Eingabe</label>
+      <textarea id="input" placeholder="Werte eingeben oder einfügen …"></textarea>
+
+      <div class="controls">
+        <div>
+          <label for="sep">Listentrennzeichen</label>
+          <select id="sep">
+            <option value="auto" selected>Automatisch</option>
+            <option value="comma">Komma</option>
+            <option value="semicolon">Semikolon</option>
+            <option value="space">Leerzeichen</option>
+            <option value="newline">Zeilenumbruch</option>
+          </select>
+        </div>
+        <div>
+          <label for="dec">Dezimaltrenner</label>
+          <select id="dec">
+            <option value="comma" selected>Komma</option>
+            <option value="dot">Punkt</option>
+          </select>
+        </div>
+        <div>
+          <label for="precision">Dezimalstellen</label>
+          <select id="precision">
+            <option>0</option><option>1</option><option selected>2</option>
+            <option>3</option><option>4</option><option>5</option>
+          </select>
+        </div>
+      </div>
+      <div class="foot" id="status">Bereit</div>
+    </section>
+
+    <aside class="card pad">
+      <div class="stats">
+        <div class="stat"><h3>n</h3><div class="val" id="n">0</div></div>
+        <div class="stat"><h3>Mittelwert</h3><div class="val" id="mean">–</div></div>
+        <div class="stat"><h3>Median</h3><div class="val" id="median">–</div></div>
+        <div class="stat"><h3>SD (Stichprobe)</h3><div class="val" id="sd">–</div></div>
+        <div class="stat"><h3>SE</h3><div class="val" id="se">–</div></div>
+        <div class="stat"><h3>Min / Max</h3><div class="val" id="minmax">–</div></div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const input = $("input");
+    const sepSel = $("sep");
+    const decSel = $("dec");
+    const precSel = $("precision");
+    const status = $("status");
+    const fields = { n:$("n"), mean:$("mean"), median:$("median"), sd:$("sd"), se:$("se"), minmax:$("minmax") };
+
+    // Auto-Neuberechnung
+    [input, sepSel, decSel, precSel].forEach(el => {
+      el.addEventListener("input", compute);
+      el.addEventListener("change", compute);
+    });
+    input.addEventListener("paste", () => setTimeout(compute, 0));
+    window.addEventListener("pageshow", compute);
+
+    function autoDetectSeparator(text) {
+      if (/\r?\n/.test(text.trim())) return "newline";
+      const c = {
+        semicolon: (text.match(/;/g) || []).length,
+        tab: (text.match(/\t/g) || []).length,
+        comma: (text.match(/,/g) || []).length,
+        space: (text.match(/\s/g) || []).length,
+      };
+      if (c.semicolon > 0) return "semicolon";
+      if (c.tab > 0) return "tab";
+      if (c.comma > 0) return "comma";
+      if (c.space > 1) return "space";
+      return "comma";
+    }
+    function splitValues(text, mode) {
+      if (mode === "auto") mode = autoDetectSeparator(text);
+      switch (mode) {
+        case "newline": return text.split(/\r?\n/);
+        case "semicolon": return text.split(/;/);
+        case "tab": return text.split(/\t/);
+        case "space": return text.trim().split(/\s+/);
+        default: return text.split(/,/);
+      }
+    }
+    function parseNumbers(text) {
+      const parts = splitValues(text, sepSel.value).map(s=>s.trim()).filter(Boolean);
+      const useComma = decSel.value === "comma";
+      let invalid = 0, parsed = [];
+      for (let s of parts) {
+        s = s.replace(/['’\u00A0 ]/g, "");
+        if (useComma) s = s.replace(/,/, ".");
+        const v = Number(s);
+        if (Number.isFinite(v)) parsed.push(v); else invalid++;
+      }
+      return { values: parsed, invalid };
+    }
+
+    const mean = (a) => a.reduce((x,y)=>x+y,0)/a.length;
+    const median = (a) => { const s=[...a].sort((x,y)=>x-y); const m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+    const varianceSample = (a, mu) => a.length<2 ? NaN : a.reduce((acc,x)=>acc+(x-mu)*(x-mu),0)/(a.length-1);
+
+    function fmt(x) {
+      const digits = parseInt(precSel.value, 10);
+      if (!isFinite(x)) return "–";
+      const useComma = decSel.value === "comma";
+      let s = x.toFixed(digits);
+      return useComma ? s.replace(".", ",") : s;
+    }
+
+    function compute() {
+      const raw = input.value;
+      const { values, invalid } = parseNumbers(raw);
+      const n = values.length;
+      fields.n.textContent = String(n);
+
+      if (n === 0) {
+        ["mean","median","sd","se","minmax"].forEach(k => fields[k].textContent = "–");
+        status.textContent = invalid>0 ? `${invalid} Einträge ignoriert` : "Bereit";
+        return;
+      }
+
+      const mu = mean(values);
+      const med = median(values);
+      const sd = Math.sqrt(varianceSample(values, mu));
+      const se = sd/Math.sqrt(n);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+
+      fields.mean.textContent = fmt(mu);
+      fields.median.textContent = fmt(med);
+      fields.sd.textContent = isFinite(sd) ? fmt(sd) : "–";
+      fields.se.textContent = isFinite(se) ? fmt(se) : "–";
+      fields.minmax.textContent = `${fmt(min)} / ${fmt(max)}`;
+
+      status.textContent = invalid>0 ? `${invalid} Einträge ignoriert · SD=Stichprobe; SE=SD/√n` : "SD=Stichprobe; SE=SD/√n";
+    }
+
+    // Initial
+    compute();
+  </script>
+</body>
+</html>
