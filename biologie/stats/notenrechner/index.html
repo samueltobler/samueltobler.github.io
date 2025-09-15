@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notenrechner</title>
+  <!-- Tailwind CSS via CDN for a moderne, zugängliche UI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    /* Sanfte Fokus-Ringe für Tastatur-Nutzer */
+    :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  </style>
+</head>
+<body class="min-h-screen bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-900 dark:text-neutral-100">
+  <main class="mx-auto max-w-2xl p-6">
+    <header class="mb-6 flex items-center justify-between">
+      <h1 class="text-3xl font-semibold tracking-tight">Notenrechner</h1>
+      <a href="#hilfe" class="text-sm underline underline-offset-4">Hilfe</a>
+    </header>
+
+    <section class="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
+      <form id="form" class="grid gap-4" onsubmit="return false;">
+        <div>
+          <label for="punkte" class="block text-sm font-medium">Punkte</label>
+          <input id="punkte" name="punkte" type="text" inputmode="decimal"
+                 class="mt-1 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 leading-6 shadow-sm placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900"
+                 placeholder="z. B. 18,5; 22; 25 oder 18.5,22,25" aria-describedby="punkte-hinweis" />
+          <p id="punkte-hinweis" class="mt-1 text-xs text-neutral-500">Mehrere Werte mit Komma oder Semikolon trennen; Dezimaltrennzeichen Komma oder Punkt möglich.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4 max-[420px]:grid-cols-1">
+          <div>
+            <label for="max" class="block text-sm font-medium">MaxPunkte</label>
+            <input id="max" name="max" type="number" step="any" min="0"
+                   class="mt-1 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 leading-6 shadow-sm placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900"
+                   placeholder="z. B. 28" />
+          </div>
+          <div>
+            <label for="rundung" class="block text-sm font-medium">Dezimalstellen</label>
+            <input id="rundung" name="rundung" type="number" min="0" max="4" value="2"
+                   class="mt-1 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 leading-6 shadow-sm placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900" />
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button id="berechnen" type="button"
+                  class="rounded-2xl px-4 py-2 text-sm font-medium shadow-sm transition active:scale-[0.99] bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-white">
+            Berechnen
+          </button>
+          <button id="zuruecksetzen" type="reset"
+                  class="rounded-2xl px-4 py-2 text-sm font-medium shadow-sm transition active:scale-[0.99] border border-neutral-300 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800">
+            Zurücksetzen
+          </button>
+        </div>
+
+        <p id="fehlermeldung" class="hidden rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/50 dark:text-red-300"></p>
+      </form>
+    </section>
+
+    <section id="ergebnis-card" class="mt-6 hidden rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
+      <h2 class="mb-3 text-lg font-medium">Ergebnis</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-neutral-200 dark:border-neutral-800">
+              <th class="py-2 text-left font-semibold">Punkte</th>
+              <th class="py-2 text-left font-semibold">Begrenzte Punkte</th>
+              <th class="py-2 text-left font-semibold">Note</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <p id="zusammenfassung" class="mt-3 text-sm text-neutral-600 dark:text-neutral-400"></p>
+    </section>
+
+    <section id="hilfe" class="mt-10 text-sm text-neutral-600 dark:text-neutral-400">
+      <h2 class="mb-2 text-base font-medium text-neutral-900 dark:text-neutral-100">Hilfe</h2>
+      <ul class="list-disc space-y-1 pl-5">
+        <li>Formel: <code>Note = round((Punkte × 5 / MaxPunkte) + 1, 2)</code>; anschliessend auf 1–6 begrenzt.</li>
+        <li>Punkte über <em>MaxPunkte</em> werden automatisch auf <em>MaxPunkte</em> gesetzt.</li>
+        <li>Mehrere Eingaben möglich; Ausgaben werden tabellarisch dargestellt.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    // Hilfsfunktionen
+    const toNumber = (s) => {
+      if (typeof s !== 'string') return NaN;
+      // Erlaube Komma oder Punkt als Dezimaltrennzeichen
+      const norm = s.trim().replace(/\u00A0/g, ' ').replace(/,/g, '.');
+      return norm === '' ? NaN : Number(norm);
+    };
+
+    const roundTo = (val, digits) => {
+      const f = Math.pow(10, digits);
+      return Math.round((val + Number.EPSILON) * f) / f;
+    };
+
+    const formatCH = (n, digits = 2) => new Intl.NumberFormat('de-CH', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
+
+    // Notenrechner – JS-Port der gegebenen R-Funktion
+    function Notenrechner(punkteArray, maxPunkte, digits = 2) {
+      if (!Array.isArray(punkteArray)) throw new Error('Interner Fehler: punkteArray ist nicht ein Array.');
+      if (typeof maxPunkte !== 'number' || Number.isNaN(maxPunkte)) throw new Error('Beide Eingaben müssen numerisch sein.');
+      if (maxPunkte <= 0) throw new Error('MaxPunkte muss grösser als 0 sein.');
+
+      return punkteArray.map((p) => {
+        if (typeof p !== 'number' || Number.isNaN(p)) throw new Error('Beide Eingaben müssen numerisch sein.');
+        if (p < 0) throw new Error('Punkte müssen grösser oder gleich 0 sein.');
+        const begrenzt = Math.min(p, maxPunkte);
+        let n = (begrenzt * 5 / maxPunkte) + 1;
+        n = Math.max(1, Math.min(roundTo(n, digits), 6));
+        return { punkte: p, begrenzt, note: n };
+      });
+    }
+
+    // DOM-Interaktion
+    const form = document.getElementById('form');
+    const btn = document.getElementById('berechnen');
+    const reset = document.getElementById('zuruecksetzen');
+    const fehler = document.getElementById('fehlermeldung');
+    const tbody = document.getElementById('tbody');
+    const card = document.getElementById('ergebnis-card');
+    const zusammenfassung = document.getElementById('zusammenfassung');
+
+    btn.addEventListener('click', () => {
+      fehler.classList.add('hidden');
+      fehler.textContent = '';
+      tbody.innerHTML = '';
+      zusammenfassung.textContent = '';
+
+      const punkteRoh = document.getElementById('punkte').value;
+      const maxStr = document.getElementById('max').value;
+      const digits = Number(document.getElementById('rundung').value || 2);
+
+      // Parsen der Punkte-Liste
+      const teile = punkteRoh.split(/[,;\s]+/).filter(Boolean);
+      const punkte = teile.map(toNumber);
+      const max = toNumber(maxStr);
+
+      try {
+        if (punkte.length === 0) throw new Error('Bitte mindestens einen Punktewert eingeben.');
+        const result = Notenrechner(punkte, max, digits);
+
+        // Tabelle füllen
+        for (const row of result) {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-neutral-100 last:border-0 dark:border-neutral-800';
+          const td1 = document.createElement('td');
+          const td2 = document.createElement('td');
+          const td3 = document.createElement('td');
+          td1.className = 'py-2';
+          td2.className = 'py-2';
+          td3.className = 'py-2 font-medium';
+          td1.textContent = formatCH(row.punkte, 2);
+          td2.textContent = formatCH(row.begrenzt, 2);
+          td3.textContent = formatCH(row.note, digits);
+          tr.append(td1, td2, td3);
+          tbody.appendChild(tr);
+        }
+
+        // Zusammenfassung
+        const noten = result.map(r => r.note);
+        const schnitt = noten.reduce((a, b) => a + b, 0) / noten.length;
+        zusammenfassung.textContent = `Ø-Note: ${formatCH(schnitt, digits)} · Einträge: ${noten.length}`;
+        card.classList.remove('hidden');
+      } catch (e) {
+        fehler.textContent = e.message || 'Unbekannter Fehler.';
+        fehler.classList.remove('hidden');
+        card.classList.add('hidden');
+      }
+    });
+
+    reset.addEventListener('click', () => {
+      fehler.classList.add('hidden');
+      fehler.textContent = '';
+      tbody.innerHTML = '';
+      zusammenfassung.textContent = '';
+      card.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>
