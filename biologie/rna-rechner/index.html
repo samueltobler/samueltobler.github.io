@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aminosäure → DNA/mRNA</title>
+  <style>
+    :root { --fg:#111; --bg:#fff; --muted:#666; --accent:#0a84ff; --err:#b00020; }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Cantarell, Ubuntu, 'Noto Sans', Arial, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--fg); display: grid; place-items: center; min-height: 100dvh; padding: 2rem; }
+    main { width: min(700px, 100%); display: grid; gap: 1rem; }
+    h1 { margin: 0 0 .25rem 0; font-size: 1.25rem; }
+    .card { border: 1px solid #e5e5e5; border-radius: 16px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+    label { font-weight: 600; display: block; margin-bottom: .5rem; }
+    input[type="text"] { width: 100%; font-size: 1rem; padding: .75rem .9rem; border: 1px solid #ddd; border-radius: 12px; outline: none; }
+    input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+    .row { display: grid; gap: .5rem; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 1rem; word-break: break-all; }
+    .muted { color: var(--muted); font-size: .9rem; }
+    .bad   { color: var(--err); }
+    .grid { display: grid; gap: .5rem; grid-template-columns: 9rem 1fr; align-items: start; }
+    .pill { display:inline-block; padding:.1rem .5rem; border-radius:999px; background:#f4f4f4; margin-left:.5rem; font-weight:600; font-size:.85rem; }
+    footer { color: var(--muted); font-size: .85rem; text-align: center; margin-top: .5rem; }
+    @media (max-width: 520px){ .grid{grid-template-columns: 1fr;} }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <h1>Aminosäure-Code → DNA/mRNA</h1>
+      <p class="muted">Beispiel: <span class="mono">ACDX</span> ergibt DNA mit Stop am Ende.</p>
+      <label for="aa">Eingabe</label>
+      <input id="aa" type="text" inputmode="latin" placeholder="z. B. ACDX" autofocus />
+      <p id="warn" class="muted"></p>
+    </section>
+
+    <section class="card row">
+      <div class="grid">
+        <div><strong>Leitstrang</strong><span class="pill">5’→3’ (coding)</span></div>
+        <div class="mono" id="lead">–</div>
+
+        <div><strong>Folgestrang</strong><span class="pill">3’→5’ (komplementär)</span></div>
+        <div class="mono" id="lag">–</div>
+
+        <div><strong>mRNA</strong><span class="pill">5’→3’</span></div>
+        <div class="mono" id="mrna">–</div>
+      </div>
+    </section>
+
+    <footer>Standard-Codon pro Aminosäure; <span class="mono">X</span> = Stop (<span class="mono">TAA</span>).</footer>
+  </main>
+
+  <script>
+    // Kanonisches DNA-Codon pro Aminosäure (5'→3' des Leitstrangs).
+    const AA_TO_DNA = {
+      A:"GCT", C:"TGT", D:"GAT", E:"GAA", F:"TTT",
+      G:"GGT", H:"CAT", I:"ATT", K:"AAA", L:"CTG",
+      M:"ATG", N:"AAT", P:"CCT", Q:"CAA", R:"CGT",
+      S:"TCT", T:"ACT", V:"GTG", W:"TGG", Y:"TAT",
+      X:"TAA" // Stop
+      // Nicht unterstützt: B, Z, J, U, O
+    };
+
+    const comp = { A:"T", T:"A", C:"G", G:"C" };
+
+    const $ = (id) => document.getElementById(id);
+    const aaInput = $("aa"), leadOut = $("lead"), lagOut = $("lag"), mrnaOut = $("mrna"), warn = $("warn");
+
+    function translate(seq){
+      const letters = seq.toUpperCase().replace(/\s+/g,"");
+      let lead = "", bad = [];
+      for (const ch of letters){
+        if (AA_TO_DNA[ch]) lead += AA_TO_DNA[ch];
+        else bad.push(ch);
+      }
+      if (!lead) return { lead:"–", lag:"–", mrna:"–", bad };
+      // Folgestrang: komplementär; Orientierung bleibt 3'→5' zur Ausrichtung unter dem Leitstrang.
+      const lag = lead.replace(/./g, b => comp[b] || b);
+      const mrna = lead.replaceAll("T","U");
+      return { lead, lag, mrna, bad };
+    }
+
+    function render(){
+      const { lead, lag, mrna, bad } = translate(aaInput.value);
+      leadOut.textContent = lead;
+      lagOut.textContent  = lag === "–" ? "–" : lag; // bereits 3'→5'
+      mrnaOut.textContent = mrna;
+      if (bad.length){
+        warn.innerHTML = `Ignoriert: <span class="bad mono">${[...new Set(bad)].join("")}</span> (nicht unterstützt).`;
+      } else {
+        warn.textContent = "";
+      }
+    }
+
+    aaInput.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>
