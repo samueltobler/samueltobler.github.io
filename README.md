@@ -10,5 +10,6 @@
 - Grundumsatz         (https://samueltobler.github.io/biologie/grundumsatz)
 - Neuron              (https://samueltobler.github.io/biologie/neuron)
 - Notenrechner        (https://samueltobler.github.io/biologie/notenrechner)
+- Prüfungsuhr         (https://samueltobler.github.io/biologie/exam-timer)
 - RNA-Tool            (https://samueltobler.github.io/biologie/rna-rechner)
 - Statistiken         (https://samueltobler.github.io/biologie/stats)
