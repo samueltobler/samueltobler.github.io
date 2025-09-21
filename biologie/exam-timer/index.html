@@ -10,12 +10,9 @@
       --bg-alert: #ff6b6b;
       --fg: #fff;
       --muted: #adb5bd;
-      --accent: #495057;
       --accent-2: #1a1d20;
     }
-    html, body {
-      height: 100%;
-    }
+    html, body { height: 100%; }
     body {
       margin: 0;
       background: var(--bg-dark);
@@ -26,12 +23,9 @@
       justify-content: space-between;
       height: 100vh;
       transition: background 0.3s ease;
+      position: relative;
     }
-    .wrap {
-      width: 100%;
-      text-align: center;
-      margin: auto 0;
-    }
+    .wrap { width: 100%; text-align: center; margin: auto 0; }
     .date {
       font-size: clamp(1rem, 2vw, 1.4rem);
       letter-spacing: 0.03em;
@@ -46,11 +40,7 @@
       letter-spacing: 0.02em;
       font-variant-numeric: tabular-nums;
     }
-    .seconds {
-      font-size: 0.25em;
-      opacity: 0.6;
-      margin-left: 4px;
-    }
+    .seconds { font-size: 0.25em; opacity: 0.6; margin-left: 4px; }
     .countdown-line {
       font-size: clamp(1.5rem, 4vw, 2rem);
       margin-top: 20px;
@@ -66,39 +56,45 @@
       border-top-right-radius: 8px;
       font-size: 0.8rem;
     }
-    .row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
+    .row { display: flex; align-items: center; justify-content: center; gap: 6px; }
     input[type="number"] {
-      background: none;
-      color: var(--fg);
-      border: none;
-      border-bottom: 1px solid var(--muted);
-      padding: 4px 2px;
-      font-size: 0.9rem;
-      text-align: right;
-      outline: none;
-      width: 50px;
+      background: none; color: var(--fg);
+      border: none; border-bottom: 1px solid var(--muted);
+      padding: 4px 2px; font-size: 0.9rem; text-align: right; outline: none; width: 50px;
       -moz-appearance: textfield;
     }
     input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     button {
-      background: none;
-      color: var(--fg);
+      background: none; color: var(--fg);
       border: 1px solid var(--muted);
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 0.8rem;
-      cursor: pointer;
+      border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer;
     }
     button:disabled { opacity: .5; cursor: default; }
+
+    /* Schlichte Icon-Buttons unten (ohne Kreis) */
+    .icon-btn {
+      position: absolute; bottom: 10px;
+      background: none; border: none; color: var(--fg);
+      font-size: 1.1rem; padding: 4px 6px; cursor: pointer; opacity: .8;
+      line-height: 1; user-select: none;
+    }
+    .icon-btn:hover { opacity: 1; }
+    #toggleLayout { left: 10px; }
+    #toggleSeconds { right: 10px; }
+
+    /* Layout-Wechsel: nur die Zahl gross, Labels klein */
+    body.alt-layout .time { font-size: clamp(2rem, 6vw, 4rem); }
+    body.alt-layout .date { font-size: clamp(0.9rem, 1.6vw, 1.1rem); }
+    /* Grundgrösse der Countdown-Zeile klein halten */
+    body.alt-layout .countdown-line { font-size: clamp(1rem, 2.5vw, 1.4rem); gap: 10px; }
+    /* Nur die Zahl gross ziehen */
+    body.alt-layout #countdown {
+      font-size: clamp(5rem, 15vw, 12rem);
+      font-weight: 700;
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
   </style>
 </head>
 <body>
@@ -106,7 +102,7 @@
     <div class="date" id="date"></div>
     <div class="time" id="clock" aria-live="polite">--:--<span class="seconds">--</span></div>
 
-    <div class="countdown-line">
+    <div class="countdown-line" aria-live="polite">
       <span>Verbleibende Zeit:</span>
       <span id="countdown">0</span>
       <span>Minuten</span>
@@ -122,13 +118,20 @@
     </div>
   </section>
 
+  <!-- Icon-Buttons ohne Kreis -->
+  <button class="icon-btn" id="toggleLayout" title="Layout wechseln" aria-label="Layout wechseln">↺</button>
+  <button class="icon-btn" id="toggleSeconds" title="Sekunden ein-/ausblenden" aria-label="Sekunden ein- oder ausblenden">x</button>
+
   <script>
     function pad(n){ return String(n).padStart(2, '0'); }
+
+    let showSeconds = true;
 
     function tickClock(){
       const now = new Date();
       document.getElementById('clock').innerHTML =
-        `${pad(now.getHours())}:${pad(now.getMinutes())}<span class="seconds">:${pad(now.getSeconds())}</span>`;
+        `${pad(now.getHours())}:${pad(now.getMinutes())}` +
+        (showSeconds ? `<span class="seconds">:${pad(now.getSeconds())}</span>` : '');
       document.getElementById('date').textContent =
         now.toLocaleDateString('de-CH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }
@@ -139,6 +142,8 @@
     const startBtn = document.getElementById('start');
     const resetBtn = document.getElementById('reset');
     const cdEl = document.getElementById('countdown');
+    const toggleBtn = document.getElementById('toggleSeconds');
+    const layoutBtn = document.getElementById('toggleLayout');
 
     let cdMinutes = 0;
     let cdTimer = null;
@@ -149,11 +154,12 @@
     }
 
     function setBackgroundDark(){
-      document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-dark');
+      document.body.style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue('--bg-dark');
     }
-
     function setBackgroundAlert(){
-      document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-alert');
+      document.body.style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue('--bg-alert');
     }
 
     function startCountdown(){
@@ -201,12 +207,17 @@
     });
 
     minutesInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        if (!cdTimer) startCountdown();
-      }
-      if (e.key === 'Escape') {
-        stopCountdown();
-      }
+      if (e.key === 'Enter') { if (!cdTimer) startCountdown(); }
+      if (e.key === 'Escape') { stopCountdown(); }
+    });
+
+    toggleBtn.addEventListener('click', () => {
+      showSeconds = !showSeconds;
+      tickClock();
+    });
+
+    layoutBtn.addEventListener('click', () => {
+      document.body.classList.toggle('alt-layout');
     });
 
     setCountdownDisplay(0);
