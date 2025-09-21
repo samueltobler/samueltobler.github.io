@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Exam Time</title>
+  <style>
+    :root {
+      --bg-dark: #212529;
+      --bg-alert: #ff6b6b;
+      --fg: #fff;
+      --muted: #adb5bd;
+      --accent: #495057;
+      --accent-2: #1a1d20;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      margin: 0;
+      background: var(--bg-dark);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100vh;
+      transition: background 0.3s ease;
+    }
+    .wrap {
+      width: 100%;
+      text-align: center;
+      margin: auto 0;
+    }
+    .date {
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 14px;
+    }
+    .time {
+      font-size: clamp(5rem, 15vw, 12rem);
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .seconds {
+      font-size: 0.25em;
+      opacity: 0.6;
+      margin-left: 4px;
+    }
+    .countdown-line {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .controls {
+      padding: 8px;
+      background: var(--accent-2);
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      font-size: 0.8rem;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    input[type="number"] {
+      background: none;
+      color: var(--fg);
+      border: none;
+      border-bottom: 1px solid var(--muted);
+      padding: 4px 2px;
+      font-size: 0.9rem;
+      text-align: right;
+      outline: none;
+      width: 50px;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    button {
+      background: none;
+      color: var(--fg);
+      border: 1px solid var(--muted);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .5; cursor: default; }
+  </style>
+</head>
+<body>
+  <main class="wrap" role="main">
+    <div class="date" id="date"></div>
+    <div class="time" id="clock" aria-live="polite">--:--<span class="seconds">--</span></div>
+
+    <div class="countdown-line">
+      <span>Verbleibende Zeit:</span>
+      <span id="countdown">0</span>
+      <span>Minuten</span>
+    </div>
+  </main>
+
+  <section class="controls" aria-label="Minuten-Timer">
+    <div class="row">
+      <label for="minutes" class="hidden">Minuten</label>
+      <input id="minutes" type="number" min="0" step="1" placeholder="0" inputmode="numeric" />
+      <button id="start">Start</button>
+      <button id="reset" class="hidden">Reset</button>
+    </div>
+  </section>
+
+  <script>
+    function pad(n){ return String(n).padStart(2, '0'); }
+
+    function tickClock(){
+      const now = new Date();
+      document.getElementById('clock').innerHTML =
+        `${pad(now.getHours())}:${pad(now.getMinutes())}<span class="seconds">:${pad(now.getSeconds())}</span>`;
+      document.getElementById('date').textContent =
+        now.toLocaleDateString('de-CH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    tickClock();
+    setInterval(tickClock, 250);
+
+    const minutesInput = document.getElementById('minutes');
+    const startBtn = document.getElementById('start');
+    const resetBtn = document.getElementById('reset');
+    const cdEl = document.getElementById('countdown');
+
+    let cdMinutes = 0;
+    let cdTimer = null;
+
+    function setCountdownDisplay(mins){
+      cdEl.textContent = mins;
+      document.title = `${mins} min — Exam Time`;
+    }
+
+    function setBackgroundDark(){
+      document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-dark');
+    }
+
+    function setBackgroundAlert(){
+      document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-alert');
+    }
+
+    function startCountdown(){
+      const mins = parseInt(minutesInput.value, 10);
+      if (isNaN(mins) || mins <= 0) return;
+      cdMinutes = mins;
+      startBtn.disabled = true;
+      minutesInput.disabled = true;
+      resetBtn.classList.add('hidden');
+      setBackgroundDark();
+      setCountdownDisplay(cdMinutes);
+      cdTimer = setInterval(() => {
+        cdMinutes--;
+        setCountdownDisplay(cdMinutes);
+        if (cdMinutes <= 0){
+          stopCountdown(true);
+          flashDone();
+        }
+      }, 60000);
+    }
+
+    function stopCountdown(completed=false){
+      if (cdTimer){
+        clearInterval(cdTimer);
+        cdTimer = null;
+      }
+      startBtn.disabled = false;
+      minutesInput.disabled = false;
+      if (!completed) setCountdownDisplay(cdMinutes);
+    }
+
+    function flashDone(){
+      setBackgroundAlert();
+      resetBtn.classList.remove('hidden');
+    }
+
+    resetBtn.addEventListener('click', () => {
+      setBackgroundDark();
+      resetBtn.classList.add('hidden');
+    });
+
+    startBtn.addEventListener('click', () => {
+      if (cdTimer) return;
+      startCountdown();
+    });
+
+    minutesInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (!cdTimer) startCountdown();
+      }
+      if (e.key === 'Escape') {
+        stopCountdown();
+      }
+    });
+
+    setCountdownDisplay(0);
+  </script>
+</body>
+</html>
