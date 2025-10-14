@@ -5,29 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>bioTutor – Exemplary Conversations</title>
   <style>
-    body {
-      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    html, body {
+      height: 100%;
+      margin: 0;
       background-color: #f9fafb;
       color: #222;
-      margin: 0;
-      padding: 2rem;
+      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
     }
+
     h1 {
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 0.4rem;
     }
+
     h2 {
       font-size: 1.1rem;
       font-weight: 400;
       color: #555;
       margin-top: 0;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
+
     .button-container {
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
     }
+
     button {
       background-color: #ffffff;
       border: 1px solid #ccc;
@@ -38,28 +51,31 @@
       cursor: pointer;
       transition: all 0.2s ease-in-out;
     }
+
     button:hover {
       background-color: #e5e7eb;
     }
+
     .selected {
       background-color: #dbeafe;
       border-color: #60a5fa;
       font-weight: 600;
     }
+
     iframe {
-      width: 90%;
-      height: 600px;
+      width: 80vw;
+      height: 80vh;
       border: 1px solid #ddd;
       border-radius: 10px;
-      margin-top: 1rem;
       display: none;
     }
+
     .active {
       display: block;
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false" onkeydown="return false" ondragstart="return false">
 
   <h1>🧬 bioTutor</h1>
   <h2>exemplary conversations with the chatbot</h2>
@@ -69,8 +85,14 @@
     <button id="btn-en" onclick="showPDF('en')">English (translated)</button>
   </div>
 
-  <iframe id="pdf-de" src="https://samueltobler.github.io/fw/ai/conv/bioTutor_Conversations_DE.pdf" class="active"></iframe>
-  <iframe id="pdf-en" src="https://samueltobler.github.io/fw/ai/conv/bioTutor_Conversations_EN.pdf"></iframe>
+  <!-- PDF.js viewer ohne Toolbar -->
+  <iframe id="pdf-de"
+    src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://samueltobler.github.io/fw/ai/conv/bioTutor_Conversations_DE.pdf#toolbar=0&navpanes=0&scrollbar=0"
+    class="active"></iframe>
+
+  <iframe id="pdf-en"
+    src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://samueltobler.github.io/fw/ai/conv/bioTutor_Conversations_EN.pdf#toolbar=0&navpanes=0&scrollbar=0">
+  </iframe>
 
   <script>
     function showPDF(lang) {
@@ -82,6 +104,11 @@
       document.getElementById('btn-en').classList.remove('selected');
       document.getElementById('btn-' + lang).classList.add('selected');
     }
+
+    // Zusätzliche Sicherheit gegen Interaktion
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', event => event.preventDefault());
+    document.addEventListener('selectstart', event => event.preventDefault());
   </script>
 
 </body>
