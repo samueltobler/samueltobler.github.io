@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bioTutor – Exemplary Conversations</title>
+  <style>
+    body {
+      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+      background-color: #f9fafb;
+      color: #222;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: #555;
+      margin-top: 0;
+      margin-bottom: 2rem;
+    }
+    .button-container {
+      margin-bottom: 2rem;
+    }
+    button {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      margin: 0 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    button:hover {
+      background-color: #e5e7eb;
+    }
+    .selected {
+      background-color: #dbeafe;
+      border-color: #60a5fa;
+      font-weight: 600;
+    }
+    iframe {
+      width: 90%;
+      height: 600px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-top: 1rem;
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧬 bioTutor</h1>
+  <h2>exemplary conversations with the chatbot</h2>
+
+  <div class="button-container">
+    <button id="btn-de" class="selected" onclick="showPDF('de')">Deutsch</button>
+    <button id="btn-en" onclick="showPDF('en')">English (translated)</button>
+  </div>
+
+  <iframe id="pdf-de" src="bioTutor_Conversations_DE.pdf" class="active"></iframe>
+  <iframe id="pdf-en" src="bioTutor_Conversations_EN.pdf"></iframe>
+
+  <script>
+    function showPDF(lang) {
+      document.getElementById('pdf-de').classList.remove('active');
+      document.getElementById('pdf-en').classList.remove('active');
+      document.getElementById('pdf-' + lang).classList.add('active');
+
+      document.getElementById('btn-de').classList.remove('selected');
+      document.getElementById('btn-en').classList.remove('selected');
+      document.getElementById('btn-' + lang).classList.add('selected');
+    }
+  </script>
+
+</body>
+</html>
