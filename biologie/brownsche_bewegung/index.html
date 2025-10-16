@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de-CH">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fullscreen Bild</title>
+    <style>
+      html, body { height: 100%; margin: 0; background: #000; }
+      img.fullscreen {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover; /* Falls du das ganze Bild sehen willst: contain */
+        object-position: center center;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+      footer {
+        position: fixed;
+        bottom: 5px;
+        width: 100%;
+        text-align: center;
+        font-size: 10px;
+        color: #fff;
+        font-family: sans-serif;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <img class="fullscreen" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Brownianmotion_beads_in_water_spim_video.gif" alt="Vollbild" />
+    <footer>
+      Brownsche Bewegung von fluoreszierenden Latex-Kügelchen. Bild: Jan Wolfgang Krieger (2010).
+    </footer>
+  </body>
+</html>
