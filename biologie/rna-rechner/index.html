@@ -36,10 +36,10 @@
 
     <section class="card row">
       <div class="grid">
-        <div><strong>Leitstrang</strong><span class="pill">5’→3’ (coding)</span></div>
+        <div><strong>Folgestrang</strong><span class="pill">5’→3’ (coding)</span></div>
         <div class="mono" id="lead">–</div>
 
-        <div><strong>Folgestrang</strong><span class="pill">3’→5’ (komplementär)</span></div>
+        <div><strong>Leitstrang</strong><span class="pill">3’→5’ (komplementär)</span></div>
         <div class="mono" id="lag">–</div>
 
         <div><strong>mRNA</strong><span class="pill">5’→3’</span></div>
@@ -51,7 +51,7 @@
   </main>
 
   <script>
-    // Kanonisches DNA-Codon pro Aminosäure (5'→3' des Leitstrangs).
+    // Kanonisches DNA-Codon pro Aminosäure (5'→3' des Folgestrangs).
     const AA_TO_DNA = {
       A:"GCT", C:"TGT", D:"GAT", E:"GAA", F:"TTT",
       G:"GGT", H:"CAT", I:"ATT", K:"AAA", L:"CTG",
@@ -74,7 +74,7 @@
         else bad.push(ch);
       }
       if (!lead) return { lead:"–", lag:"–", mrna:"–", bad };
-      // Folgestrang: komplementär; Orientierung bleibt 3'→5' zur Ausrichtung unter dem Leitstrang.
+      // Leitstrang: komplementär; Orientierung bleibt 3'→5' zur Ausrichtung unter dem Folgestrang.
       const lag = lead.replace(/./g, b => comp[b] || b);
       const mrna = lead.replaceAll("T","U");
       return { lead, lag, mrna, bad };
