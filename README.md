@@ -31,6 +31,9 @@
 - Prüfungsuhr         (https://samueltobler.github.io/biologie/exam-timer)
 
 
+**Q**
+- QR-Code-Generator   (https://samueltobler.github.io/biologie/qr)
+
 **R**
 - RNA-Tool            (https://samueltobler.github.io/biologie/rna-rechner)
 
