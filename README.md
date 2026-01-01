@@ -36,3 +36,6 @@
 
 **S**
 - Statistiken         (https://samueltobler.github.io/biologie/stats)
+
+**Z**
+- Zähler              (https://samueltobbler.github.io/biologie/counter)
