@@ -1,0 +1,13 @@
+name: qrcode
+title: qrcode
+username: gymnasium
+account: gymnasium
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16365723
+bundleId: 11431821
+url: https://gymnasium.shinyapps.io/qrcode/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .Rapp.history|index.html
