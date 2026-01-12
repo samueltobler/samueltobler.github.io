@@ -20,6 +20,8 @@
 **G**
 - Grundumsatz         (https://samueltobler.github.io/biologie/grundumsatz)
 
+**M**
+- Montagsmaler       (https://samueltobler.github.io/biologie/montagsmaler)
 
 **N**
 - Neuron              (https://samueltobler.github.io/biologie/neuron)

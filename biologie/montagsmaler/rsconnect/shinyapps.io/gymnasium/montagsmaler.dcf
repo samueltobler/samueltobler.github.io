@@ -1,0 +1,13 @@
+name: montagsmaler
+title: montagsmaler
+username: gymnasium
+account: gymnasium
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16411232
+bundleId: 11435048
+url: https://gymnasium.shinyapps.io/montagsmaler/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .Rapp.history|.RData|index.html
