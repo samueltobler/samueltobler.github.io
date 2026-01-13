@@ -26,10 +26,34 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      fileInput("file", "CSV hochladen", accept = c(".csv", "text/csv")),
+      radioButtons(
+        "source",
+        "Quelle wählen",
+        choices = c("Gespeicherte Liste" = "saved", "Upload (CSV)" = "upload"),
+        selected = "saved"
+      ),
+      
+      conditionalPanel(
+        condition = "input.source == 'saved'",
+        selectInput(
+          "saved_choice",
+          "Liste auswählen",
+          choices = c(
+            "Fortpflanzung" = "data/montagsmaler_fortpflanzung.csv",
+            "Zellbio" = "data/montagsmaler_zellbiologie.csv"
+          )
+        )
+      ),
+      
+      conditionalPanel(
+        condition = "input.source == 'upload'",
+        fileInput("file", "CSV hochladen", accept = c(".csv", "text/csv"))
+      ),
+      
       tags$hr(),
       verbatimTextOutput("stats")
     ),
+    
     mainPanel(
       div(class = "card", textOutput("word")),
       div(class = "controls",
@@ -43,44 +67,35 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  words <- reactive({
-    req(input$file)
-    
+  read_words_from_csv <- function(path) {
     df <- tryCatch(
-      read.csv(
-        input$file$datapath,
-        header = TRUE,
-        stringsAsFactors = FALSE,
-        sep = ",",
-        check.names = FALSE
-      ),
+      read.csv(path, stringsAsFactors = FALSE, check.names = FALSE),
       error = function(e) NULL
     )
-    
-    if (is.null(df) || nrow(df) == 0) {
-      raw_lines <- readLines(input$file$datapath, warn = FALSE, encoding = "UTF-8")
-      df <- data.frame(V1 = raw_lines, stringsAsFactors = FALSE)
-    }
+    if (is.null(df) || nrow(df) == 0) return(character(0))
     
     x <- paste(unlist(df, use.names = FALSE), collapse = ",")
     parts <- unlist(strsplit(x, "[,;]"))
     
-    if (isTRUE(input$trim)) parts <- trimws(parts)
-    
+    parts <- trimws(parts)
     parts <- parts[!is.na(parts)]
     parts <- parts[parts != ""]
-    
-    if (isTRUE(input$dedup)) parts <- unique(parts)
-    
-    parts
+    unique(parts)
+  }
+  
+  words <- reactive({
+    if (input$source == "saved") {
+      req(input$saved_choice)
+      return(read_words_from_csv(input$saved_choice))
+    } else {
+      req(input$file)
+      return(read_words_from_csv(input$file$datapath))
+    }
   })
   
-  state <- reactiveValues(
-    history = character(0),
-    pos = 0
-  )
+  state <- reactiveValues(history = character(0), pos = 0)
   
-  observeEvent(input$file, {
+  reset_deck <- function() {
     w <- words()
     if (length(w) == 0) {
       state$history <- character(0)
@@ -90,10 +105,13 @@ server <- function(input, output, session) {
     first <- sample(w, 1)
     state$history <- first
     state$pos <- 1
-  })
+  }
+  
+  observeEvent(list(input$source, input$saved_choice, input$file), {
+    reset_deck()
+  }, ignoreInit = TRUE)
   
   observeEvent(input$next_btn, {
-    req(input$file)
     w <- words()
     if (length(w) == 0) return()
     
@@ -112,7 +130,7 @@ server <- function(input, output, session) {
   })
   
   output$word <- renderText({
-    if (state$pos == 0) return("CSV hochladen")
+    if (state$pos == 0) return("Keine Wörter gefunden")
     state$history[state$pos]
   })
   
@@ -122,10 +140,19 @@ server <- function(input, output, session) {
   })
   
   output$stats <- renderText({
-    if (is.null(input$file)) return("Noch kein File geladen.")
     w <- words()
+    
+    src_txt <- if (input$source == "saved") {
+      if (input$saved_choice == "data/montagsmaler_fortpflanzung.csv") "Fortpflanzung"
+      else if (input$saved_choice == "data/montagsmaler_zellbiologie.csv") "Zellbio"
+      else input$saved_choice
+    } else {
+      "Upload"
+    }
+    
     paste0(
-      "Wörter gefunden: ", length(w), "\n"
+      "Quelle: ", src_txt, "\n",
+      "Wörter gefunden: ", length(w)
     )
   })
 }
