@@ -13,7 +13,6 @@
 - EM Bilder           (https://samueltobler.github.io/biologie/em_bilder)
 
 **F**
-- Farewell            (https://samueltobler.github.io/biologie/farewell)
 - Farewell-Board      (https://samueltobler.github.io/biologie)
 
 
