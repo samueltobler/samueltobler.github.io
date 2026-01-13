@@ -125,9 +125,7 @@ server <- function(input, output, session) {
     if (is.null(input$file)) return("Noch kein File geladen.")
     w <- words()
     paste0(
-      "Wörter gefunden: ", length(w), "\n",
-      "Duplikate entfernen: ", if (isTRUE(input$dedup)) "ja" else "nein", "\n",
-      "Trimmen: ", if (isTRUE(input$trim)) "ja" else "nein"
+      "Wörter gefunden: ", length(w), "\n"
     )
   })
 }
