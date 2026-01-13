@@ -5,7 +5,7 @@ account: gymnasium
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16411232
-bundleId: 11438172
+bundleId: 11438176
 url: https://gymnasium.shinyapps.io/montagsmaler/
 version: 1
 asMultiple: FALSE
