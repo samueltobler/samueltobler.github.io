@@ -5,9 +5,9 @@ account: gymnasium
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16411232
-bundleId: 11438176
+bundleId: 11442704
 url: https://gymnasium.shinyapps.io/montagsmaler/
 version: 1
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .Rapp.history|.RData|data/montagsmaler_fortpflanzung.csv|data/montagsmaler_zellbiologie.csv|index.html
+ignoredFiles: .Rapp.history|.RData|data/montagsmaler_fortpflanzung.csv|data/montagsmaler_random.csv|data/montagsmaler_zellbiologie.csv|index.html

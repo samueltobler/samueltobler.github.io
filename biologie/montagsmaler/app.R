@@ -3,6 +3,8 @@ library(shiny)
 library(jsonlite)
 
 ui <- fluidPage(
+  title = "Montagsmaler",
+  
   tags$head(
     tags$style(HTML("
       .card {
@@ -29,6 +31,12 @@ ui <- fluidPage(
     tags$script(HTML("
       Shiny.addCustomMessageHandler('toggleSidebar', function(message) {
         document.body.classList.toggle('sidebar-hidden');
+      });
+
+      Shiny.addCustomMessageHandler('setDisabled', function(message) {
+        var el = document.getElementById(message.id);
+        if (!el) return;
+        el.disabled = !!message.disabled;
       });
     "))
   ),
@@ -104,7 +112,6 @@ server <- function(input, output, session) {
     )
     
     labels <- sub("\\.csv$", "", x$name, ignore.case = TRUE)
-    
     stats::setNames(as.list(raw_urls), labels)
   }
   
@@ -117,13 +124,17 @@ server <- function(input, output, session) {
     if (length(choices) > 0) {
       current <- isolate(input$saved_choice)
       if (is.null(current) || !(current %in% unlist(choices, use.names = FALSE))) {
-        updateSelectInput(session, "saved_choice",
-                          choices = choices,
-                          selected = unlist(choices, use.names = FALSE)[1])
+        updateSelectInput(
+          session, "saved_choice",
+          choices = choices,
+          selected = unlist(choices, use.names = FALSE)[1]
+        )
       } else {
-        updateSelectInput(session, "saved_choice",
-                          choices = choices,
-                          selected = current)
+        updateSelectInput(
+          session, "saved_choice",
+          choices = choices,
+          selected = current
+        )
       }
     } else {
       updateSelectInput(session, "saved_choice", choices = list("Keine CSV gefunden" = ""))
@@ -169,17 +180,17 @@ server <- function(input, output, session) {
     }
   })
   
-  state <- reactiveValues(history = character(0), pos = 0)
+  # Deck: zufällig ohne Zurücklegen
+  state <- reactiveValues(deck = character(0), pos = 0)
   
   reset_deck <- function() {
     w <- words()
     if (length(w) == 0) {
-      state$history <- character(0)
+      state$deck <- character(0)
       state$pos <- 0
       return()
     }
-    first <- sample(w, 1)
-    state$history <- first
+    state$deck <- sample(w, length(w))
     state$pos <- 1
   }
   
@@ -188,17 +199,8 @@ server <- function(input, output, session) {
   }, ignoreInit = TRUE)
   
   observeEvent(input$next_btn, {
-    w <- words()
-    if (length(w) == 0) return()
-    
-    new_word <- sample(w, 1)
-    
-    if (state$pos < length(state$history)) {
-      state$history <- state$history[1:state$pos]
-    }
-    
-    state$history <- c(state$history, new_word)
-    state$pos <- state$pos + 1
+    if (state$pos == 0) return()
+    if (state$pos < length(state$deck)) state$pos <- state$pos + 1
   })
   
   observeEvent(input$prev_btn, {
@@ -210,12 +212,16 @@ server <- function(input, output, session) {
       if (input$source == "upload") return("CSV hochladen")
       return("Liste wählen")
     }
-    state$history[state$pos]
+    state$deck[state$pos]
   })
   
   output$status <- renderText({
     if (state$pos == 0) return("")
-    paste0("Karte ", state$pos, " von ", length(state$history))
+    if (state$pos >= length(state$deck)) {
+      paste0("Karte ", state$pos, " von ", length(state$deck), " (alle Wörter durch)")
+    } else {
+      paste0("Karte ", state$pos, " von ", length(state$deck))
+    }
   })
   
   output$stats <- renderText({
@@ -233,10 +239,24 @@ server <- function(input, output, session) {
       "Upload"
     }
     
+    remaining <- if (state$pos == 0) 0 else max(length(state$deck) - state$pos, 0)
+    
     paste0(
       "Quelle: ", src_txt, "\n",
-      "Wörter gefunden: ", length(w)
+      "Wörter gefunden: ", length(w), "\n",
+      "Übrig: ", remaining
     )
+  })
+  
+  # Buttons deaktivieren/aktivieren
+  observe({
+    # prev deaktivieren, wenn ganz am Anfang oder kein Deck
+    prev_disabled <- (state$pos <= 1)
+    # next deaktivieren, wenn am Ende oder kein Deck
+    next_disabled <- (state$pos == 0) || (state$pos >= length(state$deck))
+    
+    session$sendCustomMessage("setDisabled", list(id = "prev_btn", disabled = prev_disabled))
+    session$sendCustomMessage("setDisabled", list(id = "next_btn", disabled = next_disabled))
   })
   
   observeEvent(input$toggle_sidebar_btn, {
