@@ -19,6 +19,9 @@
 **G**
 - Grundumsatz         (https://samueltobler.github.io/biologie/grundumsatz)
 
+**I**
+- Imposter (Bio-Version)  (https://samueltobler.github.io/biologie/imposter)
+
 **M**
 - Montagsmaler       (https://samueltobler.github.io/biologie/montagsmaler)
 
