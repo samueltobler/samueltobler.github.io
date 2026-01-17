@@ -1,10 +1,13 @@
 # app.R
-# Änderungen:
-# - word_a ist das Hauptwort (für alle Spieler); word_b ist das Hinweiswort (nur für Imposter)
-# - Toggle-Button, ob das Hinweiswort (word_b) dem Imposter angezeigt wird (AN/AUS)
-# - Startspieler bleibt bias-randomisiert; Setup klappt nach Start zu; Spielernamen bleiben bei "Neue Runde"
+# Modernes, mobiles UI (Bootstrap 5 via bslib):
+# - Responsive Layout; grosse Touch-Buttons; klare Typografie
+# - Setup als einklappbares Panel; klappt nach Start automatisch zu
+# - Toggle: Imposter-Hinweiswort (word_b) AN/AUS
+# - Wörter nur im Modal; nie im Haupt-UI
+# - Startspieler bias-randomisiert; Auflösung nur Imposter
 
 library(shiny)
+library(bslib)
 
 default_pairs <- data.frame(
   word_a = c(
@@ -53,27 +56,53 @@ pick_start_index_biased <- function(roles, imposter_start_prob = 0.10) {
 
 `%||%` <- function(a, b) if (!is.null(a)) a else b
 
+theme_modern <- bs_theme(
+  version = 5,
+  bootswatch = "flatly",
+  base_font = font_google("Inter")
+)
+
 ui <- fluidPage(
-  tags$style(HTML("
-    .wrap { max-width: 760px; margin: 0 auto; }
-    .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; }
-    .muted { color: #6b7280; }
-    .btn-wide { width: 100%; }
-    .title { font-weight: 700; font-size: 22px; margin-bottom: 8px; }
-    .step { display:inline-block; padding:4px 10px; border:1px solid #e5e7eb; border-radius:999px; font-size: 12px; }
-    textarea, input { border-radius: 10px !important; }
-    .btn { border-radius: 10px !important; }
-    .setup-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .setup-body { margin-top: 10px; }
-  ")),
-  div(class = "wrap",
-      div(class = "card",
-          div(class = "title", "🧠 Impostor | Bio-Version"),
-          uiOutput("step_badge"),
-          tags$hr(),
-          uiOutput("setup_ui"),
-          tags$hr(),
-          uiOutput("main_ui")
+  theme = theme_modern,
+  tags$head(
+    tags$meta(name = "viewport", content = "width=device-width, initial-scale=1, maximum-scale=1"),
+    tags$style(HTML("
+      :root { --radius: 16px; }
+      body { background: #f6f7fb; }
+      .app-wrap { max-width: 740px; margin: 0 auto; padding: 14px 12px 28px; }
+      .app-title { font-weight: 800; letter-spacing: -0.2px; }
+      .pill { display:inline-flex; align-items:center; gap:8px; border: 1px solid rgba(0,0,0,.08); padding: 6px 10px; border-radius: 999px; font-size: 12px; background: rgba(255,255,255,.7); }
+      .cardish { border-radius: var(--radius) !important; box-shadow: 0 10px 30px rgba(0,0,0,.06); border: 1px solid rgba(0,0,0,.06) !important; }
+      .btn { border-radius: 14px !important; padding: 12px 14px; font-weight: 650; }
+      .btn-wide { width: 100%; }
+      .muted { color: rgba(0,0,0,.6); }
+      .tight p { margin-bottom: .5rem; }
+      textarea.form-control { border-radius: 14px !important; }
+      input.form-control { border-radius: 14px !important; }
+      .modal-content { border-radius: 18px !important; }
+      .word-big { font-size: 30px; font-weight: 850; letter-spacing: -0.3px; }
+      .touch-gap { height: 10px; }
+    "))
+  ),
+  
+  div(class = "app-wrap",
+      div(class = "d-flex align-items-center justify-content-between mb-2",
+          div(
+            tags$div(class = "app-title h3 mb-0", "🤓 Impostor: Bio-Version"),
+          ),
+          uiOutput("step_badge")
+      ),
+      
+      card(
+        class = "cardish",
+        card_body(uiOutput("setup_ui"))
+      ),
+      
+      div(class = "touch-gap"),
+      
+      card(
+        class = "cardish",
+        card_body(uiOutput("main_ui"))
       )
   )
 )
@@ -98,47 +127,50 @@ server <- function(input, output, session) {
   })
   
   output$step_badge <- renderUI({
-    if (!state$started) return(span(class = "step", "Setup"))
+    if (!state$started) return(span(class = "pill", "Setup"))
     n <- length(state$players)
-    if (state$idx >= 1 && state$idx <= n) return(span(class = "step", paste0("Reveal ", state$idx, "/", n)))
-    if (state$idx == n + 1) return(span(class = "step", "Runde läuft"))
-    if (state$idx == n + 2) return(span(class = "step", "Auflösung"))
-    span(class = "step", "Status")
+    if (state$idx >= 1 && state$idx <= n) return(span(class = "pill", paste0("Reveal ", state$idx, "/", n)))
+    if (state$idx == n + 1) return(span(class = "pill", "Runde läuft"))
+    if (state$idx == n + 2) return(span(class = "pill", "Auflösung"))
+    span(class = "pill", "Status")
   })
   
   output$setup_ui <- renderUI({
-    tagList(
-      div(class = "setup-head",
-          tags$h3(style = "margin:0;", "Setup"),
-          actionButton("toggle_setup", if (state$setup_open) "Schliessen" else "Öffnen",
-                       class = "btn btn-default")
-      ),
-      if (state$setup_open) {
-        div(class = "setup-body",
-            textAreaInput(
-              "players",
-              "Spielernamen; ein Name pro Zeile",
-              value = isolate(input$players) %||% paste0("Spieler ", 1:6, collapse = "\n"),
-              rows = 7
-            ),
-            numericInput("n_impostors", "Anzahl Imposters", value = 1, min = 1, step = 1),
-            
-            actionButton(
-              "toggle_imposter_word",
-              if (isTRUE(state$show_imposter_word)) "Imposter-Hinweiswort: AN" else "Imposter-Hinweiswort: AUS",
-              class = if (isTRUE(state$show_imposter_word)) "btn btn-success btn-wide" else "btn btn-default btn-wide"
-            ),
-            tags$p(class = "muted",
-                   "AN: Imposter sieht Hinweis; AUS kein Hinweis."),
-            
-            actionButton("start_round", "Runde starten", class = "btn-primary btn-wide"),
-            tags$div(style = "height:8px;"),
-            actionButton("new_round", "Neue Runde", class = "btn-default btn-wide"),
-            tags$p(class = "muted", style = "margin-top:12px;",
-                   "word_a für Spieler; word_b als Hinweiswort für Imposter; Startspieler randomisiert; Imposter beginnt selten.")
-        )
-      }
+    header <- div(class = "d-flex align-items-center justify-content-between",
+                  tags$h4(class = "mb-0", "Setup"),
+                  actionButton(
+                    "toggle_setup",
+                    if (state$setup_open) "Schliessen" else "Öffnen",
+                    class = "btn btn-outline-secondary"
+                  )
     )
+    
+    body <- NULL
+    if (state$setup_open) {
+      body <- div(
+        class = "mt-3 tight",
+        textAreaInput(
+          "players",
+          "Spielernamen; ein Name pro Zeile",
+          value = isolate(input$players) %||% paste0("Spieler ", 1:6, collapse = "\n"),
+          rows = 7
+        ),
+        numericInput("n_impostors", "Anzahl Imposters", value = 1, min = 1, step = 1),
+        
+        actionButton(
+          "toggle_imposter_word",
+          if (isTRUE(state$show_imposter_word)) "Imposter-Hinweiswort: AN" else "Imposter-Hinweiswort: AUS",
+          class = if (isTRUE(state$show_imposter_word)) "btn btn-success btn-wide" else "btn btn-outline-secondary btn-wide"
+        ),
+        tags$p(class = "muted", "AN: Imposter sieht Hinweis; AUS: Imposter sieht kein Wort."),
+        
+        actionButton("start_round", "Runde starten", class = "btn btn-primary btn-wide"),
+        div(class = "touch-gap"),
+        actionButton("new_round", "Neue Runde", class = "btn btn-outline-secondary btn-wide"),
+      )
+    }
+    
+    tagList(header, body)
   })
   
   observeEvent(input$toggle_setup, {
@@ -194,27 +226,27 @@ server <- function(input, output, session) {
       if (isTRUE(state$show_imposter_word)) {
         body <- tagList(
           tags$h4("Du bist IMPOSTER"),
-          div(style = "font-size:28px; font-weight:800; padding:10px 0;", state$word_imposter),
-          tags$p(class = "muted", "Merke dir das Wort; schliesse danach das Fenster.")
+          div(class = "word-big my-2", state$word_imposter),
+          tags$p(class = "muted mb-0", "Merke dir das Wort; schliesse danach das Fenster.")
         )
       } else {
         body <- tagList(
           tags$h4("Du bist IMPOSTER"),
-          tags$p(class = "muted", "Du bekommst kein Wort; schliesse danach das Fenster.")
+          tags$p(class = "muted mb-0", "Du bekommst kein Wort; schliesse danach das Fenster.")
         )
       }
     } else {
       body <- tagList(
         tags$h4("Dein Wort"),
-        div(style = "font-size:28px; font-weight:800; padding:10px 0;", state$word_player),
-        tags$p(class = "muted", "Merke dir das Wort; schliesse danach das Fenster.")
+        div(class = "word-big my-2", state$word_player),
+        tags$p(class = "muted mb-0", "Merke dir das Wort; schliesse danach das Fenster.")
       )
     }
     
     showModal(modalDialog(
       title = title,
       body,
-      footer = actionButton("close_word", "Ich habe es mir gemerkt", class = "btn-primary"),
+      footer = actionButton("close_word", "Ich habe es mir gemerkt", class = "btn btn-primary btn-wide"),
       size = "m",
       easyClose = FALSE
     ))
@@ -237,11 +269,7 @@ server <- function(input, output, session) {
   observeEvent(input$next_player, {
     req(state$started)
     n <- length(state$players)
-    if (state$idx < n) {
-      state$idx <- state$idx + 1
-    } else {
-      state$idx <- n + 1
-    }
+    state$idx <- if (state$idx < n) state$idx + 1 else n + 1
     removeModal()
   })
   
@@ -254,11 +282,12 @@ server <- function(input, output, session) {
   output$main_ui <- renderUI({
     if (!state$started) {
       return(tagList(
+        tags$h4("So läufts"),
         tags$p(class = "muted",
-               "Ablauf: Gerät herumgeben; jede Person klickt „Wort anzeigen“; Popup schliessen; dann „Nächster Spieler“."),
+               "Gerät herumgeben; jede Person klickt „Wort anzeigen“; Popup schliessen; dann „Nächster Spieler“."),
         tags$ul(
           tags$li("Reihum je ein Hinweiswort sagen; keine direkten Wortteile."),
-          tags$li("Danach Diskussion und Abstimmung; Imposter gewinnt, wenn er nicht entdeckt wird.")
+          tags$li("Dann Diskussion und Abstimmung; Imposter gewinnt; wenn er nicht entdeckt wird.")
         )
       ))
     }
@@ -268,37 +297,40 @@ server <- function(input, output, session) {
     if (state$idx >= 1 && state$idx <= n) {
       player <- state$players[state$idx]
       return(tagList(
-        tags$h3(paste0("Jetzt: ", player)),
-        tags$p(class = "muted", "Nur dieser Person geben; danach sofort weitergeben."),
-        actionButton("reveal_modal", "Wort anzeigen", class = "btn-success btn-wide"),
-        tags$div(style = "height:8px;"),
-        actionButton("next_player", if (state$idx < n) "Nächster Spieler" else "Runde starten",
-                     class = "btn-primary btn-wide"),
+        tags$h4(paste0("Jetzt: ", player)),
+        tags$p(class = "muted", "Nur dieser Person zeigen; danach sofort weitergeben."),
+        actionButton("reveal_modal", "Wort anzeigen", class = "btn btn-success btn-wide"),
+        div(class = "touch-gap"),
+        actionButton(
+          "next_player",
+          if (state$idx < n) "Nächster Spieler" else "Runde starten",
+          class = "btn btn-primary btn-wide"
+        ),
         tags$hr(),
-        tags$p(class = "muted", "Das Wort erscheint nur im Popup und ist danach nicht mehr sichtbar.")
+        tags$p(class = "muted mb-0", "Das Wort erscheint nur im Popup und ist danach nicht mehr sichtbar.")
       ))
     }
     
     if (state$idx == n + 1) {
       return(tagList(
-        tags$h3("Runde läuft"),
+        tags$h4("Runde läuft"),
         tags$p(paste0("Die Runde beginnt bei: ", state$start_player)),
-        actionButton("show_summary", "Auflösung anzeigen", class = "btn-warning btn-wide")
+        actionButton("show_summary", "Auflösung anzeigen", class = "btn btn-warning btn-wide")
       ))
     }
     
     if (state$idx == n + 2) {
       imposters <- state$players[state$roles == "Imposter"]
       return(tagList(
-        tags$h3("Auflösung"),
+        tags$h4("Auflösung"),
         tags$p("Imposter:"),
         tags$ul(lapply(imposters, tags$li)),
         tags$hr(),
-        actionButton("new_round", "Neue Runde", class = "btn-primary btn-wide")
+        actionButton("new_round", "Neue Runde", class = "btn btn-primary btn-wide")
       ))
     }
     
-    tagList(tags$h3("Unbekannter Zustand"))
+    tagList(tags$h4("Unbekannter Zustand"))
   })
 }
 
