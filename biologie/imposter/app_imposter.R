@@ -1,60 +1,58 @@
 # app.R
-# Modernes, mobiles UI (Bootstrap 5 via bslib):
-# - Responsive Layout; grosse Touch-Buttons; klare Typografie
-# - Setup als einklappbares Panel; klappt nach Start automatisch zu
-# - Toggle: Imposter-Hinweiswort (word_b) AN/AUS
-# - Wörter nur im Modal; nie im Haupt-UI
-# - Startspieler bias-randomisiert; Auflösung nur Imposter
 
 library(shiny)
 library(bslib)
 
-default_pairs <- data.frame(
-  word_a = c(
-    "Zelle","DNA","Gen","Chromosom","Vererbung","Mutation","Evolution","Anpassung","Art","Population",
-    "Ökosystem","Lebensraum","Umwelt","Nahrung","Energie","Wasser","Luft","Licht","Wärme","Wachstum",
-    "Fortpflanzung","Entwicklung","Bewegung","Reiz","Sinne","Gesundheit","Krankheit","Abwehr","Immunsystem","Mikroben",
-    "Bakterien","Viren","Pilze","Körper","Organ","Gewebe","Blut","Herz","Atmung","Verdauung",
-    "Stoffwechsel","Gehirn","Nerven","Muskeln","Skelett","Haut","Pflanze","Tier","Mensch","Nahrungskette"
-  ),
-  word_b = c(
-    "Innenwelt","Ursprung","Regel","Ordnung","Tradition","Zufall","Wandel","Tendenz","Gruppe","Menge",
-    "Zusammenspiel","Ort","Einfluss","Routine","Antrieb","Fluss","Umgebung","Hinweis","Faktor","Prozess",
-    "Neustart","Abschnitt","Impuls","Kontakt","Eindruck","Zustand","Störung","Schutz","Alarm","Begleitung",
-    "Spuren","Gerücht","Schatten","Hülle","Bereich","Schicht","Transport","Takt","Rhythmus","Umweg",
-    "Umsetzung","Zentrale","Leitung","Kraft","Gerüst","Mantel","Wachstum","Instinkt","Alltag","Kreislauf"
-  ),
-  stringsAsFactors = FALSE
-)
-
-pick_pair <- function(df) df[sample.int(nrow(df), 1), , drop = FALSE]
+`%||%` <- function(a, b) if (!is.null(a)) a else b
 
 assign_roles <- function(n_players, n_impostors = 1) {
-  n_impostors <- max(1, min(n_players - 1, n_impostors))
+  n_impostors <- max(1L, min(n_players - 1L, as.integer(n_impostors)))
   roles <- rep("Spieler", n_players)
-  roles[sample.int(n_players, n_impostors)] <- "Imposter"
+  roles[sample.int(n_players, n_impostors)] <- "Impostor"
   roles
 }
 
 pick_start_index_biased <- function(roles, imposter_start_prob = 0.10) {
   n <- length(roles)
-  imp_idx <- which(roles == "Imposter")
-  non_idx <- which(roles != "Imposter")
+  imp_idx <- which(roles == "Impostor")
+  non_idx <- which(roles != "Impostor")
   
-  if (length(imp_idx) == 0) return(sample.int(n, 1))
-  if (length(non_idx) == 0) return(sample(imp_idx, 1))
+  if (length(imp_idx) == 0L) return(sample.int(n, 1L))
+  if (length(non_idx) == 0L) return(sample(imp_idx, 1L))
   
   p_imp_each <- imposter_start_prob / length(imp_idx)
   p_non_each <- (1 - imposter_start_prob) / length(non_idx)
   
-  probs <- rep(0, n)
+  probs <- numeric(n)
   probs[imp_idx] <- p_imp_each
   probs[non_idx] <- p_non_each
   
-  sample.int(n, 1, prob = probs)
+  sample.int(n, 1L, prob = probs)
 }
 
-`%||%` <- function(a, b) if (!is.null(a)) a else b
+# GitHub Raw-URLs
+GH_WORD_A <- "https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/biologie/imposter/data/imposter_a.csv"
+GH_WORD_B <- "https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/biologie/imposter/data/imposter_b.csv"
+
+read_word_list <- function(url) {
+  x <- utils::read.csv(url, stringsAsFactors = FALSE, check.names = FALSE)
+  if (ncol(x) < 1L) stop("CSV hat keine Spalten")
+  v <- trimws(as.character(x[[1]]))
+  v <- v[nzchar(v)]
+  v
+}
+
+load_pairs_from_github <- function(url_a = GH_WORD_A, url_b = GH_WORD_B) {
+  a <- read_word_list(url_a)
+  b <- read_word_list(url_b)
+  
+  if (length(a) < 1L || length(b) < 1L) stop("Leere Wortliste")
+  
+  m <- min(length(a), length(b))
+  if (m < 1L) stop("Keine überlappenden Einträge")
+  
+  data.frame(word_a = a[seq_len(m)], word_b = b[seq_len(m)], stringsAsFactors = FALSE)
+}
 
 theme_modern <- bs_theme(
   version = 5,
@@ -64,6 +62,7 @@ theme_modern <- bs_theme(
 
 ui <- fluidPage(
   theme = theme_modern,
+  tags$title("Impostor: Bio-Version"),
   tags$head(
     tags$meta(name = "viewport", content = "width=device-width, initial-scale=1, maximum-scale=1"),
     tags$style(HTML("
@@ -87,30 +86,21 @@ ui <- fluidPage(
   
   div(class = "app-wrap",
       div(class = "d-flex align-items-center justify-content-between mb-2",
-          div(
-            tags$div(class = "app-title h3 mb-0", "🤓 Impostor: Bio-Version"),
-          ),
+          div(tags$div(class = "app-title h3 mb-0", "🤓 Impostor: Bio-Version")),
           uiOutput("step_badge")
       ),
       
-      card(
-        class = "cardish",
-        card_body(uiOutput("setup_ui"))
-      ),
-      
+      card(class = "cardish", card_body(uiOutput("setup_ui"))),
       div(class = "touch-gap"),
-      
-      card(
-        class = "cardish",
-        card_body(uiOutput("main_ui"))
-      )
+      card(class = "cardish", card_body(uiOutput("main_ui")))
   )
 )
 
 server <- function(input, output, session) {
+  
   state <- reactiveValues(
     started = FALSE,
-    idx = 1,
+    idx = 1L,
     players = character(0),
     roles = character(0),
     word_player = "",
@@ -120,8 +110,45 @@ server <- function(input, output, session) {
     show_imposter_word = TRUE
   )
   
+  # Deck-Handling gekapselt (keine reactives nötig; aber sauberer als <<- im globalen Scope)
+  deck_env <- local({
+    e <- new.env(parent = emptyenv())
+    e$pairs <- NULL
+    e$deck <- integer(0)
+    e$pos <- 1L
+    
+    e$init <- function() {
+      e$pairs <- load_pairs_from_github()
+      e$deck <- sample.int(nrow(e$pairs))
+      e$pos <- 1L
+      invisible(TRUE)
+    }
+    
+    e$next_pair <- function() {
+      if (is.null(e$pairs) || !is.data.frame(e$pairs) || nrow(e$pairs) < 1L) {
+        stop("Wortlisten konnten nicht geladen werden; prüfe Internetverbindung oder CSV-Format.")
+      }
+      if (e$pos > length(e$deck)) {
+        e$deck <- sample.int(nrow(e$pairs))
+        e$pos <- 1L
+      }
+      i <- e$deck[e$pos]
+      e$pos <- e$pos + 1L
+      e$pairs[i, , drop = FALSE]
+    }
+    
+    e
+  })
+  
+  # initialer Load; Fehler nur protokollieren, UI reagiert beim Start-Button
+  tryCatch(
+    deck_env$init(),
+    error = function(e) message("Wortlisten konnten nicht geladen werden. Grund: ", conditionMessage(e))
+  )
+  
   get_players <- reactive({
-    p <- trimws(unlist(strsplit(input$players, "\n", fixed = TRUE)))
+    raw <- input$players %||% ""
+    p <- trimws(unlist(strsplit(raw, "\n", fixed = TRUE)))
     p <- p[nzchar(p)]
     unique(p)
   })
@@ -129,9 +156,9 @@ server <- function(input, output, session) {
   output$step_badge <- renderUI({
     if (!state$started) return(span(class = "pill", "Setup"))
     n <- length(state$players)
-    if (state$idx >= 1 && state$idx <= n) return(span(class = "pill", paste0("Reveal ", state$idx, "/", n)))
-    if (state$idx == n + 1) return(span(class = "pill", "Runde läuft"))
-    if (state$idx == n + 2) return(span(class = "pill", "Auflösung"))
+    if (state$idx >= 1L && state$idx <= n) return(span(class = "pill", paste0("Reveal ", state$idx, "/", n)))
+    if (state$idx == n + 1L) return(span(class = "pill", "Runde läuft"))
+    if (state$idx == n + 2L) return(span(class = "pill", "Auflösung"))
     span(class = "pill", "Status")
   })
   
@@ -140,33 +167,33 @@ server <- function(input, output, session) {
                   tags$h4(class = "mb-0", "Setup"),
                   actionButton(
                     "toggle_setup",
-                    if (state$setup_open) "Schliessen" else "Öffnen",
+                    if (isTRUE(state$setup_open)) "Schliessen" else "Öffnen",
                     class = "btn btn-outline-secondary"
                   )
     )
     
     body <- NULL
-    if (state$setup_open) {
+    if (isTRUE(state$setup_open)) {
       body <- div(
         class = "mt-3 tight",
         textAreaInput(
           "players",
           "Spielernamen; ein Name pro Zeile",
-          value = isolate(input$players) %||% paste0("Spieler ", 1:6, collapse = "\n"),
+          value = isolate(input$players) %||% paste0("Person ", 1:3, collapse = "\n"),
           rows = 7
         ),
-        numericInput("n_impostors", "Anzahl Imposters", value = 1, min = 1, step = 1),
+        numericInput("n_impostors", "Anzahl Impostors", value = 1, min = 1, step = 1),
         
         actionButton(
           "toggle_imposter_word",
-          if (isTRUE(state$show_imposter_word)) "Imposter-Hinweiswort: AN" else "Imposter-Hinweiswort: AUS",
+          if (isTRUE(state$show_imposter_word)) "Impostor-Hinweiswort: AN" else "Impostor-Hinweiswort: AUS",
           class = if (isTRUE(state$show_imposter_word)) "btn btn-success btn-wide" else "btn btn-outline-secondary btn-wide"
         ),
-        tags$p(class = "muted", "AN: Imposter sieht Hinweis; AUS: Imposter sieht kein Wort."),
+        tags$p(class = "muted", "AN: Impostor sieht Hinweis; AUS: Impostor sieht kein Wort."),
         
         actionButton("start_round", "Runde starten", class = "btn btn-primary btn-wide"),
         div(class = "touch-gap"),
-        actionButton("new_round", "Neue Runde", class = "btn btn-outline-secondary btn-wide"),
+        actionButton("new_round", "Neue Runde", class = "btn btn-outline-secondary btn-wide")
       )
     }
     
@@ -184,13 +211,29 @@ server <- function(input, output, session) {
   observeEvent(input$start_round, {
     players <- get_players()
     n <- length(players)
-    validate(
-      need(n >= 3, "Mindestens 3 Spieler nötig."),
-      need(input$n_impostors <= n - 1, "Anzahl Imposters muss kleiner als Spielerzahl sein.")
-    )
     
-    pair <- pick_pair(default_pairs)
-    roles <- assign_roles(n, input$n_impostors)
+    n_impostors <- as.integer(input$n_impostors %||% 1L)
+    n_impostors <- max(1L, n_impostors)
+    
+    if (n < 3L) {
+      showNotification("Mindestens 3 Spieler nötig.", type = "error")
+      return()
+    }
+    if (n_impostors > (n - 1L)) {
+      showNotification("Anzahl Impostors muss kleiner als Spielerzahl sein.", type = "error")
+      return()
+    }
+    
+    pair <- tryCatch(
+      deck_env$next_pair(),
+      error = function(e) {
+        showNotification(conditionMessage(e), type = "error")
+        NULL
+      }
+    )
+    if (is.null(pair)) return()
+    
+    roles <- assign_roles(n, n_impostors)
     
     state$word_player <- pair$word_a[1]
     state$word_imposter <- pair$word_b[1]
@@ -198,7 +241,7 @@ server <- function(input, output, session) {
     si <- pick_start_index_biased(roles, imposter_start_prob = 0.10)
     
     state$started <- TRUE
-    state$idx <- 1
+    state$idx <- 1L
     state$players <- players
     state$roles <- roles
     state$start_player <- players[si]
@@ -209,7 +252,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$new_round, {
     state$started <- FALSE
-    state$idx <- 1
+    state$idx <- 1L
     state$players <- character(0)
     state$roles <- character(0)
     state$word_player <- ""
@@ -222,10 +265,10 @@ server <- function(input, output, session) {
   show_word_modal <- function(player_name, role) {
     title <- paste0("Nur für: ", player_name)
     
-    if (role == "Imposter") {
+    if (identical(role, "Impostor")) {
       if (isTRUE(state$show_imposter_word)) {
         body <- tagList(
-          tags$h4("Du bist IMPOSTER"),
+          tags$h4("Du bist IMPOSTOR"),
           div(class = "word-big my-2", state$word_imposter),
           tags$p(class = "muted mb-0", "Merke dir das Wort; schliesse danach das Fenster.")
         )
@@ -255,7 +298,7 @@ server <- function(input, output, session) {
   observeEvent(input$reveal_modal, {
     req(state$started)
     n <- length(state$players)
-    req(state$idx >= 1 && state$idx <= n)
+    req(state$idx >= 1L && state$idx <= n)
     
     player <- state$players[state$idx]
     role <- state$roles[state$idx]
@@ -269,32 +312,31 @@ server <- function(input, output, session) {
   observeEvent(input$next_player, {
     req(state$started)
     n <- length(state$players)
-    state$idx <- if (state$idx < n) state$idx + 1 else n + 1
+    state$idx <- if (state$idx < n) state$idx + 1L else n + 1L
     removeModal()
   })
   
   observeEvent(input$show_summary, {
     req(state$started)
-    state$idx <- length(state$players) + 2
+    state$idx <- length(state$players) + 2L
     removeModal()
   })
   
   output$main_ui <- renderUI({
     if (!state$started) {
       return(tagList(
-        tags$h4("So läufts"),
-        tags$p(class = "muted",
-               "Gerät herumgeben; jede Person klickt „Wort anzeigen“; Popup schliessen; dann „Nächster Spieler“."),
+        tags$h4("Spielanleitung"),
+        tags$p(class = "muted", "Gerät herumgeben; jede Person klickt „Wort anzeigen“; Popup schliessen; dann „Nächster Spieler“."),
         tags$ul(
           tags$li("Reihum je ein Hinweiswort sagen; keine direkten Wortteile."),
-          tags$li("Dann Diskussion und Abstimmung; Imposter gewinnt; wenn er nicht entdeckt wird.")
+          tags$li("Dann Diskussion und Abstimmung; Impostor gewinnt; wenn er nicht entdeckt wird.")
         )
       ))
     }
     
     n <- length(state$players)
     
-    if (state$idx >= 1 && state$idx <= n) {
+    if (state$idx >= 1L && state$idx <= n) {
       player <- state$players[state$idx]
       return(tagList(
         tags$h4(paste0("Jetzt: ", player)),
@@ -311,7 +353,7 @@ server <- function(input, output, session) {
       ))
     }
     
-    if (state$idx == n + 1) {
+    if (state$idx == n + 1L) {
       return(tagList(
         tags$h4("Runde läuft"),
         tags$p(paste0("Die Runde beginnt bei: ", state$start_player)),
@@ -319,11 +361,11 @@ server <- function(input, output, session) {
       ))
     }
     
-    if (state$idx == n + 2) {
-      imposters <- state$players[state$roles == "Imposter"]
+    if (state$idx == n + 2L) {
+      imposters <- state$players[state$roles == "Impostor"]
       return(tagList(
         tags$h4("Auflösung"),
-        tags$p("Imposter:"),
+        tags$p("Impostor:"),
         tags$ul(lapply(imposters, tags$li)),
         tags$hr(),
         actionButton("new_round", "Neue Runde", class = "btn btn-primary btn-wide")
