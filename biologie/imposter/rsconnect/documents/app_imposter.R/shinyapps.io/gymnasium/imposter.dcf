@@ -5,7 +5,7 @@ account: gymnasium
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16449769
-bundleId: 11458554
+bundleId: 11458559
 url: https://gymnasium.shinyapps.io/imposter/
 version: 1
 asMultiple: FALSE
