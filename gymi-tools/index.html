@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gymi-Tools</title>
+  <meta name="description" content="Sammlung moderner Unterrichtstools." />
+
+  <style>
+    :root{
+      --bg1:#f6f8ff;
+      --bg2:#ffffff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --border: rgba(15,23,42,.10);
+      --shadow: 0 18px 55px rgba(2,6,23,.10);
+      --shadow2: 0 10px 30px rgba(2,6,23,.08);
+      --radius: 22px;
+      --focus: rgba(59,130,246,.35);
+      --chip: rgba(2,6,23,.04);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+
+
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+
+      background:
+        radial-gradient(900px 520px at 18% 10%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(900px 520px at 80% 15%, rgba(16,185,129,.14), transparent 60%),
+        radial-gradient(900px 520px at 55% 95%, rgba(168,85,247,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 55%, var(--bg1) 100%);
+
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+
+      line-height:1.45;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+
+    .wrap{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 34px 18px 56px;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 16px;
+      flex-wrap:wrap;
+      padding: 10px 0 18px;
+    }
+
+    .brand{ min-width: 260px; }
+    .title{
+      margin:0;
+      font-size: clamp(30px, 3.2vw, 46px);
+      letter-spacing:-0.02em;
+    }
+
+    .subtitle{
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .subtitle a{
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(15,23,42,.18);
+    }
+    .subtitle a:hover{
+      border-bottom-color: rgba(15,23,42,.35);
+    }
+
+    .intro{
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 62ch;
+      font-size: 14px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 260px;
+      flex: 1;
+      justify-content:flex-end;
+    }
+
+    .search{
+      position:relative;
+      width: min(460px, 100%);
+    }
+
+    .search input{
+      width:100%;
+      padding: 12px 14px 12px 42px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      outline:none;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .search input::placeholder{ color: rgba(71,85,105,.85); }
+
+    .search .icon{
+      position:absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      opacity: .65;
+      pointer-events:none;
+      color: #0f172a;
+    }
+
+    .search input:focus{
+      border-color: rgba(59,130,246,.35);
+      box-shadow: 0 0 0 4px var(--focus), var(--shadow2);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+      padding-bottom: 100px;
+    }
+
+    .card{
+      grid-column: span 4;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      position:relative;
+      cursor: pointer;
+    }
+
+    .card:focus-within{
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .thumbwrap{
+      aspect-ratio: 16/9;
+      width: 100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .thumbimg{
+      width: 92%;
+      height: 92%;
+      object-fit: contain;
+      display:block;
+      filter: drop-shadow(0 14px 30px rgba(2,6,23,.18));
+    }
+
+    .content{
+      padding: 14px 14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .ctitle{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:-0.01em;
+    }
+
+    .chip{
+      font-size: 12px;
+      color: rgba(15,23,42,.70);
+      background: var(--chip);
+      border: 1px solid rgba(15,23,42,.08);
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space:nowrap;
+    }
+
+    .desc{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hit{
+      position:absolute;
+      inset:0;
+      border-radius: inherit;
+      z-index: 5;
+    }
+    .hit:focus{ outline:none; }
+
+    /* klar klickbar */
+    .card, .card .hit { cursor: pointer; }
+
+    /* Hover klar sichtbar (auch wenn Overlay-Link gehovered wird) */
+    @media (hover: hover) and (pointer: fine){
+      .card:hover{
+        transform: translateY(-4px);
+        border-color: rgba(15,23,42,.22);
+        box-shadow: 0 22px 70px rgba(2,6,23,.12);
+      }
+
+      .card:hover .ctitle,
+      .card .hit:hover ~ .content .ctitle{
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .card:hover .chip,
+      .card .hit:hover ~ .content .chip{
+        border-color: rgba(15,23,42,.18);
+      }
+
+      .card::after{
+        content: "↗";
+        position:absolute;
+        top: 10px;
+        right: 12px;
+        width: 30px;
+        height: 30px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius: 999px;
+        background: rgba(255,255,255,.75);
+        border: 1px solid rgba(15,23,42,.10);
+        box-shadow: 0 10px 30px rgba(2,6,23,.08);
+        color: rgba(15,23,42,.70);
+        opacity: 0;
+        transform: translateY(-3px);
+        transition: 160ms ease;
+        pointer-events:none;
+        z-index: 6;
+      }
+
+      .card:hover::after{ opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px){
+      .card{ grid-column: span 6; }
+      .topbar{ justify-content:flex-start; }
+    }
+
+    @media (max-width: 620px){
+      .wrap{ padding-bottom: 44px; }
+      .card{ grid-column: span 12; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .card{ transition:none; }
+      .card::after{ transition:none; }
+    }
+    
+    a.card,
+a.card *{
+  cursor: pointer !important;
+}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1 class="title">Gymi-Tools</h1>
+        <p class="subtitle">von
+          <a href="https://samueltobler.github.io" target="_blank" rel="noopener noreferrer">Samuel Tobler</a>
+        </p>
+        <p class="intro">
+Unterrichtstools fürs Gymi: praktische Helfer wie Prüfungsuhren und Rechner für Prüfungsstatistiken sowie Spiele wie Montagsmaler oder Imposter.        </p>
+      </div>
+
+      <div class="topbar">
+        <div class="search" aria-label="Tools durchsuchen">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M16.3 16.3 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input id="q" type="search" placeholder="Suchen; z.B. Aminosäuren, Noten, Statistik" autocomplete="off" />
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="grid" id="grid" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <script>
+    const q = document.getElementById('q');
+    const grid = document.getElementById('grid');
+
+    const CSV_URL  = "https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/gymi-tools/data.csv";
+    const IMG_BASE = "https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/gymi-tools/img/";
+    const BG_FILES = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png", "bg7.png", "bg8.png"];
+
+    function norm(s){ return (s || '').toLowerCase().trim(); }
+
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function parseSemicolonCSV(text){
+      const lines = text.replace(/\r/g,'').split('\n').filter(l => l.trim().length);
+      if(lines.length < 2) return [];
+      const header = lines[0].split(';').map(h => h.trim());
+
+      const idxTitel  = header.indexOf('Titel');
+      const idxBeschr = header.indexOf('Beschreibung');
+      const idxDatei  = header.indexOf('Datei');
+      const idxLink   = header.indexOf('Link');
+      const idxKat    = header.indexOf('Kategorie');
+
+      return lines.slice(1).map(line => {
+        const cols = line.split(';');
+        return {
+          titel: (cols[idxTitel] ?? '').trim(),
+          beschreibung: (cols[idxBeschr] ?? '').trim(),
+          datei: (cols[idxDatei] ?? '').trim(),
+          link: (cols[idxLink] ?? '').trim(),
+          kategorie: (cols[idxKat] ?? '').trim(),
+        };
+      }).filter(r => r.titel && r.datei && r.link);
+    }
+
+    function shuffleInPlace(arr){
+      for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function pickRandomBgUrl(){
+      const bg = BG_FILES[Math.floor(Math.random() * BG_FILES.length)];
+      return IMG_BASE + bg;
+    }
+
+    function makeCard({ titel, beschreibung, datei, link, kategorie }){
+  const img = IMG_BASE + datei;
+  const tag = kategorie || 'Tool';
+  const bgUrl = pickRandomBgUrl();
+
+  const a = document.createElement('a');
+  a.className = 'card';
+  a.href = link;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.setAttribute('aria-label', `${titel} öffnen`);
+
+  a.dataset.title = titel;
+  a.dataset.desc = beschreibung;
+  a.dataset.kategorie = tag;
+
+  a.innerHTML = `
+    <div class="thumbwrap" style="background-image:url('${escapeHtml(bgUrl)}')">
+      <img class="thumbimg" src="${escapeHtml(img)}" alt="${escapeHtml(titel)}" loading="lazy">
+    </div>
+
+    <div class="content">
+      <div class="row">
+        <h2 class="ctitle">${escapeHtml(titel)}</h2>
+        <span class="chip">${escapeHtml(tag)}</span>
+      </div>
+      <p class="desc">${escapeHtml(beschreibung)}</p>
+    </div>
+  `;
+  return a;
+}
+
+
+    function applyFilter(){
+      const term = norm(q.value);
+      const cards = Array.from(grid.querySelectorAll('.card'));
+      for(const card of cards){
+        const hay = norm(
+          card.dataset.title + ' ' +
+          card.dataset.desc + ' ' +
+          (card.dataset.kategorie || '') + ' ' +
+          card.innerText
+        );
+        card.style.display = (!term || hay.includes(term)) ? '' : 'none';
+      }
+    }
+
+    async function init(){
+      try{
+        const res = await fetch(CSV_URL, { cache: 'no-store' });
+        if(!res.ok) throw new Error(`data.csv nicht gefunden (${res.status})`);
+        const text = await res.text();
+        const rows = parseSemicolonCSV(text);
+
+        shuffleInPlace(rows);
+
+        grid.innerHTML = '';
+        for(const row of rows){
+          grid.appendChild(makeCard(row));
+        }
+        applyFilter();
+      }catch(err){
+        grid.innerHTML = `
+          <div style="grid-column:1/-1;padding:16px;border:1px solid rgba(15,23,42,.10);border-radius:18px;background:rgba(255,255,255,.75);box-shadow:0 10px 30px rgba(2,6,23,.08);color:#0f172a">
+            <strong>Fehler beim Laden der Tools.</strong><br>
+            <span style="color:rgba(71,85,105,.9)">CSV oder Bilder konnten nicht geladen werden.</span>
+          </div>
+        `;
+        console.error(err);
+      }
+    }
+
+    q.addEventListener('input', applyFilter);
+    init();
+  </script>
+</body>
+</html>
