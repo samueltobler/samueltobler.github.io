@@ -56,20 +56,15 @@
       border-top-right-radius: 8px;
       font-size: 0.8rem;
     }
-    .row { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
-    input[type="number"], textarea {
+    .row { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    input[type="number"] {
       background: none; color: var(--fg);
       border: none; border-bottom: 1px solid var(--muted);
-      padding: 4px 2px; outline: none;
-    }
-    input[type="number"] {
-      font-size: 0.9rem;
-      text-align: right; width: 50px;
+      padding: 4px 2px; font-size: 0.9rem; text-align: right; outline: none; width: 50px;
       -moz-appearance: textfield;
     }
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
     button {
       background: none; color: var(--fg);
       border: 1px solid var(--muted);
@@ -77,8 +72,7 @@
     }
     button:disabled { opacity: .5; cursor: default; }
 
-    .hidden { display: none !important; }
-
+    /* Schlichte Icon-Buttons unten (ohne Kreis) */
     .icon-btn {
       position: absolute; bottom: 10px;
       background: none; border: none; color: var(--fg);
@@ -89,50 +83,29 @@
     #toggleLayout { left: 10px; }
     #toggleSeconds { right: 10px; }
 
+    /* Layout-Wechsel: nur die Zahl gross, Labels klein */
     body.alt-layout .time { font-size: clamp(2rem, 6vw, 4rem); }
     body.alt-layout .date { font-size: clamp(0.9rem, 1.6vw, 1.1rem); }
+    /* Grundgrösse der Countdown-Zeile klein halten */
     body.alt-layout .countdown-line { font-size: clamp(1rem, 2.5vw, 1.4rem); gap: 10px; }
+    /* Nur die Zahl gross ziehen */
     body.alt-layout #countdown {
       font-size: clamp(5rem, 15vw, 12rem);
       font-weight: 700;
       line-height: 1.05;
       font-variant-numeric: tabular-nums;
     }
-
-    .notes-panel {
-      width: min(720px, calc(100% - 24px));
-      margin: 10px auto 0;
-      background: rgba(0,0,0,0.15);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px;
-      padding: 10px;
-      text-align: left;
-    }
-    .notes-panel textarea {
-      width: 100%;
-      min-height: 110px;
-      border-bottom: 1px solid rgba(255,255,255,0.0);
-      resize: vertical;
-      font-family: inherit;
-      font-size: 1.1rem;
-      line-height: 1.35;
-      padding: 8px 6px;
-    }
   </style>
 </head>
 <body>
   <main class="wrap" role="main">
     <div class="date" id="date"></div>
-    <div class="time" id="clock" aria-live="polite">--:--</div>
+    <div class="time" id="clock" aria-live="polite">--:--<span class="seconds">--</span></div>
 
     <div class="countdown-line" aria-live="polite">
       <span>Verbleibende Zeit:</span>
       <span id="countdown">0</span>
       <span>Minuten</span>
-    </div>
-
-    <div id="notesPanel" class="notes-panel hidden" aria-label="Notizen">
-      <textarea id="notes" placeholder="Notizen eingeben ..."></textarea>
     </div>
   </main>
 
@@ -142,18 +115,17 @@
       <input id="minutes" type="number" min="0" step="1" placeholder="0" inputmode="numeric" />
       <button id="start">Start</button>
       <button id="reset" class="hidden">Reset</button>
-
-      <button id="toggleNotes" type="button" aria-expanded="false">Notizen</button>
     </div>
   </section>
 
+  <!-- Icon-Buttons ohne Kreis -->
   <button class="icon-btn" id="toggleLayout" title="Layout wechseln" aria-label="Layout wechseln">↺</button>
-  <button class="icon-btn" id="toggleSeconds" title="Sekunden ein-/ausblenden" aria-label="Sekunden ein- oder ausblenden">⧖</button>
+  <button class="icon-btn" id="toggleSeconds" title="Sekunden ein-/ausblenden" aria-label="Sekunden ein- oder ausblenden">x</button>
 
   <script>
     function pad(n){ return String(n).padStart(2, '0'); }
 
-    let showSeconds = false;
+    let showSeconds = true;
 
     function tickClock(){
       const now = new Date();
@@ -170,12 +142,8 @@
     const startBtn = document.getElementById('start');
     const resetBtn = document.getElementById('reset');
     const cdEl = document.getElementById('countdown');
-    const toggleSecondsBtn = document.getElementById('toggleSeconds');
+    const toggleBtn = document.getElementById('toggleSeconds');
     const layoutBtn = document.getElementById('toggleLayout');
-
-    const toggleNotesBtn = document.getElementById('toggleNotes');
-    const notesPanel = document.getElementById('notesPanel');
-    const notes = document.getElementById('notes');
 
     let cdMinutes = 0;
     let cdTimer = null;
@@ -243,19 +211,13 @@
       if (e.key === 'Escape') { stopCountdown(); }
     });
 
-    toggleSecondsBtn.addEventListener('click', () => {
+    toggleBtn.addEventListener('click', () => {
       showSeconds = !showSeconds;
       tickClock();
     });
 
     layoutBtn.addEventListener('click', () => {
       document.body.classList.toggle('alt-layout');
-    });
-
-    toggleNotesBtn.addEventListener('click', () => {
-      const isHidden = notesPanel.classList.toggle('hidden');
-      toggleNotesBtn.setAttribute('aria-expanded', String(!isHidden));
-      if (!isHidden) notes.focus();
     });
 
     setCountdownDisplay(0);
