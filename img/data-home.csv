@@ -1,12 +1,2 @@
 Titel;Beschreibung;Datei;Link;Kategorie
-Aminosäuren-Rechner;Wandelt DNA-Sequenzen in RNA und Protein um und hilft bei Genetik und Translation.;aminosauren.png;https://samueltobler.github.io/biologie/rna-rechner;Biologie
-Zähler;Zählt Daten einfach und schnell und eignet sich für Strichlisten und Live-Auswertungen.;counter.png;https://samueltobler.github.io/biologie/counter;Tool
-Grundumsatzrechner;Berechnet den Grundumsatz anhand von Körperdaten und gibt einen schnellen Überblick.;grundumsatz.png;https://samueltobler.github.io/biologie/grundumsatz;Biologie
-Imposter (Bio-Version);Impostor-Spiel mit Biobegriffen für spielerische Repetition und Einstieg.;impostor.png;https://samueltobler.github.io/biologie/imposter;Spiel
-Montagsmaler;Montagsmaler mit Biobegriffen zum Zeichnen und Begriffe erraten als Repetition.;montagsmaler.png;https://samueltobler.github.io/biologie/montagsmaler;Spiel
-Notenrechner;Notenberechnung nur mit Punkten für schnelle und klare Ergebnisse.;notenrechner.png;https://samueltobler.github.io/biologie/notenrechner;Tool
-Plagiat-Check;Vergleicht Texte auf Ähnlichkeiten und zeigt mögliche Übereinstimmungen.;plagiatscan.png;https://samueltobler.github.io/biologie/similarity;Tool
-Prüfungsuhr;Timer für Prüfungen mit klarer Anzeige und einfacher Zeitübersicht.;pruefungsuhr.png;https://samueltobler.github.io/biologie/exam-timer;Tool
-QR-Code-Generator;Erstellt QR-Codes kostenlos und ohne Weiterleitung für Links oder kurze Texte.;qrcode.png;https://samueltobler.github.io/biologie/qr;Tool
-Teststatistik;Berechnet Mittelwert, Median, Spannweite und Streuung und zeigt Resultate übersichtlich.;teststatistik.png;https://samueltobler.github.io/biologie/stats;Tool
-Automatisierte statistische Testanalyse;Berechnet Kennwerte und Noten und liefert Statistik zu Prüfungsfragen und Reliabilität des Gesamttests.;asta.png;https://samueltobler.shinyapps.io/ASTA/;Tool
+AI in Education;  bioTutor: An AI-powered chatbot for personalized biology education; https://samueltobler.github.io/fw/ai; ai.png; Research 
