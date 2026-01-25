@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blutgruppen-Spendercheck</title>
+  <meta name="description" content="Minimalistische Übung: passende Erythrozyten-Spenderblutgruppen eingeben und prüfen." />
+  <meta property="og:title" content="Blutgruppen-Spendercheck" />
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --card:#f8fafc;
+      --line:#e2e8f0;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 50% -10%, #f1f5f9 0%, var(--bg) 55%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .wrap{width:min(520px, 100%)}
+    .card{
+      background: rgba(255,255,255,0.9);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      backdrop-filter: blur(8px);
+    }
+    .grid{display:grid; gap:12px}
+    .recipient{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      text-align:center;
+    }
+    .recipient .value{
+      font-size: clamp(44px, 8vw, 64px);
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .recipient .hint{
+      margin-top:8px;
+      color:var(--muted);
+      font-size: 12.5px;
+    }
+    input{
+      width:100%;
+      font-size:16px;
+      padding:14px 14px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background:#fff;
+      outline:none;
+      transition: border-color 120ms ease;
+    }
+    input:focus{border-color:#94a3b8}
+    .row{display:flex; gap:10px}
+    button{
+      flex:1;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 14px;
+      padding:12px 14px;
+      font-size:15px;
+      font-weight:650;
+      cursor:pointer;
+      transition: transform 80ms ease, background 120ms ease, border-color 120ms ease;
+      touch-action: manipulation;
+      user-select:none;
+    }
+    button:active{transform: scale(0.99)}
+    #checkBtn{
+      background:#0f172a;
+      color:#fff;
+      border-color:#0f172a;
+    }
+    #infoBtn{background:#fff; color:var(--text)}
+    .result{
+      min-height: 22px;
+      font-size: 14px;
+      font-weight: 650;
+      text-align:center;
+    }
+    .result.good{color:var(--good)}
+    .result.bad{color:var(--bad)}
+    .solution{
+      min-height: 22px;
+      font-size: 14px;
+      color: var(--muted);
+      text-align:center;
+      word-break: break-word;
+    }
+    .modal{
+      position:fixed;
+      inset:0;
+      background: rgba(2,6,23,0.45);
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding: 14px;
+    }
+    .modal[open]{display:flex}
+    .sheet{
+      width:min(520px, 100%);
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .sheet p{
+      margin:0;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .sheet button{margin-top: 12px; width:100%}
+    .sr-only{
+      position:absolute;
+      width:1px;height:1px;
+      padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0,0,0,0);
+      white-space:nowrap;border:0;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="grid">
+        <div class="recipient" role="group" aria-label="Empfängerblutgruppe">
+          <div class="value" id="recipient">–</div>
+          <div class="hint" aria-hidden="true">Tippen für neue Zufallsblutgruppe</div>
+        </div>
+
+        <label class="sr-only" for="answer">Antwort</label>
+        <input
+          id="answer"
+          inputmode="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          placeholder="Antwort eingeben"
+          aria-label="Passende Spenderblutgruppen eingeben"
+        />
+
+        <div class="row">
+          <button id="checkBtn" type="button">Prüfen</button>
+          <button id="infoBtn" type="button">Anleitung</button>
+        </div>
+
+        <div id="result" class="result" aria-live="polite"></div>
+        <div id="solution" class="solution" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Info">
+    <div class="sheet">
+      <p>
+        Diese App zeigt eine zufällige Blutgruppe (Empfänger:in) und prüft, ob deine Eingabe die passenden Erythrozyten-Spenderblutgruppen enthält.
+        <br><br>
+        Anleitung:
+        <br>1) Blutgruppe oben ablesen.
+        <br>2) Im Eingabefeld alle Blutgruppen eingeben, die Erythrozyten spenden können.
+        <br>3) Mehrere Antworten mit Komma trennen (z.B. 0-, 0+).
+        <br>4) Auf „Prüfen“ tippen; danach erscheint „Richtig/Falsch“ und die Lösung.
+        <br>5) Für eine neue Aufgabe oben auf die Blutgruppe tippen.
+      </p>
+      <button type="button" id="closeModal">Schliessen</button>
+    </div>
+  </div>
+
+  <script>
+    const ORDER = ["0-","0+","A-","A+","B-","B+","AB-","AB+"];
+
+    function parseGroup(s){
+      const raw = (s || "").toUpperCase().trim().replace(/\s+/g,"");
+      if(!raw) return null;
+
+      const normalized = raw.replace(/^O/,"0");
+      const rh = normalized.endsWith("+") ? "+" : (normalized.endsWith("-") ? "-" : null);
+      if(!rh) return null;
+
+      const abo = normalized.slice(0, -1);
+      if(!["0","A","B","AB"].includes(abo)) return null;
+
+      return { abo, rh, label: abo + rh };
+    }
+
+    function antigensABO(abo){
+      if(abo === "0") return new Set();
+      if(abo === "A") return new Set(["A"]);
+      if(abo === "B") return new Set(["B"]);
+      return new Set(["A","B"]);
+    }
+
+    function canDonateRBC(donor, recipient){
+      const d = antigensABO(donor.abo);
+      const r = antigensABO(recipient.abo);
+      for(const a of d){ if(!r.has(a)) return false; }
+
+      if(donor.rh === "+") return recipient.rh === "+";
+      return true;
+    }
+
+    function donorsFor(recipient){
+      const all = ORDER.map(parseGroup).filter(Boolean);
+      return all.filter(d => canDonateRBC(d, recipient)).map(d => d.label);
+    }
+
+    function normaliseAnswer(text){
+      const parts = (text || "")
+        .toUpperCase()
+        .replace(/O/g,"0")
+        .split(/[,;\n]+/g)
+        .map(x => x.trim().replace(/\s+/g,""))
+        .filter(Boolean);
+
+      const cleaned = [];
+      for(const p of parts){
+        const g = parseGroup(p);
+        if(g) cleaned.push(g.label);
+      }
+      return Array.from(new Set(cleaned));
+    }
+
+    function sameSet(a, b){
+      if(a.length !== b.length) return false;
+      const sa = new Set(a);
+      for(const x of b){ if(!sa.has(x)) return false; }
+      return true;
+    }
+
+    const elRecipient = document.getElementById("recipient");
+    const elAnswer = document.getElementById("answer");
+    const elResult = document.getElementById("result");
+    const elSolution = document.getElementById("solution");
+    const btnCheck = document.getElementById("checkBtn");
+    const btnInfo = document.getElementById("infoBtn");
+    const modal = document.getElementById("modal");
+    const btnClose = document.getElementById("closeModal");
+
+    let currentRecipient = null;
+    let currentSolution = [];
+
+    function newRound(){
+      const rnd = ORDER[Math.floor(Math.random() * ORDER.length)];
+      currentRecipient = parseGroup(rnd);
+      currentSolution = donorsFor(currentRecipient);
+
+      elRecipient.textContent = currentRecipient.label;
+      elAnswer.value = "";
+      elResult.textContent = "";
+      elResult.className = "result";
+      elSolution.textContent = "";
+      setTimeout(() => elAnswer.focus(), 50);
+    }
+
+    function check(){
+      const ans = normaliseAnswer(elAnswer.value);
+      const sol = [...currentSolution];
+      const ok = sameSet(ans, sol);
+
+      elResult.textContent = ok ? "Richtig" : "Falsch";
+      elResult.className = "result " + (ok ? "good" : "bad");
+
+      const solSorted = ORDER.filter(x => sol.includes(x));
+      elSolution.textContent = "Lösung: " + solSorted.join(", ");
+    }
+
+    btnCheck.addEventListener("click", check);
+
+    elAnswer.addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){
+        e.preventDefault();
+        check();
+      }
+    });
+
+    elRecipient.addEventListener("click", newRound);
+
+    btnInfo.addEventListener("click", () => {
+      modal.setAttribute("open", "");
+      btnClose.focus();
+    });
+
+    btnClose.addEventListener("click", () => {
+      modal.removeAttribute("open");
+      btnInfo.focus();
+    });
+
+    modal.addEventListener("click", (e) => {
+      if(e.target === modal){
+        modal.removeAttribute("open");
+        btnInfo.focus();
+      }
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "Escape" && modal.hasAttribute("open")){
+        modal.removeAttribute("open");
+        btnInfo.focus();
+      }
+    });
+
+    newRound();
+  </script>
+</body>
+</html>
