@@ -10,4 +10,4 @@ Prüfungsuhr;Timer für Prüfungen mit klarer Anzeige und einfacher Zeitübersic
 QR-Code-Generator;Erstellt QR-Codes kostenlos und ohne Weiterleitung für Links oder kurze Texte.;qrcode.png;https://samueltobler.github.io/biologie/qr;Tool
 Teststatistik;Berechnet Mittelwert, Median, Spannweite und Streuung und zeigt Resultate übersichtlich.;teststatistik.png;https://samueltobler.github.io/biologie/stats;Tool
 Automatisierte statistische Testanalyse;Berechnet Kennwerte und Noten und liefert Statistik zu Prüfungsfragen und Reliabilität des Gesamttests.;asta.png;https://samueltobler.shinyapps.io/ASTA/;Tool
-Blutgruppen; Zeigt eine zufällige Blutgruppe an und ermöglicht das Üben der passenden Erythrozyten-Spenderblutgruppen mit sofortiger Kontrolle und Lösung.;blutgruppen.png; https://samueltobler.github.io/biologie/blutgruppen/;Tool
+Blutgruppen; Zeigt eine zufällige Blutgruppe an und ermöglicht das Üben der passenden Erythrozyten-Spenderblutgruppen mit sofortiger Kontrolle und Lösung. Entwickelt in Zusammenarbeit mit Laura Mazza.;blutgruppen.png; https://samueltobler.github.io/biologie/blutgruppen/;Tool
