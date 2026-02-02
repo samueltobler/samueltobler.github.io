@@ -92,8 +92,21 @@ ui <- fluidPage(
       
       card(class = "cardish", card_body(uiOutput("setup_ui"))),
       div(class = "touch-gap"),
-      card(class = "cardish", card_body(uiOutput("main_ui")))
+      card(class = "cardish", card_body(uiOutput("main_ui"))),
+      
+      tags$footer(
+        class = "mt-4 text-center muted",
+        tags$small(
+          style = "font-size: 0.75em;",
+          HTML(
+            'by <a href="https://samueltobler.github.io" target="_blank" rel="noopener">Samuel Tobler</a> | 
+       <a href="https://samueltobler.github.io/gymi-tools" target="_blank" rel="noopener">Gymi-Tools</a>'
+          )
+        )
+      )
+      
   )
+  
 )
 
 server <- function(input, output, session) {
