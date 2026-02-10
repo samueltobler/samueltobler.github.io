@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Muskelkontraktion - Querbrückenzyklus</title>
+
+  <style>
+    :root{
+      --bg:#f5f5f7;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --accent:#2563eb;
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1000px;
+      margin:0 auto;
+      padding:24px 16px 40px;
+    }
+
+    h1{
+      font-size:22px;
+      margin:0 0 6px 0;
+      font-weight:600;
+    }
+
+    .subtitle{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:18px;
+      max-width:720px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap:16px;
+    }
+
+    @media (max-width:900px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+    }
+
+    .viewer{padding:12px}
+
+    .stage{
+      position:relative;
+      width:100%;
+      aspect-ratio:16/10;
+      background:#ffffff;
+      border:1px solid var(--border);
+      border-radius:12px;
+      overflow:hidden;
+    }
+
+    .stage img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      opacity:0;
+      transition:opacity 200ms ease;
+    }
+
+    .stage img.active{opacity:1}
+
+    .controls{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:12px;
+      gap:12px;
+    }
+
+    button{
+      border:1px solid var(--border);
+      background:#ffffff;
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:14px;
+      cursor:pointer;
+    }
+
+    button.primary{
+      border-color:var(--accent);
+      color:var(--accent);
+    }
+
+    .counter{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .panel{
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .panel strong{
+      font-size:15px;
+      font-weight:600;
+    }
+
+    .panel span{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .panel p{
+      margin:0;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    /* Footer Credit */
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <h1>Muskelkontraktion - Querbrückenzyklus</h1>
+
+    <div class="subtitle">
+      Interaktive Schritt-für-Schritt-Darstellung des Querbrückenzyklus zwischen Myosin und Aktin während der Muskelkontraktion.
+    </div>
+
+    <div class="grid">
+
+      <section class="card viewer">
+        <div class="stage" id="stage">
+          <img src="https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/biologie/muskelkontraktion/img/Folie1.jpeg" class="active">
+          <img src="https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/biologie/muskelkontraktion/img/Folie2.jpeg">
+          <img src="https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/biologie/muskelkontraktion/img/Folie3.jpeg">
+          <img src="https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/biologie/muskelkontraktion/img/Folie4.jpeg">
+          <img src="https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/biologie/muskelkontraktion/img/Folie5.jpeg">
+        </div>
+
+        <div class="controls">
+          <button id="prevBtn">Zurück</button>
+          <div class="counter" id="counter">Schritt 1/5</div>
+          <button id="nextBtn" class="primary">Weiter</button>
+        </div>
+      </section>
+
+      <aside class="card panel">
+        <strong id="stepTitle">Schritt 1</strong>
+        <span id="stepSub"></span>
+        <p id="stepText"></p>
+      </aside>
+
+    </div>
+
+    <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+
+  </div>
+
+<script>
+const steps = [
+  {
+    sub:"Myosinkopf vorgeladen (ADP + Pi)",
+    text:"Der Myosinkopf ist mit ADP und anorganischem Phosphat (Pi) gebunden, gespannt und bereit, an das Aktinfilament zu binden."
+  },
+  {
+    sub:"Ca²⁺-Signal",
+    text:"Calcium-Ionen binden an Troponin. Tropomyosin verschiebt sich und gibt die Bindungsstellen auf dem Aktin frei."
+  },
+  {
+    sub:"Kraftschlag",
+    text:"Der Myosinkopf bindet an Aktin, gibt Pi und ADP ab und zieht das Aktinfilament in Richtung Sarkomermitte."
+  },
+  {
+    sub:"ATP bindet",
+    text:"ATP bindet an den Myosinkopf und verringert die Bindung an Aktin."
+  },
+  {
+    sub:"Lösung & Reset",
+    text:"Aktin und Myosin lösen sich. ATP wird gespalten und spannt den Myosinkopf erneut vor."
+  }
+];
+
+const imgs = document.querySelectorAll("#stage img");
+const title = document.getElementById("stepTitle");
+const sub = document.getElementById("stepSub");
+const text = document.getElementById("stepText");
+const counter = document.getElementById("counter");
+
+let i = 0;
+
+function render(){
+  imgs.forEach((img,idx)=>img.classList.toggle("active", idx===i));
+  title.textContent = "Schritt " + (i+1);
+  sub.textContent = steps[i].sub;
+  text.textContent = steps[i].text;
+  counter.textContent = "Schritt " + (i+1) + "/" + steps.length;
+}
+
+function next(){ i = (i+1)%steps.length; render(); }
+function prev(){ i = (i-1+steps.length)%steps.length; render(); }
+
+prevBtn.onclick = prev;
+nextBtn.onclick = next;
+
+document.addEventListener("keydown", e=>{
+  if(e.key==="ArrowRight"||e.key===" "||e.key==="Enter"){e.preventDefault();next();}
+  if(e.key==="ArrowLeft"){e.preventDefault();prev();}
+});
+
+render();
+</script>
+
+</body>
+</html>
