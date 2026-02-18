@@ -1,0 +1,90 @@
+<html>
+<head>
+<title>Übersicht über die Organellen</title>
+<style type="text/css">
+<!--
+body,html{
+  margin:0px;
+  padding:0px;
+  height:100%;
+  overflow:auto;
+  font-family:  arial, sans-serif;
+}
+-->
+
+</style>
+
+<script type="text/javascript" src="SCORM_API_wrapper.js"></script>
+
+<script type="text/javascript">
+
+//creating shortcut for less verbose code
+var scorm = pipwerks.SCORM;
+
+function init(){
+//	scorm.version = "1.2"; // auto if not specified
+	scorm.init();
+}
+
+function set(param, value){
+	scorm.set(param, value);
+}
+
+function get(param){
+	scorm.get(param);
+}
+
+function end(){
+	scorm.quit();
+}
+
+window.onload = function (){
+	init();
+}
+
+window.onunload = function (){
+	end();
+}
+
+var onmessage = function(e) { 
+ var a = e.data.split ? e.data.split("|") : [""];
+ if(a[0] == "AppChecked" && parseInt(a[a.length-1])<= 2){ 
+  var value = parseInt(a[a.length-2]);
+  if(value > 0 && value <= 100 && a[a.length-2].indexOf(";") == -1){
+    scorm.status("set", "completed");
+    scorm.set("cmi.core.score.raw",value+"");
+    scorm.set("cmi.core.score.min","0");
+    scorm.set("cmi.core.score.max","100");
+    scorm.set("cmi.core.score.scaled","1");
+    scorm.set("cmi.success_status", "passed");
+    scorm.save();  
+  }
+ }
+ if(a[0] == "AppSolved" && parseInt(a[a.length-1])<= 2){ 
+  scorm.status("set", "completed");
+  scorm.set("cmi.core.score.raw",a[2]); // 100 or a defined value
+  scorm.set("cmi.core.score.min","0");
+  scorm.set("cmi.core.score.max","100");
+  scorm.set("cmi.core.score.scaled","1");
+  scorm.set("cmi.success_status", "passed");
+  scorm.save();  
+ }
+} 
+ 
+if(typeof window.addEventListener != 'undefined') { 
+ window.addEventListener('message', onmessage, false); 
+} 
+else if(typeof window.attachEvent != 'undefined') { 
+ window.attachEvent('onmessage', onmessage); 
+}
+</script>
+
+</head>
+
+<body>
+<div style="width:100%;height:100%;overflow:hidden">
+<iframe id="frame" src ="https://LearningApps.org/show?id=phq7m5fhk25&fullscreen=1" frameborder="0" width="100%" height="100%"></iframe>
+</div>
+</body>
+
+</html>
