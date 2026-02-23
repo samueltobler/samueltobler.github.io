@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gruppen-Generator</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:rgba(0,0,0,0.55);
+      --border:rgba(0,0,0,0.10);
+      --shadow:0 12px 30px rgba(0,0,0,0.08);
+      --radius:16px;
+      --focus:rgba(17, 24, 39, 0.18);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1000px 700px at 20% 10%, #ffffff 0%, var(--bg) 55%, #eef0f7 100%);
+      min-height:100vh;
+    }
+    .wrap{max-width:1000px;margin:0 auto;padding:34px 18px 22px}
+    header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+    h1{margin:0;font-size:28px;letter-spacing:-0.02em;line-height:1.1}
+    .hint{margin-top:6px;font-size:13px;color:var(--muted);line-height:1.45;max-width:62ch}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:16px}
+    @media (max-width:860px){.grid{grid-template-columns:1fr}header{flex-direction:column}}
+    .panel{padding:18px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}
+    textarea{
+      width:100%;min-height:320px;resize:vertical;border-radius:14px;border:1px solid var(--border);
+      padding:12px 12px;font-size:14px;line-height:1.5;outline:none;background:#fff
+    }
+    textarea:focus,input:focus{border-color:rgba(17,24,39,0.22);box-shadow:0 0 0 4px var(--focus)}
+    .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:12px}
+    .field{flex:1;min-width:180px}
+    input[type="number"]{
+      width:100%;border-radius:12px;border:1px solid var(--border);padding:10px 10px;font-size:14px;outline:none;background:#fff
+    }
+    .btn{
+      appearance:none;border:none;border-radius:12px;padding:11px 14px;font-size:14px;cursor:pointer;background:var(--text);color:#fff;
+      transition:transform .06s ease, opacity .12s ease;white-space:nowrap
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .meta{margin-top:10px;font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+    .pill{border:1px solid var(--border);padding:5px 10px;border-radius:999px;background:rgba(255,255,255,0.6)}
+    .out{padding:18px;min-height:420px;display:flex;flex-direction:column}
+    .out-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+    .out-title{margin:0;font-size:16px;letter-spacing:-0.01em}
+    .groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:6px}
+    @media (max-width:560px){.groups{grid-template-columns:1fr}}
+    .group{border:1px solid var(--border);border-radius:14px;padding:12px 12px 10px;background:rgba(255,255,255,0.75)}
+    .group h3{margin:0 0 8px;font-size:13px;color:rgba(0,0,0,0.72);letter-spacing:0.02em;text-transform:uppercase}
+    .names{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+    .tag{display:inline-flex;align-items:center;border:1px solid var(--border);background:#fff;border-radius:999px;padding:6px 10px;font-size:13px;line-height:1}
+    .empty{
+      margin-top:18px;color:var(--muted);font-size:13px;line-height:1.45;border:1px dashed rgba(0,0,0,0.18);
+      border-radius:14px;padding:14px;background:rgba(255,255,255,0.55)
+    }
+    .toast{
+      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(17,24,39,0.94);color:#fff;
+      padding:10px 12px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(-2px)}
+
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+    .footer a:hover{
+      text-decoration:underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Gruppen-Generator</h1>
+        <div class="hint">Ein Tool, um automatisch zufällige Gruppen zu generieren. </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card panel" aria-label="Eingaben">
+        <label for="names">Namen (eine Person pro Zeile oder mit Komma getrennt)</label>
+        <textarea id="names" placeholder="z.B.&#10;Aylin&#10;Ben&#10;Chiara&#10;Diego"></textarea>
+
+        <div class="row">
+          <div class="field">
+            <label for="groupCount">Anzahl Gruppen</label>
+            <input id="groupCount" type="number" min="1" step="1" inputmode="numeric" value="3" />
+          </div>
+
+          <button class="btn" id="makeBtn">Gruppen bilden</button>
+          <button class="btn secondary" id="shuffleBtn" title="Nur neu mischen; gleiche Anzahl Gruppen">Neu mischen</button>
+          <button class="btn secondary" id="clearBtn">Leeren</button>
+        </div>
+
+        <div class="meta" aria-live="polite">
+          <span class="pill" id="countPill">0 Namen</span>
+          <span class="pill" id="statusPill">Bereit</span>
+        </div>
+      </section>
+
+      <section class="card out" aria-label="Ausgabe">
+        <div class="out-head">
+          <h2 class="out-title">Ergebnis</h2>
+          <div class="row" style="margin:0">
+            <button class="btn secondary" id="copyBtn" disabled>Als Text kopieren</button>
+          </div>
+        </div>
+
+        <div id="output">
+          <div class="empty">Gib links Namen ein und bilde Gruppen; hier erscheinen die zufällig verteilten Gruppen.</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank" rel="noopener">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank" rel="noopener">Gymi-Tools</a>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const namesEl = $("names");
+    const groupCountEl = $("groupCount");
+    const makeBtn = $("makeBtn");
+    const shuffleBtn = $("shuffleBtn");
+    const clearBtn = $("clearBtn");
+    const copyBtn = $("copyBtn");
+    const outputEl = $("output");
+    const countPill = $("countPill");
+    const statusPill = $("statusPill");
+    const toastEl = $("toast");
+
+    let lastGroups = null;
+
+    function normaliseNames(raw){
+      // Unterstützt Zeilen und Kommas (auch gemischt)
+      return raw
+        .split(/\r?\n/)
+        .flatMap(line => line.split(","))
+        .map(s => s.trim())
+        .filter(Boolean);
+    }
+
+    function getGroupCount(){
+      const v = Number(groupCountEl.value);
+      const k = Number.isFinite(v) ? Math.floor(v) : 1;
+      return Math.max(1, k);
+    }
+
+    function cryptoShuffle(arr){
+      const a = arr.slice();
+      for(let i = a.length - 1; i > 0; i--){
+        const buf = new Uint32Array(1);
+        crypto.getRandomValues(buf);
+        const j = buf[0] % (i + 1);
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function distribute(names, k){
+      const groups = Array.from({length: k}, () => []);
+      names.forEach((name, idx) => groups[idx % k].push(name));
+      return groups;
+    }
+
+    function render(groups){
+      if(!groups || !groups.length){
+        outputEl.innerHTML = '<div class="empty">Keine Gruppen vorhanden.</div>';
+        copyBtn.disabled = true;
+        return;
+      }
+
+      const html = `
+        <div class="groups">
+          ${groups.map((g, i) => `
+            <div class="group">
+              <h3>Gruppe ${i + 1}</h3>
+              ${g.length
+                ? `<ul class="names">${g.map(n => `<li class="tag">${escapeHtml(n)}</li>`).join("")}</ul>`
+                : `<div class="empty" style="margin:0; padding:10px; font-size:12px">Leer</div>`
+              }
+            </div>
+          `).join("")}
+        </div>
+      `;
+      outputEl.innerHTML = html;
+      copyBtn.disabled = false;
+    }
+
+    function escapeHtml(s){
+      return s.replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+      }[m]));
+    }
+
+    function setStatus(text){
+      statusPill.textContent = text;
+    }
+
+    function updateCount(){
+      const names = normaliseNames(namesEl.value);
+      countPill.textContent = `${names.length} Name${names.length === 1 ? "" : "n"}`;
+      return names.length;
+    }
+
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      window.clearTimeout(toastEl._t);
+      toastEl._t = window.setTimeout(() => toastEl.classList.remove("show"), 1400);
+    }
+
+    function buildGroups(){
+      const names = normaliseNames(namesEl.value);
+      const k = getGroupCount();
+
+      updateCount();
+
+      if(names.length === 0){
+        lastGroups = null;
+        render(null);
+        setStatus("Bitte Namen eingeben");
+        return;
+      }
+
+      if(k === 1){
+        setStatus("1 Gruppe erstellt");
+      }else if(k > names.length){
+        setStatus(`Mehr Gruppen als Namen; es werden ${k} Gruppen erstellt`);
+      }else{
+        setStatus(`${k} Gruppen erstellt`);
+      }
+
+      const shuffled = cryptoShuffle(names);
+      lastGroups = distribute(shuffled, k);
+      render(lastGroups);
+    }
+
+    function reshuffle(){
+      const names = normaliseNames(namesEl.value);
+      const k = getGroupCount();
+
+      if(names.length === 0){
+        setStatus("Bitte Namen eingeben");
+        return;
+      }
+
+      const shuffled = cryptoShuffle(names);
+      lastGroups = distribute(shuffled, k);
+      setStatus("Neu gemischt");
+      render(lastGroups);
+    }
+
+    function copyAsText(){
+      if(!lastGroups) return;
+      const lines = lastGroups.map((g, i) => {
+        const members = g.length ? g.join(", ") : "—";
+        return `Gruppe ${i + 1}: ${members}`;
+      }).join("\n");
+
+      navigator.clipboard.writeText(lines).then(() => {
+        toast("Kopiert");
+      }).catch(() => {
+        const tmp = document.createElement("textarea");
+        tmp.value = lines;
+        document.body.appendChild(tmp);
+        tmp.select();
+        try{
+          document.execCommand("copy");
+          toast("Kopiert");
+        }catch(e){
+          toast("Kopieren nicht möglich");
+        }
+        document.body.removeChild(tmp);
+      });
+    }
+
+    function clearAll(){
+      namesEl.value = "";
+      groupCountEl.value = "3";
+      lastGroups = null;
+      updateCount();
+      setStatus("Bereit");
+      render(null);
+      namesEl.focus();
+    }
+
+    // Inputs härten: wenn leer/ungültig, sofort auf 1 setzen
+    groupCountEl.addEventListener("input", () => {
+      const k = getGroupCount();
+      groupCountEl.value = String(k);
+      setStatus("Bereit");
+    });
+
+    makeBtn.addEventListener("click", buildGroups);
+    shuffleBtn.addEventListener("click", reshuffle);
+    clearBtn.addEventListener("click", clearAll);
+    copyBtn.addEventListener("click", copyAsText);
+
+    namesEl.addEventListener("input", () => {
+      updateCount();
+      setStatus("Bereit");
+    });
+
+    namesEl.addEventListener("keydown", (e) => {
+      if((e.ctrlKey || e.metaKey) && e.key === "Enter"){
+        buildGroups();
+      }
+    });
+
+    updateCount();
+  </script>
+</body>
+</html>
