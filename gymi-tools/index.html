@@ -19,12 +19,11 @@
       --radius: 22px;
       --focus: rgba(59,130,246,.35);
       --chip: rgba(2,6,23,.04);
+      --tabbg: rgba(255,255,255,.70);
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
-
-
 
     body{
       margin:0;
@@ -91,11 +90,56 @@
 
     .topbar{
       display:flex;
-      align-items:center;
+      align-items:flex-end;
       gap: 10px;
       min-width: 260px;
       flex: 1;
       justify-content:flex-end;
+      flex-wrap: wrap;
+    }
+
+    /* Tabs */
+    .tabs{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      padding: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--tabbg);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .tab{
+      border: 1px solid transparent;
+      background: transparent;
+      color: rgba(15,23,42,.82);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      transition: 140ms ease;
+      white-space: nowrap;
+    }
+
+    .tab:hover{
+      background: rgba(2,6,23,.04);
+      border-color: rgba(15,23,42,.08);
+    }
+
+    .tab[aria-selected="true"]{
+      background: rgba(59,130,246,.12);
+      border-color: rgba(59,130,246,.25);
+      color: rgba(15,23,42,.95);
+    }
+
+    .tab:focus{
+      outline:none;
+      box-shadow: 0 0 0 4px var(--focus);
     }
 
     .search{
@@ -215,18 +259,9 @@
       font-size: 13px;
     }
 
-    .hit{
-      position:absolute;
-      inset:0;
-      border-radius: inherit;
-      z-index: 5;
-    }
-    .hit:focus{ outline:none; }
-
     /* klar klickbar */
-    .card, .card .hit { cursor: pointer; }
+    .card{ cursor: pointer; }
 
-    /* Hover klar sichtbar (auch wenn Overlay-Link gehovered wird) */
     @media (hover: hover) and (pointer: fine){
       .card:hover{
         transform: translateY(-4px);
@@ -234,14 +269,12 @@
         box-shadow: 0 22px 70px rgba(2,6,23,.12);
       }
 
-      .card:hover .ctitle,
-      .card .hit:hover ~ .content .ctitle{
+      .card:hover .ctitle{
         text-decoration: underline;
         text-underline-offset: 3px;
       }
 
-      .card:hover .chip,
-      .card .hit:hover ~ .content .chip{
+      .card:hover .chip{
         border-color: rgba(15,23,42,.18);
       }
 
@@ -278,17 +311,20 @@
     @media (max-width: 620px){
       .wrap{ padding-bottom: 44px; }
       .card{ grid-column: span 12; }
+      .tabs{ width: 100%; justify-content: space-between; }
+      .search{ width: 100%; }
     }
 
     @media (prefers-reduced-motion: reduce){
       .card{ transition:none; }
       .card::after{ transition:none; }
+      .tab{ transition:none; }
     }
-    
+
     a.card,
-a.card *{
-  cursor: pointer !important;
-}
+    a.card *{
+      cursor: pointer !important;
+    }
   </style>
 </head>
 
@@ -301,10 +337,18 @@ a.card *{
           <a href="https://samueltobler.github.io" target="_blank" rel="noopener noreferrer">Samuel Tobler</a>
         </p>
         <p class="intro">
-Unterrichtstools fürs Gymi: praktische Helfer wie Prüfungsuhren und Rechner für Prüfungsstatistiken sowie Spiele wie Montagsmaler oder Imposter.        </p>
+          Unterrichtstools fürs Gymi: praktische Helfer wie Prüfungsuhren, Gruppengeneratoren, und Rechner für Prüfungsstatistiken, Tools für den Biologieunterricht sowie Biologie-inspirierte Spiele wie Montagsmaler oder Imposter.
+        </p>
       </div>
 
       <div class="topbar">
+        <div class="tabs" role="tablist" aria-label="Kategorie auswählen">
+  <button class="tab" type="button" role="tab" aria-selected="true"  data-kat="__all">Alle</button>
+  <button class="tab" type="button" role="tab" aria-selected="false" data-kat="__tools">Tools</button>
+  <button class="tab" type="button" role="tab" aria-selected="false" data-kat="biologie">Biologie</button>
+  <button class="tab" type="button" role="tab" aria-selected="false" data-kat="spiel">Spiel</button>
+</div>
+
         <div class="search" aria-label="Tools durchsuchen">
           <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
@@ -323,11 +367,16 @@ Unterrichtstools fürs Gymi: praktische Helfer wie Prüfungsuhren und Rechner f�
   <script>
     const q = document.getElementById('q');
     const grid = document.getElementById('grid');
+    const tabs = Array.from(document.querySelectorAll('.tab'));
 
     const CSV_URL  = "https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/gymi-tools/data.csv";
     const IMG_BASE = "https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/gymi-tools/img/";
     const BG_FILES = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png", "bg7.png", "bg8.png"];
 
+    let activeKat = "__all";
+
+    const TOOL_KATS = new Set(['tool', 'tools']);
+    
     function norm(s){ return (s || '').toLowerCase().trim(); }
 
     function escapeHtml(s){
@@ -376,51 +425,70 @@ Unterrichtstools fürs Gymi: praktische Helfer wie Prüfungsuhren und Rechner f�
     }
 
     function makeCard({ titel, beschreibung, datei, link, kategorie }){
-  const img = IMG_BASE + datei;
-  const tag = kategorie || 'Tool';
-  const bgUrl = pickRandomBgUrl();
+      const img = IMG_BASE + datei;
+      const tag = kategorie || 'Tool';
+      const bgUrl = pickRandomBgUrl();
 
-  const a = document.createElement('a');
-  a.className = 'card';
-  a.href = link;
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  a.setAttribute('aria-label', `${titel} öffnen`);
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = link;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.setAttribute('aria-label', `${titel} öffnen`);
 
-  a.dataset.title = titel;
-  a.dataset.desc = beschreibung;
-  a.dataset.kategorie = tag;
+      a.dataset.title = titel;
+      a.dataset.desc = beschreibung;
+      a.dataset.kategorie = tag;
 
-  a.innerHTML = `
-    <div class="thumbwrap" style="background-image:url('${escapeHtml(bgUrl)}')">
-      <img class="thumbimg" src="${escapeHtml(img)}" alt="${escapeHtml(titel)}" loading="lazy">
-    </div>
+      a.innerHTML = `
+        <div class="thumbwrap" style="background-image:url('${escapeHtml(bgUrl)}')">
+          <img class="thumbimg" src="${escapeHtml(img)}" alt="${escapeHtml(titel)}" loading="lazy">
+        </div>
 
-    <div class="content">
-      <div class="row">
-        <h2 class="ctitle">${escapeHtml(titel)}</h2>
-        <span class="chip">${escapeHtml(tag)}</span>
-      </div>
-      <p class="desc">${escapeHtml(beschreibung)}</p>
-    </div>
-  `;
-  return a;
-}
+        <div class="content">
+          <div class="row">
+            <h2 class="ctitle">${escapeHtml(titel)}</h2>
+            <span class="chip">${escapeHtml(tag)}</span>
+          </div>
+          <p class="desc">${escapeHtml(beschreibung)}</p>
+        </div>
+      `;
+      return a;
+    }
 
+    function setActiveTab(kat){
+      activeKat = kat;
+      for(const btn of tabs){
+        const isActive = btn.dataset.kat === kat;
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      }
+      applyFilter();
+    }
 
     function applyFilter(){
-      const term = norm(q.value);
-      const cards = Array.from(grid.querySelectorAll('.card'));
-      for(const card of cards){
-        const hay = norm(
-          card.dataset.title + ' ' +
-          card.dataset.desc + ' ' +
-          (card.dataset.kategorie || '') + ' ' +
-          card.innerText
-        );
-        card.style.display = (!term || hay.includes(term)) ? '' : 'none';
-      }
-    }
+  const term = norm(q.value);
+  const cards = Array.from(grid.querySelectorAll('.card'));
+
+  for(const card of cards){
+    const cardKat = norm(card.dataset.kategorie);
+
+    const matchesTab =
+      (activeKat === "__all") ||
+      (activeKat === "__tools" && TOOL_KATS.has(cardKat)) ||
+      (activeKat !== "__tools" && activeKat !== "__all" && cardKat === activeKat);
+
+    const hay = norm(
+      card.dataset.title + ' ' +
+      card.dataset.desc + ' ' +
+      (card.dataset.kategorie || '') + ' ' +
+      card.innerText
+    );
+
+    const matchesSearch = (!term || hay.includes(term));
+
+    card.style.display = (matchesTab && matchesSearch) ? '' : 'none';
+  }
+}
 
     async function init(){
       try{
@@ -448,6 +516,11 @@ Unterrichtstools fürs Gymi: praktische Helfer wie Prüfungsuhren und Rechner f�
     }
 
     q.addEventListener('input', applyFilter);
+
+    for(const btn of tabs){
+      btn.addEventListener('click', () => setActiveTab(btn.dataset.kat));
+    }
+
     init();
   </script>
 </body>
