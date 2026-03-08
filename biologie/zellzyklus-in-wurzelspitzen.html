@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zellzyklusdauer in Wurzelspitzen</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:rgba(15,23,42,0.08);
+      --shadow:0 20px 50px rgba(15,23,42,0.08);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box;}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#f8fafc 0%,#eef2ff 100%);
+      color:var(--text);
+    }
+
+    .wrap{
+      width:100%;
+      max-width:520px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:32px;
+      backdrop-filter:blur(12px);
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:clamp(28px,4vw,36px);
+      line-height:1.1;
+      letter-spacing:-0.03em;
+    }
+
+    p{
+      margin:0 0 24px;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.6;
+    }
+
+    .label{
+      display:block;
+      margin-bottom:10px;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .input-row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+
+    .input-wrap{
+      position:relative;
+      flex:1;
+    }
+
+    input{
+      width:100%;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      border-radius:18px;
+      padding:16px 48px 16px 16px;
+      font-size:18px;
+      color:var(--text);
+      outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+
+    input:focus{
+      border-color:rgba(99,102,241,0.35);
+      box-shadow:0 0 0 4px rgba(99,102,241,0.12);
+    }
+
+    .percent{
+      position:absolute;
+      right:16px;
+      top:50%;
+      transform:translateY(-50%);
+      color:var(--muted);
+      font-size:16px;
+      pointer-events:none;
+    }
+
+    button{
+      border:none;
+      border-radius:18px;
+      padding:16px 20px;
+      font-size:15px;
+      font-weight:600;
+      cursor:pointer;
+      background:#111827;
+      color:white;
+      transition:transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+      box-shadow:0 12px 24px rgba(17,24,39,0.18);
+      white-space:nowrap;
+    }
+
+    button:hover{
+      transform:translateY(-1px);
+      opacity:0.96;
+    }
+
+    .result{
+      margin-top:12px;
+      padding:20px;
+      border-radius:20px;
+      background:linear-gradient(180deg,#f8fafc 0%,#eef2ff 100%);
+      border:1px solid rgba(99,102,241,0.12);
+    }
+
+    .result-label{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .result-value{
+      font-size:30px;
+      font-weight:700;
+      letter-spacing:-0.03em;
+    }
+
+    .hint{
+      margin-top:14px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    @media (max-width:560px){
+      .card{padding:24px;}
+      .input-row{flex-direction:column;}
+      button{width:100%;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Zellzyklusdauer in Wurzelspitzen</h1>
+      <p>Geben Sie unten den Anteil der Zellen ein, die sich in Ihrem Mikroskopiepräparat aktuell in der Mitose befinden.</p>
+
+      <label class="label" for="mitoseProzent">Zellen in der Mitose</label>
+      <div class="input-row">
+        <div class="input-wrap">
+          <input id="mitoseProzent" type="number" min="0" max="100" step="0.1" placeholder="z. B. 8.5" />
+          <span class="percent">%</span>
+        </div>
+        <button id="calcBtn">Berechnen</button>
+      </div>
+
+      <div class="result" aria-live="polite">
+        <div class="result-label">Geschätzte Dauer der Mitose</div>
+        <div class="result-value" id="result">0 h</div>
+      </div>
+
+      <div class="hint">Beispiel: (5 × 12) ÷ 100 = 0.6 h</div>
+    </div>
+
+    <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('mitoseProzent');
+    const result = document.getElementById('result');
+    const button = document.getElementById('calcBtn');
+
+    function berechnen(){
+      const wert = parseFloat(input.value.replace(',', '.'));
+
+      if (Number.isNaN(wert)) {
+        result.textContent = 'Bitte Wert eingeben';
+        return;
+      }
+
+      const dauer = (wert * 12) / 100;
+      const formatiert = Number.isInteger(dauer)
+        ? dauer.toString()
+        : dauer.toFixed(2).replace(/\.?0+$/, '');
+
+      result.textContent = `${formatiert} h`;
+    }
+
+    button.addEventListener('click', berechnen);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') berechnen();
+    });
+  </script>
+</body>
+</html>
