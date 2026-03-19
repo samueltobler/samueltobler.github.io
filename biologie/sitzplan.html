@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sitzplan Generator</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+:root{
+--bg:#f6f7fb;
+--surface:rgba(255,255,255,0.9);
+--text:#14171f;
+--muted:#6b7280;
+--radius:22px;
+--shadow:0 12px 40px rgba(0,0,0,0.08);
+--accent:#111827;
+}
+
+*{box-sizing:border-box;}
+
+body{
+margin:0;
+font-family:system-ui;
+background:
+radial-gradient(circle at top left, rgba(99,102,241,0.12), transparent 28%),
+radial-gradient(circle at top right, rgba(16,185,129,0.10), transparent 22%),
+var(--bg);
+color:var(--text);
+}
+
+.app{max-width:1200px;margin:40px auto;padding:0 16px;}
+
+.hero{margin-bottom:28px;}
+.eyebrow{
+font-size:12px;
+padding:6px 10px;
+border-radius:999px;
+background:rgba(255,255,255,0.6);
+display:inline-block;
+}
+h1{margin:14px 0 10px;font-size:34px;}
+.subtitle{color:var(--muted);max-width:720px;line-height:1.5;}
+
+.layout{
+display:grid;
+grid-template-columns:380px 1fr;
+gap:24px;
+}
+
+.panel,.room-card{
+background:var(--surface);
+backdrop-filter:blur(14px);
+border-radius:var(--radius);
+padding:26px;
+box-shadow:var(--shadow);
+overflow:hidden;
+}
+
+label{font-weight:600;font-size:14px;margin-top:16px;display:block;}
+
+textarea{
+width:100%;
+max-width:100%;
+border-radius:14px;
+border:1px solid rgba(0,0,0,0.08);
+padding:14px;
+margin-top:8px;
+font-family:inherit;
+background:#fff;
+font-size:14px;
+resize:vertical;
+}
+
+button{
+margin-top:18px;
+padding:14px;
+border:none;
+border-radius:14px;
+cursor:pointer;
+font-weight:700;
+background:var(--accent);
+color:white;
+transition:0.15s;
+}
+
+button:hover{transform:translateY(-1px);}
+
+.room{
+border-radius:20px;
+padding:26px;
+background:white;
+border:1px solid rgba(0,0,0,0.06);
+}
+
+.teacher{
+text-align:center;
+margin-bottom:24px;
+padding:12px;
+border-radius:12px;
+background:rgba(0,0,0,0.05);
+font-weight:600;
+font-size:14px;
+}
+
+.row{
+display:flex;
+justify-content:center;
+gap:12px;
+margin-bottom:18px;
+transition:0.2s;
+}
+
+.desk{
+width:85px;
+height:65px;
+border-radius:14px;
+background:#fff;
+border:1px solid rgba(0,0,0,0.08);
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+cursor:grab;
+font-size:13px;
+transition:0.15s;
+}
+
+.desk.empty{
+background:#e5e7eb;
+color:#6b7280;
+}
+
+.desk:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 18px rgba(0,0,0,0.08);
+}
+
+.desk.dragging{
+opacity:0.5;
+transform:scale(1.08);
+}
+
+.desk.target{
+outline:2px solid rgba(0,0,0,0.15);
+transform:scale(1.05);
+}
+
+.aisle{
+width:60px;
+position:relative;
+}
+
+.aisle::after{
+content:"";
+position:absolute;
+top:0;
+bottom:0;
+left:50%;
+width:2px;
+background:rgba(0,0,0,0.08);
+}
+
+.meta{
+display:flex;
+gap:10px;
+margin-bottom:16px;
+flex-wrap:wrap;
+}
+
+.chip{
+font-size:12px;
+padding:6px 10px;
+border-radius:999px;
+background:#fff;
+border:1px solid rgba(0,0,0,0.06);
+color:var(--muted);
+}
+
+.hint{
+font-size:12px;
+color:var(--muted);
+margin-top:4px;
+}
+
+.export{width:100%;margin-top:18px;}
+
+.footer{
+margin-top:32px;
+text-align:center;
+font-size:11px;
+color:rgba(0,0,0,0.5);
+}
+.footer a{color:rgba(0,0,0,0.5);text-decoration:none;}
+.footer a:hover{text-decoration:underline;}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="hero">
+<div class="eyebrow">Sitzplan Generator</div>
+<h1>Zufällige Sitzordnung für dein Klassenzimmer</h1>
+<p class="subtitle">
+Definiere Reihen mit Gängen (z. B. 3|3), füge Namen hinzu und optimiere die Sitzordnung per Drag & Drop.
+</p>
+</header>
+
+<div class="layout">
+
+<div class="panel">
+
+<label>Reihenstruktur</label>
+<textarea id="layout" placeholder="3|3
+2|2|2
+4"></textarea>
+<div class="hint">Verwende | für Gänge. Jede Zeile = eine Reihe.</div>
+
+<label>Namen</label>
+<textarea id="names"></textarea>
+<div class="hint">Ein Name pro Zeile oder mit Komma getrennt.</div>
+
+<button onclick="generate()">Zufällig verteilen</button>
+</div>
+
+<div class="room-card">
+
+<div class="meta">
+<div class="chip" id="students">0 Namen</div>
+<div class="chip" id="desks">0 Tische</div>
+</div>
+
+<div class="room" id="room">
+<div class="teacher">Lehrperson</div>
+<div id="plan"></div>
+</div>
+
+<button class="export" onclick="downloadPNG()">Sitzplan als PNG</button>
+</div>
+
+</div>
+
+<div class="footer">
+by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+<a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+</div>
+
+</div>
+
+<script>
+let dragged=null;
+
+function parseNames(){
+return document.getElementById('names').value
+.split(/\n|,/).map(x=>x.trim()).filter(x=>x);
+}
+
+function parseLayout(){
+return document.getElementById('layout').value
+.split(/\n/)
+.map(r=>r.split('|').map(x=>parseInt(x)).filter(x=>x>0))
+.filter(r=>r.length);
+}
+
+function shuffle(arr){
+for(let i=arr.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]]=[arr[j],arr[i]];
+}
+return arr;
+}
+
+function updateMeta(names, layout){
+document.getElementById('students').textContent = names.length + ' Namen';
+const total = layout.flat().reduce((a,b)=>a+b,0);
+document.getElementById('desks').textContent = total + ' Tische';
+}
+
+function generate(){
+const layout=parseLayout();
+const names=shuffle(parseNames());
+updateMeta(names, layout);
+
+let index=0;
+const plan=document.getElementById('plan');
+plan.innerHTML='';
+
+layout.forEach(blocks=>{
+const row=document.createElement('div');
+row.className='row';
+
+blocks.forEach((block,i)=>{
+for(let j=0;j<block;j++){
+const name = names[index++] || '';
+const d=document.createElement('div');
+d.className='desk'+(name ? '' : ' empty');
+d.draggable=true;
+d.textContent=name || 'Leer';
+
+d.addEventListener('dragstart',()=>{dragged=d;d.classList.add('dragging');});
+
+d.addEventListener('dragover',e=>{
+e.preventDefault();
+if(dragged && dragged!==d) d.classList.add('target');
+});
+
+d.addEventListener('dragleave',()=>d.classList.remove('target'));
+
+d.addEventListener('dragend',()=>{
+d.classList.remove('dragging');
+document.querySelectorAll('.desk').forEach(el=>el.classList.remove('target'));
+});
+
+d.addEventListener('drop',()=>{
+if(dragged && dragged!==d){
+[d.textContent, dragged.textContent] = [dragged.textContent, d.textContent];
+d.classList.toggle('empty', d.textContent==='Leer');
+dragged.classList.toggle('empty', dragged.textContent==='Leer');
+}
+});
+
+row.appendChild(d);
+}
+
+if(i<blocks.length-1){
+const aisle=document.createElement('div');
+aisle.className='aisle';
+row.appendChild(aisle);
+}
+});
+
+plan.appendChild(row);
+});
+}
+
+function downloadPNG(){
+html2canvas(document.getElementById('room'),{scale:3}).then(canvas=>{
+let link=document.createElement('a');
+link.download='sitzplan.png';
+link.href=canvas.toDataURL();
+link.click();
+});
+}
+</script>
+
+</body>
+</html>
