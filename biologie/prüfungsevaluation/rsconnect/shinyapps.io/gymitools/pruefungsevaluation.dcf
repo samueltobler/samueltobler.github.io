@@ -1,0 +1,13 @@
+name: pruefungsevaluation
+title: pruefungsevaluation
+username: gymitools
+account: gymitools
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16971231
+bundleId: 11753865
+url: https://gymitools.shinyapps.io/pruefungsevaluation/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: index.html
