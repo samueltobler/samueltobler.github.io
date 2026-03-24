@@ -17,3 +17,4 @@ LearningApps; Eine Sammlung unterschiedlicher LearningApps zu unterschiedlichen 
 Gruppengenerator; Ein Tool, um aus einer Liste von Namen automatisch zufällige Gruppen zu bilden.;gruppengenerator.png;https://samueltobler.github.io/biologie/gruppengenerator;Tool
 Zellzyklusdauer; Ein Tool, um die Dauer der Mitosephase im Zellzyklus anhand von Knoblauchzellen-Wurzelspitzen zu berechnen.; zellzyklusdauer.png; https://samueltobler.github.io/biologie/zellzyklusdauer; Biologie
 Sitzplan-Generator; Tool, das automatisch flexible Sitzpläne für Schulklassen generiert, zufällig verteilt und per Drag & Drop anpassbar macht.; sitzplan.png; https://samueltobler.github.io/biologie/sitzplan; Tools
+Prüfungsevaluation; Tool zur visuellen Auswertung von Prüfungsevaluationen, das Antwortzahlen erfasst, automatisch als übersichtliche Likert-Grafik darstellt und direkt als PNG exportiert.; prüfungsevaluation.png; https://gymitools.shinyapps.io/pruefungsevaluation; Tools
