@@ -5,7 +5,7 @@ biologie/rna-rechner/.Rapp.history
 biologie/rna-rechner/.RData
 biologie/rna-rechner/.Rhistory
 biologie/prüfungsevaluation/app.R
-biologie/imposter/app.R
+biologie/imposter/app_imposter.R
 biologie/qr/app.R
 biologie/montagsmaler/app.R
 
@@ -15,3 +15,5 @@ biologie/montagsmaler/app.R
 depr.
 code/mailto/priv
 README.html
+biologie/imposter/app_imposter.R
+biologie/imposter/app_imposter.R
