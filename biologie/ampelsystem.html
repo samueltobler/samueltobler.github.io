@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ampelübersicht</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --surface:rgba(255,255,255,0.82);
+      --surface-strong:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:rgba(17,24,39,0.08);
+      --shadow:0 20px 50px rgba(15,23,42,0.08);
+      --green:#22c55e;
+      --orange:#f59e0b;
+      --red:#ef4444;
+      --track:#d1d5db;
+      --ring:0 0 0 4px rgba(37,99,235,0.12);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box;}
+
+    [hidden]{display:none !important;}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,0.08), transparent 30%),
+        radial-gradient(circle at top right, rgba(16,185,129,0.08), transparent 28%),
+        var(--bg);
+      color:var(--text);
+    }
+
+    body{
+      padding:32px 18px 40px;
+    }
+
+    .shell{
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .hero{
+      background:var(--surface);
+      backdrop-filter:blur(18px);
+      border:1px solid var(--border);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(17,24,39,0.04);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:0.02em;
+      margin-bottom:16px;
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:clamp(28px,4vw,44px);
+      line-height:1.05;
+      letter-spacing:-0.03em;
+    }
+
+    .subtext{
+      margin:0;
+      max-width:700px;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.6;
+    }
+
+    .panel-wrap{
+      display:block;
+      margin-top:22px;
+    }
+
+    .panel,
+    .board{
+      padding:20px;
+      min-height:520px;
+      display:flex;
+      flex-direction:column;
+      width:100%;
+    }
+
+    .panel{
+      padding:20px;
+      margin-bottom:16px;
+    }
+
+    .panel h2,
+    .board h2{
+      margin:0 0 8px;
+      font-size:18px;
+      letter-spacing:-0.02em;
+    }
+
+    .panel p,
+    .board p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    label{
+      display:block;
+      margin:18px 0 10px;
+      font-size:13px;
+      font-weight:700;
+      color:#1f2937;
+    }
+
+    textarea{
+      width:100%;
+      min-height:260px;
+      resize:vertical;
+      border:none;
+      outline:none;
+      padding:16px;
+      border-radius:18px;
+      background:#f8fafc;
+      color:var(--text);
+      font:inherit;
+      line-height:1.55;
+      box-shadow:inset 0 0 0 1px rgba(17,24,39,0.08);
+      transition:box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    textarea:focus{
+      box-shadow:inset 0 0 0 1px rgba(37,99,235,0.35), var(--ring);
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    button{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      font:inherit;
+      transition:transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    }
+
+    .primary,
+    .secondary{
+      padding:14px 18px;
+      border-radius:16px;
+      font-weight:700;
+    }
+
+    .primary{
+      background:#111827;
+      color:#fff;
+      box-shadow:0 12px 28px rgba(17,24,39,0.18);
+    }
+
+    .primary:hover,
+    .secondary:hover,
+    .card:hover{
+      transform:translateY(-1px);
+    }
+
+    .secondary{
+      background:#eef2f7;
+      color:#111827;
+    }
+
+    .hint{
+      margin-top:12px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .board{
+      padding:20px;
+      min-height:520px;
+      display:flex;
+      flex-direction:column;
+      width:100%;
+    }
+
+    .board-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:18px;
+    }
+
+    .counter{
+      flex-shrink:0;
+      padding:9px 12px;
+      border-radius:999px;
+      background:#f3f4f6;
+      color:#374151;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .empty{
+      flex:1;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      border:1px dashed rgba(17,24,39,0.12);
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(248,250,252,0.95), rgba(255,255,255,1));
+      padding:30px;
+    }
+
+    .empty strong{
+      display:block;
+      font-size:18px;
+      margin-bottom:8px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+      gap:12px;
+    }
+
+    .card{
+      border:none;
+      text-align:left;
+      padding:18px;
+      border-radius:22px;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      box-shadow:0 10px 30px rgba(15,23,42,0.07);
+      border:1px solid rgba(17,24,39,0.06);
+    }
+
+    .name{
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      margin-bottom:14px;
+      word-break:break-word;
+    }
+
+    .traffic-light{
+      width:48px;
+      padding:6px;
+      border-radius:999px;
+      background:#111827;
+      display:grid;
+      gap:8px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .light{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      background:var(--track);
+      opacity:0.28;
+      transition:opacity 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card[data-state="green"] .light.green,
+    .card[data-state="orange"] .light.orange,
+    .card[data-state="red"] .light.red{
+      opacity:1;
+      transform:scale(1.02);
+    }
+
+    .card[data-state="green"] .light.green{background:var(--green); box-shadow:0 0 18px rgba(34,197,94,0.45);}
+    .card[data-state="orange"] .light.orange{background:var(--orange); box-shadow:0 0 18px rgba(245,158,11,0.45);}
+    .card[data-state="red"] .light.red{background:var(--red); box-shadow:0 0 18px rgba(239,68,68,0.45);}
+
+    .state-label{
+      margin-top:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background:#f3f4f6;
+      font-size:12px;
+      font-weight:700;
+      color:#374151;
+    }
+
+    .state-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:currentColor;
+    }
+
+    .state-green{color:#16a34a;}
+    .state-orange{color:#d97706;}
+    .state-red{color:#dc2626;}
+
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    @media (max-width: 900px){
+      .panel-wrap{
+      display:block;
+      margin-top:22px;
+    }
+
+      .panel{
+      padding:20px;
+      margin-bottom:16px;
+    }
+    }
+
+    @media (max-width: 560px){
+      body{padding:16px 14px 28px;}
+      .hero,.panel,.board{
+      padding:20px;
+      min-height:520px;
+      display:flex;
+      flex-direction:column;
+      width:100%;
+    }
+      .grid{grid-template-columns:1fr 1fr;}
+    }
+
+    @media (max-width: 420px){
+      .grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      
+      <h1>Ampelsystem fürs Klassenzimmer</h1>
+      <p class="subtext">Namen eingeben und generieren; Klick auf eine Ampel wechselt den Status.</p>
+    </section>
+
+    <div class="panel-wrap">
+      <aside class="panel">
+        <h2>Eingabe</h2>
+        <p>Namen eingeben und generieren.</p>
+
+        <label for="namesInput">Namenliste</label>
+        <textarea id="namesInput" placeholder="Beispiel&#10;Anna Meier&#10;Luca Keller&#10;Mia Schmid"></textarea>
+
+        <div class="actions">
+          <button class="primary" id="generateBtn">Generieren</button>
+          <button class="secondary" id="resetBtn" type="button">Zurücksetzen</button>
+        </div>
+
+        <div class="hint">Tipp: Ein Klick auf eine Ampel schaltet weiter zu Orange und Rot.</div>
+      </aside>
+
+      <main class="board">
+        <div class="board-head">
+          <div>
+            <h2>Ampelansicht</h2>
+            <p>Status je Name per Klick ändern.</p>
+          </div>
+          <div class="counter" id="counter">0 Einträge</div>
+        </div>
+
+        <div class="empty" id="emptyState">
+          <div>
+            <strong>Noch keine Ampeln erstellt</strong>
+            Gib links Namen ein und klicke auf Generieren.
+          </div>
+        </div>
+
+        <div class="grid" id="trafficGrid" hidden></div>
+      </main>
+    </div>
+
+    <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+  </div>
+
+  <script>
+    const namesInput = document.getElementById('namesInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const trafficGrid = document.getElementById('trafficGrid');
+    const emptyState = document.getElementById('emptyState');
+    const counter = document.getElementById('counter');
+
+    const states = ['green', 'orange', 'red'];
+    const stateText = {
+      green: 'Grün',
+      orange: 'Orange',
+      red: 'Rot'
+    };
+
+    function parseNames(raw){
+      return raw
+        .split(/\r?\n/)
+        .map(name => name.trim())
+        .filter(Boolean);
+    }
+
+    function updateCounter(amount){
+      counter.textContent = `${amount} ${amount === 1 ? 'Eintrag' : 'Einträge'}`;
+    }
+
+    function badgeClass(state){
+      return `state-label state-${state}`;
+    }
+
+    function createCard(name){
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'card';
+      card.dataset.state = 'green';
+      card.setAttribute('aria-label', `${name}, Status Grün`);
+
+      card.innerHTML = `
+        <div class="name">${escapeHtml(name)}</div>
+        <div class="traffic-light" aria-hidden="true">
+          <div class="light red"></div>
+          <div class="light orange"></div>
+          <div class="light green"></div>
+        </div>
+        <div class="${badgeClass('green')}">
+          <span class="state-dot"></span>
+          <span class="state-text">${stateText.green}</span>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        const currentIndex = states.indexOf(card.dataset.state);
+        const nextState = states[(currentIndex + 1) % states.length];
+        card.dataset.state = nextState;
+        card.setAttribute('aria-label', `${name}, Status ${stateText[nextState]}`);
+
+        const badge = card.querySelector('.state-label');
+        const text = card.querySelector('.state-text');
+        badge.className = badgeClass(nextState);
+        text.textContent = stateText[nextState];
+        sortCards();
+      });
+
+      return card;
+    }
+
+    function escapeHtml(value){
+      return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function renderGrid(){
+      const names = parseNames(namesInput.value);
+      trafficGrid.innerHTML = '';
+      updateCounter(names.length);
+
+      if(names.length === 0){
+        emptyState.hidden = false;
+        trafficGrid.hidden = true;
+        return;
+      }
+
+      names.forEach(name => trafficGrid.appendChild(createCard(name)));
+      emptyState.hidden = true;
+      trafficGrid.hidden = false;
+      document.querySelector('.panel').style.display = 'none';
+      sortCards();
+    }
+
+    function resetAll(){
+      namesInput.value = '';
+      trafficGrid.innerHTML = '';
+      trafficGrid.hidden = true;
+      emptyState.hidden = false;
+      updateCounter(0);
+      document.querySelector('.panel').style.display = 'block';
+      namesInput.focus();
+    }
+
+    function sortCards(){
+      const order = { red:0, orange:1, green:2 };
+      const cards = Array.from(trafficGrid.children);
+      cards.sort((a,b)=> order[a.dataset.state] - order[b.dataset.state]);
+      cards.forEach(c => trafficGrid.appendChild(c));
+    }
+
+    generateBtn.addEventListener('click', renderGrid);
+    resetBtn.addEventListener('click', resetAll);
+
+    namesInput.addEventListener('keydown', event => {
+      if((event.metaKey || event.ctrlKey) && event.key === 'Enter'){
+        renderGrid();
+      }
+    });
+  </script>
+</body>
+</html>
