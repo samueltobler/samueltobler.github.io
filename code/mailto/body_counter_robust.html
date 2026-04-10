@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Body Counter</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 16px;
+  background: #f5f5f5;
+}
+
+.container {
+  max-width: 420px;
+  margin: auto;
+}
+
+h2 {
+  text-align: center;
+}
+
+button {
+  width: 100%;
+  padding: 16px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  color: white;
+}
+
+.under { background: #3b82f6; }
+.normal { background: #10b981; }
+.obese { background: #ef4444; }
+
+.counts {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+  font-weight: bold;
+}
+
+.bar-box {
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.bar {
+  height: 22px;
+  border-radius: 10px;
+  margin: 10px 0;
+  color: white;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+
+.under-bar { background: #3b82f6; }
+.normal-bar { background: #10b981; }
+.obese-bar { background: #ef4444; }
+
+.reset {
+  background: black;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Body Type Counter</h2>
+
+  <button class="under" onclick="add('u')">Underweight</button>
+  <button class="normal" onclick="add('n')">Normal</button>
+  <button class="obese" onclick="add('o')">Obese</button>
+
+  <div class="counts">
+    <div>U: <span id="cu">0</span></div>
+    <div>N: <span id="cn">0</span></div>
+    <div>O: <span id="co">0</span></div>
+  </div>
+
+  <div class="bar-box">
+    <div id="bu" class="bar under-bar">0%</div>
+    <div id="bn" class="bar normal-bar">0%</div>
+    <div id="bo" class="bar obese-bar">0%</div>
+  </div>
+
+  <button class="reset" onclick="reset()">Reset</button>
+</div>
+
+<script>
+let data;
+try {
+  data = JSON.parse(localStorage.getItem("data")) || {u:0,n:0,o:0};
+} catch(e) {
+  data = {u:0,n:0,o:0};
+}
+
+function save(){
+  try {
+    localStorage.setItem("data", JSON.stringify(data));
+  } catch(e) {}
+}
+
+function add(t){
+  data[t]++;
+  save();
+  update();
+}
+
+function reset(){
+  data = {u:0,n:0,o:0};
+  save();
+  update();
+}
+
+function update(){
+  const total = data.u + data.n + data.o || 1;
+
+  document.getElementById("cu").textContent = data.u;
+  document.getElementById("cn").textContent = data.n;
+  document.getElementById("co").textContent = data.o;
+
+  const pu = Math.round((data.u / total) * 100);
+  const pn = Math.round((data.n / total) * 100);
+  const po = Math.round((data.o / total) * 100);
+
+  setBar("bu", pu);
+  setBar("bn", pn);
+  setBar("bo", po);
+}
+
+function setBar(id, percent){
+  const el = document.getElementById(id);
+  el.style.width = percent + "%";
+  el.textContent = percent + "%";
+}
+
+update();
+</script>
+
+</body>
+</html>
