@@ -566,7 +566,7 @@
       <div class="heroText">
         <div class="eyebrow">Übung zum Nephron</div>
         <h1>Stofftransport im Nephron</h1>
-        <p class="subtitle">Wähle einen Stoff und entscheide für jeden Abschnitt, ob der Stoff in den Harnraum gelangt, aus dem Harnraum herausgelangt oder dort keine Hauptbewegung zeigt.</p>
+        <p class="subtitle">Wähle einen Stoff und entscheide für jeden Abschnitt, ob der Stoff in den Harnraum gelangt, aus dem Harnraum herausgelangt oder dort keine Hauptbewegung zeigt. Der Harnraum ist der Bereich von Bowman-Kapsel und Tubulus-System, in dem der entstehende Harn fliesst.</p>
       </div>
 
       <div class="scoreBox" aria-live="polite">
@@ -639,10 +639,10 @@
         },
         feedback: {
           nierenkoerperchen: "Wasser gelangt durch Filtration aus dem Blut in die Bowman-Kapsel und damit in den Harnraum.",
-          proximal: "Wasser wird aus dem proximalen Tubulus zurück aus dem Harnraum heraus.",
-          henleDown: "Im absteigenden Teil verlässt Wasser die Tubulusflüssigkeit und gelangt zurück Richtung Blut.",
+          proximal: "Wasser wird aus dem Harnraum im proximalen Tubulus zurück aus dem Harnraum heraus.",
+          henleDown: "Im absteigenden Teil verlässt Wasser den Harnraum und gelangt zurück Richtung Blut.",
           henleUp: "Der aufsteigende Teil ist wasserundurchlässig.",
-          distal: "Wasser kann aus dem distalen Tubulus zurück aus dem Harnraum heraus werden.",
+          distal: "Wasser kann aus dem Harnraum im distalen Tubulus zurück aus dem Harnraum heraus werden.",
           collecting: "Im Sammelrohr wird Wasser vor allem ADH-abhängig aus dem Nephron zurück aus dem Harnraum heraus."
         }
       },
@@ -658,9 +658,9 @@
         },
         feedback: {
           nierenkoerperchen: "NaCl gelangt durch Filtration aus dem Blut in die Bowman-Kapsel und damit in den Harnraum.",
-          proximal: "NaCl wird aus dem proximalen Tubulus zurück aus dem Harnraum heraus.",
+          proximal: "NaCl wird aus dem Harnraum im proximalen Tubulus zurück aus dem Harnraum heraus.",
           henleDown: "Im absteigenden Teil ist NaCl in diesem Grundmodell keine Hauptbewegung.",
-          henleUp: "NaCl verlässt die Tubulusflüssigkeit im aufsteigenden Teil der Henle-Schleife und wird zurück Richtung Blut transportiert.",
+          henleUp: "NaCl verlässt den Harnraum im aufsteigenden Teil der Henle-Schleife und wird zurück Richtung Blut transportiert.",
           distal: "NaCl wird im distalen Tubulus reguliert zurück aus dem Harnraum heraus.",
           collecting: "NaCl wird im Sammelrohr weiter reguliert zurück aus dem Harnraum heraus."
         }
@@ -679,9 +679,9 @@
           nierenkoerperchen: "Harnstoff wird im Nierenkörperchen aus dem Blut in die Bowman-Kapsel filtriert und gelangt damit in den Harnraum.",
           proximal: "Im proximalen Tubulus verlässt ein Teil des Harnstoffs den Harnraum und wird zurück ins Blut rückresorbiert.",
           henleDown: "Im absteigenden Teil der Henle-Schleife ist Harnstoff hier keine Hauptbewegung.",
-          henleUp: "Im aufsteigenden Teil der Henle-Schleife gelangt Harnstoff aus dem Nierenmark wieder in die Tubulusflüssigkeit.",
+          henleUp: "Im aufsteigenden Teil der Henle-Schleife gelangt Harnstoff aus dem Nierenmark wieder in den Harnraum.",
           distal: "Im distalen Tubulus ist Harnstoff hier keine Hauptbewegung.",
-          collecting: "Im Sammelrohr verlässt Harnstoff die Tubulusflüssigkeit und wird ins Nierenmark abgegeben. Das unterstützt den Konzentrationsgradienten im Nierenmark."
+          collecting: "Im Sammelrohr verlässt Harnstoff den Harnraum und wird ins Nierenmark abgegeben. Das unterstützt den Konzentrationsgradienten im Nierenmark."
         }
       },
       glucose: {
@@ -696,7 +696,7 @@
         },
         feedback: {
           nierenkoerperchen: "Glucose gelangt durch Filtration aus dem Blut in die Bowman-Kapsel und damit in den Harnraum.",
-          proximal: "Glucose wird normalerweise vollständig aus dem proximalen Tubulus zurück aus dem Harnraum heraus.",
+          proximal: "Glucose wird normalerweise vollständig aus dem Harnraum im proximalen Tubulus zurück aus dem Harnraum heraus.",
           henleDown: "Glucose wurde normalerweise bereits im proximalen Tubulus zurückgewonnen; hier bleibt sie nicht als wichtiger Transportstoff übrig.",
           henleUp: "Glucose wurde normalerweise bereits vorher zurückgewonnen; hier findet keine wichtige Glucosebewegung statt.",
           distal: "Bei gesunden Nieren ist Glucose hier normalerweise nicht mehr in relevanter Menge vorhanden.",
@@ -715,7 +715,7 @@
         },
         feedback: {
           nierenkoerperchen: "Kleine wasserlösliche Vitamine können aus dem Blut in die Bowman-Kapsel filtriert werden und gelangen damit in den Harnraum.",
-          proximal: "Viele nützliche kleine Moleküle werden vor allem aus dem proximalen Tubulus zurück aus dem Harnraum heraus.",
+          proximal: "Viele nützliche kleine Moleküle werden vor allem aus dem Harnraum im proximalen Tubulus zurück aus dem Harnraum heraus.",
           henleDown: "Die wichtige Rückgewinnung kleiner nützlicher Moleküle geschieht vor allem früher im proximalen Tubulus.",
           henleUp: "Hier stehen andere Transporte im Vordergrund, besonders Salzbewegungen.",
           distal: "Für Vitamine ist dies in dieser Übung keine wichtige Transportstelle.",
@@ -778,7 +778,7 @@
         row.innerHTML = `
           <div class="segment">${name}</div>
           <div class="choices">
-            <button class="choice" type="button" data-answer="nephron">in den Harnraum<br><small>Primärharn / Tubulusflüssigkeit</small></button>
+            <button class="choice" type="button" data-answer="nephron">in den Harnraum<br><small>Bowman-Kapsel / Tubulus-System</small></button>
             <button class="choice" type="button" data-answer="blood">aus dem Harnraum heraus<br><small>ins Blut / Nierenmark</small></button>
             <button class="choice" type="button" data-answer="none">keine Hauptbewegung<br><small>für diesen Stoff</small></button>
           </div>
