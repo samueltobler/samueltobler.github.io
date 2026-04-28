@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stofftransport im Nephron</title>
+  <style>
+    :root{
+      --bg:#f8f7f3;
+      --card:rgba(255,255,255,.86);
+      --card-solid:#ffffff;
+      --ink:#141414;
+      --muted:#6f706d;
+      --soft:#eeece5;
+      --line:rgba(20,20,20,.10);
+      --accent:#176b58;
+      --accent-2:#224f9f;
+      --accent-soft:#e8f3ef;
+      --wrong:#a03d3d;
+      --wrong-soft:#f8eaea;
+      --ok:#237346;
+      --ok-soft:#e8f5ee;
+      --shadow:0 24px 70px rgba(18,24,20,.08);
+      --shadow-small:0 10px 30px rgba(18,24,20,.07);
+      --radius:28px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 8% 8%, rgba(23,107,88,.16), transparent 28rem),
+        radial-gradient(circle at 92% 10%, rgba(34,79,159,.12), transparent 24rem),
+        linear-gradient(180deg, #fbfaf7 0%, var(--bg) 48%, #f0eee7 100%);
+    }
+
+    main{
+      width:min(1240px, calc(100% - 36px));
+      margin:0 auto;
+      padding:42px 0 28px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1fr 270px;
+      gap:26px;
+      align-items:stretch;
+      margin-bottom:20px;
+    }
+
+    .heroText{
+      padding:34px;
+      border:1px solid var(--line);
+      border-radius:34px;
+      background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.62));
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:18px;
+      padding:7px 10px;
+      border:1px solid rgba(23,107,88,.16);
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .eyebrow::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--accent);
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(38px, 5.5vw, 68px);
+      line-height:.9;
+      letter-spacing:-.035em;
+    }
+
+    .subtitle{
+      max-width:760px;
+      margin:18px 0 0;
+      color:var(--muted);
+      font-size:17px;
+      line-height:1.7;
+    }
+
+    .scoreBox{
+      border:1px solid var(--line);
+      border-radius:34px;
+      background:var(--card);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height:210px;
+    }
+
+    .scoreTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .scoreDot{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:var(--accent);
+      box-shadow:0 0 0 7px rgba(23,107,88,.11);
+    }
+
+    .scoreValue{
+      font-size:58px;
+      font-weight:850;
+      letter-spacing:-.08em;
+      line-height:1;
+    }
+
+    .scoreHint{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .app{
+      display:grid;
+      grid-template-columns:340px minmax(0, 1fr);
+      gap:24px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+    }
+
+    .sidebar{
+      padding:22px;
+      position:sticky;
+      top:16px;
+    }
+
+    .sectionTitle{
+      margin:0 0 13px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+    }
+
+    .substances{
+      display:grid;
+      gap:9px;
+    }
+
+    .substance{
+      width:100%;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.78);
+      color:var(--ink);
+      border-radius:19px;
+      padding:16px;
+      cursor:pointer;
+      text-align:left;
+      transition:.16s ease;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      box-shadow:0 1px 0 rgba(255,255,255,.8) inset;
+    }
+
+    .substance:hover{
+      transform:translateY(-1px);
+      box-shadow:var(--shadow-small);
+    }
+
+    .substance.active{
+      background:linear-gradient(135deg, var(--accent-soft), #fff);
+      border-color:rgba(23,107,88,.32);
+      color:var(--accent);
+      font-weight:850;
+    }
+
+    .badge{
+      padding:5px 8px;
+      border-radius:999px;
+      background:var(--soft);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:850;
+      white-space:nowrap;
+    }
+
+    .substance.active .badge{
+      background:#dbece6;
+      color:var(--accent);
+    }
+
+    .note{
+      margin-top:15px;
+      padding:16px;
+      border-radius:20px;
+      background:rgba(238,236,229,.72);
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.65;
+    }
+
+    .note b{
+      color:var(--ink);
+    }
+
+    .map{
+      padding:22px;
+      margin-bottom:20px;
+    }
+
+    .nephron{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:10px;
+    }
+
+    .part{
+      min-height:118px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.78);
+      border-radius:24px;
+      padding:13px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      overflow:hidden;
+      position:relative;
+      transition:.16s ease;
+    }
+
+    .part::after{
+      content:"";
+      position:absolute;
+      width:90px;
+      height:90px;
+      right:-40px;
+      top:-40px;
+      border-radius:50%;
+      background:rgba(23,107,88,.10);
+      opacity:0;
+      transition:.16s ease;
+    }
+
+    .part.active{
+      transform:translateY(-2px);
+      border-color:rgba(23,107,88,.34);
+      box-shadow:var(--shadow-small);
+    }
+
+    .part.active::after{
+      opacity:1;
+    }
+
+    .partName{
+      position:relative;
+      z-index:1;
+      font-weight:850;
+      font-size:15px;
+      line-height:1.25;
+      letter-spacing:-.02em;
+    }
+
+    .partSub{
+      position:relative;
+      z-index:1;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    .exercise{
+      padding:24px;
+    }
+
+    .exerciseHeader{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:start;
+      margin-bottom:17px;
+    }
+
+    h2{
+      margin:0;
+      font-size:34px;
+      line-height:1;
+      letter-spacing:-.035em;
+    }
+
+    .instruction{
+      margin:9px 0 0;
+      color:var(--muted);
+      line-height:1.48;
+      font-size:15px;
+      max-width:740px;
+    }
+
+    .controls{
+      display:flex;
+      gap:9px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    button{
+      font:inherit;
+    }
+
+    .btn{
+      border:0;
+      border-radius:16px;
+      padding:12px 15px;
+      cursor:pointer;
+      transition:.16s ease;
+      white-space:nowrap;
+      font-weight:800;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .primary{
+      background:var(--accent);
+      color:#fff;
+      box-shadow:0 10px 24px rgba(23,107,88,.22);
+    }
+
+    .secondary{
+      background:#ebe8df;
+      color:var(--ink);
+    }
+
+    .rows{
+      display:grid;
+      gap:11px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:220px 1fr;
+      gap:16px;
+      align-items:center;
+      background:rgba(255,255,255,.82);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:13px;
+      transition:.16s ease;
+    }
+
+    .row.correct{
+      border-color:rgba(35,115,70,.45);
+      background:linear-gradient(135deg, var(--ok-soft), rgba(255,255,255,.88));
+    }
+
+    .row.wrong{
+      border-color:rgba(160,61,61,.45);
+      background:linear-gradient(135deg, var(--wrong-soft), rgba(255,255,255,.88));
+    }
+
+    .segment{
+      font-weight:850;
+      font-size:15px;
+      line-height:1.35;
+      letter-spacing:-.015em;
+    }
+
+    .choices{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(160px, 1fr));
+      gap:10px;
+    }
+
+    .choice{
+      border:1px solid var(--line);
+      background:#faf9f5;
+      border-radius:16px;
+      padding:14px 12px;
+      cursor:pointer;
+      text-align:center;
+      color:var(--muted);
+      transition:.14s ease;
+      min-height:64px;
+      font-size:14px;
+      line-height:1.35;
+    }
+
+    .choice:hover{
+      background:#f1eee6;
+    }
+
+    .choice small{
+      display:block;
+      margin-top:3px;
+      font-size:12px;
+      line-height:1.35;
+      opacity:.78;
+    }
+
+    .choice.selected{
+      background:linear-gradient(135deg, var(--accent-soft), #fff);
+      border-color:rgba(23,107,88,.42);
+      color:var(--accent);
+      font-weight:850;
+    }
+
+    .row.correct .choice.selected{
+      background:var(--ok-soft);
+      border-color:rgba(35,115,70,.55);
+      color:var(--ok);
+    }
+
+    .row.wrong .choice.selected{
+      background:var(--wrong-soft);
+      border-color:rgba(160,61,61,.55);
+      color:var(--wrong);
+    }
+
+    .feedback{
+      display:none;
+      grid-column:1 / -1;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+      padding:2px 2px 0;
+    }
+
+    .feedback.show{
+      display:block;
+    }
+
+    .result{
+      display:none;
+      margin-top:15px;
+      border-radius:20px;
+      padding:17px;
+      background:linear-gradient(135deg, var(--accent-soft), #fff);
+      color:var(--accent);
+      font-weight:850;
+      line-height:1.35;
+      border:1px solid rgba(23,107,88,.18);
+    }
+
+    .result.show{
+      display:block;
+    }
+
+    .footer{
+      width:max-content;
+      max-width:100%;
+      margin:32px auto 0;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.55);
+      border:1px solid rgba(0,0,0,.06);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    @media (max-width:1040px){
+      .hero{
+        grid-template-columns:1fr;
+      }
+
+      .scoreBox{
+        min-height:0;
+      }
+
+      .app{
+        grid-template-columns:1fr;
+      }
+
+      .sidebar{
+        position:static;
+      }
+
+      .nephron{
+        grid-template-columns:repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width:680px){
+      main{
+        width:min(100% - 22px, 1240px);
+        padding-top:24px;
+      }
+
+      .heroText{
+        padding:21px;
+        border-radius:28px;
+      }
+
+      .exerciseHeader{
+        display:block;
+      }
+
+      .controls{
+        justify-content:flex-start;
+        margin-top:13px;
+      }
+
+      .row{
+        grid-template-columns:1fr;
+      }
+
+      .choices{
+        grid-template-columns:1fr;
+      }
+
+      .nephron{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .scoreValue{
+        font-size:44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="heroText">
+        <div class="eyebrow">Übung zum Nephron</div>
+        <h1>Stofftransport im Nephron</h1>
+        <p class="subtitle">Wähle einen Stoff und entscheide für jeden Abschnitt, ob der Stoff in den Harnraum gelangt, aus dem Harnraum herausgelangt oder dort keine Hauptbewegung zeigt.</p>
+      </div>
+
+      <div class="scoreBox" aria-live="polite">
+        <div class="scoreTop">
+          <span>Aktueller Stand</span>
+          <span class="scoreDot"></span>
+        </div>
+        <div class="scoreValue" id="scoreValue">0/6</div>
+        <div class="scoreHint">Erst beantworten, dann prüfen. Pro Stoff sind sechs Abschnitte zuzuordnen.</div>
+      </div>
+    </section>
+
+    <section class="app">
+      <aside class="card sidebar">
+        <p class="sectionTitle">Stoff wählen</p>
+        <div class="substances" id="substances"></div>
+      </aside>
+
+      <div>
+        <section class="card exercise">
+          <div class="exerciseHeader">
+            <div>
+              <h2 id="title">Wasser</h2>
+              <p class="instruction" id="instruction">Ordne jeden Nephron-Abschnitt zu.</p>
+            </div>
+            <div class="controls">
+              <button class="btn secondary" id="resetBtn">Zurücksetzen</button>
+              <button class="btn primary" id="checkBtn">Prüfen</button>
+            </div>
+          </div>
+
+          <div class="rows" id="rows"></div>
+          <div class="result" id="result"></div>
+        </section>
+      </div>
+    </section>
+
+    <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+  </main>
+
+  <script>
+    const segments = [
+      ["nierenkoerperchen", "Nierenkörperchen", "Filtration in die Bowman-Kapsel"],
+      ["proximal", "proximaler Tubulus", "starke Rückresorption"],
+      ["henleDown", "Henle-Schleife absteigend", "wasserdurchlässig"],
+      ["henleUp", "Henle-Schleife aufsteigend", "salzdurchlässig"],
+      ["distal", "distaler Tubulus", "Feinregulation"],
+      ["collecting", "Sammelrohr", "Endharn / Regulation"]
+    ];
+
+    /*
+      Skriptlogik:
+      nephron = aus dem Blut in das Nephron: Filtration oder Sekretion
+      blood = aus dem Nephron zurück ins Blut: Rückresorption
+      none = keine Hauptbewegung in diesem Abschnitt
+    */
+    const data = {
+      water: {
+        label: "Wasser",
+        answers: {
+          nierenkoerperchen: "nephron",
+          proximal: "blood",
+          henleDown: "blood",
+          henleUp: "none",
+          distal: "blood",
+          collecting: "blood"
+        },
+        feedback: {
+          nierenkoerperchen: "Wasser gelangt durch Filtration aus dem Blut in die Bowman-Kapsel und damit in den Harnraum.",
+          proximal: "Wasser wird aus dem proximalen Tubulus zurück aus dem Harnraum heraus.",
+          henleDown: "Im absteigenden Teil verlässt Wasser die Tubulusflüssigkeit und gelangt zurück Richtung Blut.",
+          henleUp: "Der aufsteigende Teil ist wasserundurchlässig.",
+          distal: "Wasser kann aus dem distalen Tubulus zurück aus dem Harnraum heraus werden.",
+          collecting: "Im Sammelrohr wird Wasser vor allem ADH-abhängig aus dem Nephron zurück aus dem Harnraum heraus."
+        }
+      },
+      nacl: {
+        label: "NaCl",
+        answers: {
+          nierenkoerperchen: "nephron",
+          proximal: "blood",
+          henleDown: "none",
+          henleUp: "blood",
+          distal: "blood",
+          collecting: "blood"
+        },
+        feedback: {
+          nierenkoerperchen: "NaCl gelangt durch Filtration aus dem Blut in die Bowman-Kapsel und damit in den Harnraum.",
+          proximal: "NaCl wird aus dem proximalen Tubulus zurück aus dem Harnraum heraus.",
+          henleDown: "Im absteigenden Teil ist NaCl in diesem Grundmodell keine Hauptbewegung.",
+          henleUp: "NaCl verlässt die Tubulusflüssigkeit im aufsteigenden Teil der Henle-Schleife und wird zurück Richtung Blut transportiert.",
+          distal: "NaCl wird im distalen Tubulus reguliert zurück aus dem Harnraum heraus.",
+          collecting: "NaCl wird im Sammelrohr weiter reguliert zurück aus dem Harnraum heraus."
+        }
+      },
+      harnstoff: {
+        label: "Harnstoff",
+        answers: {
+          nierenkoerperchen: "nephron",
+          proximal: "blood",
+          henleDown: "none",
+          henleUp: "nephron",
+          distal: "none",
+          collecting: "blood"
+        },
+        feedback: {
+          nierenkoerperchen: "Harnstoff wird im Nierenkörperchen aus dem Blut in die Bowman-Kapsel filtriert und gelangt damit in den Harnraum.",
+          proximal: "Im proximalen Tubulus verlässt ein Teil des Harnstoffs den Harnraum und wird zurück ins Blut rückresorbiert.",
+          henleDown: "Im absteigenden Teil der Henle-Schleife ist Harnstoff hier keine Hauptbewegung.",
+          henleUp: "Im aufsteigenden Teil der Henle-Schleife gelangt Harnstoff aus dem Nierenmark wieder in die Tubulusflüssigkeit.",
+          distal: "Im distalen Tubulus ist Harnstoff hier keine Hauptbewegung.",
+          collecting: "Im Sammelrohr verlässt Harnstoff die Tubulusflüssigkeit und wird ins Nierenmark abgegeben. Das unterstützt den Konzentrationsgradienten im Nierenmark."
+        }
+      },
+      glucose: {
+        label: "Glucose",
+        answers: {
+          nierenkoerperchen: "nephron",
+          proximal: "blood",
+          henleDown: "none",
+          henleUp: "none",
+          distal: "none",
+          collecting: "none"
+        },
+        feedback: {
+          nierenkoerperchen: "Glucose gelangt durch Filtration aus dem Blut in die Bowman-Kapsel und damit in den Harnraum.",
+          proximal: "Glucose wird normalerweise vollständig aus dem proximalen Tubulus zurück aus dem Harnraum heraus.",
+          henleDown: "Glucose wurde normalerweise bereits im proximalen Tubulus zurückgewonnen; hier bleibt sie nicht als wichtiger Transportstoff übrig.",
+          henleUp: "Glucose wurde normalerweise bereits vorher zurückgewonnen; hier findet keine wichtige Glucosebewegung statt.",
+          distal: "Bei gesunden Nieren ist Glucose hier normalerweise nicht mehr in relevanter Menge vorhanden.",
+          collecting: "Glucose sollte im Endharn normalerweise nicht mehr vorkommen."
+        }
+      },
+      vitamins: {
+        label: "Vitamine",
+        answers: {
+          nierenkoerperchen: "nephron",
+          proximal: "blood",
+          henleDown: "none",
+          henleUp: "none",
+          distal: "none",
+          collecting: "none"
+        },
+        feedback: {
+          nierenkoerperchen: "Kleine wasserlösliche Vitamine können aus dem Blut in die Bowman-Kapsel filtriert werden und gelangen damit in den Harnraum.",
+          proximal: "Viele nützliche kleine Moleküle werden vor allem aus dem proximalen Tubulus zurück aus dem Harnraum heraus.",
+          henleDown: "Die wichtige Rückgewinnung kleiner nützlicher Moleküle geschieht vor allem früher im proximalen Tubulus.",
+          henleUp: "Hier stehen andere Transporte im Vordergrund, besonders Salzbewegungen.",
+          distal: "Für Vitamine ist dies in dieser Übung keine wichtige Transportstelle.",
+          collecting: "Überschüssige wasserlösliche Vitamine können mit dem Urin ausgeschieden werden; eine gezielte Rückresorption findet hier nicht im Vordergrund statt."
+        }
+      }
+    };
+
+    const choiceLabels = {
+      nephron: "in den Harnraum",
+      blood: "aus dem Harnraum heraus",
+      none: "keine Hauptbewegung"
+    };
+
+    const choiceLongLabels = {
+      nephron: "in den Harnraum",
+      blood: "aus dem Harnraum heraus",
+      none: "keine Hauptbewegung"
+    };
+
+    let current = "water";
+    let answersGiven = {};
+
+    const substancesEl = document.getElementById("substances");
+    const rowsEl = document.getElementById("rows");
+    const titleEl = document.getElementById("title");
+    const instructionEl = document.getElementById("instruction");
+    const scoreValueEl = document.getElementById("scoreValue");
+    const resultEl = document.getElementById("result");
+
+    function initSubstances(){
+      Object.entries(data).forEach(([key, item]) => {
+        const btn = document.createElement("button");
+        btn.className = "substance";
+        btn.type = "button";
+        btn.dataset.key = key;
+        btn.innerHTML = `<span>${item.label}</span><span class="badge" id="badge-${key}">0/6</span>`;
+        btn.addEventListener("click", () => setSubstance(key));
+        substancesEl.appendChild(btn);
+      });
+    }
+
+    function setSubstance(key){
+      current = key;
+      answersGiven = {};
+      titleEl.textContent = data[current].label;
+      instructionEl.textContent = `Ordne für ${data[current].label}: in den Harnraum, aus dem Harnraum heraus oder keine Hauptbewegung.`;
+      resultEl.classList.remove("show");
+      renderRows();
+      updateActiveState();
+      updateScore();
+    }
+
+    function renderRows(){
+      rowsEl.innerHTML = "";
+      segments.forEach(([id, name]) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.dataset.segment = id;
+        row.innerHTML = `
+          <div class="segment">${name}</div>
+          <div class="choices">
+            <button class="choice" type="button" data-answer="nephron">in den Harnraum<br><small>Primärharn / Tubulusflüssigkeit</small></button>
+            <button class="choice" type="button" data-answer="blood">aus dem Harnraum heraus<br><small>ins Blut / Nierenmark</small></button>
+            <button class="choice" type="button" data-answer="none">keine Hauptbewegung<br><small>für diesen Stoff</small></button>
+          </div>
+          <div class="feedback" id="feedback-${id}"></div>
+        `;
+
+        row.querySelectorAll(".choice").forEach(choice => {
+          choice.addEventListener("click", () => {
+            answersGiven[id] = choice.dataset.answer;
+            row.querySelectorAll(".choice").forEach(c => c.classList.remove("selected"));
+            choice.classList.add("selected");
+            row.classList.remove("correct", "wrong");
+            document.getElementById(`feedback-${id}`).classList.remove("show");
+            updateScore();
+          });
+        });
+
+        rowsEl.appendChild(row);
+      });
+    }
+
+    function check(){
+      let correct = 0;
+
+      segments.forEach(([id]) => {
+        const expected = data[current].answers[id];
+        const given = answersGiven[id];
+        const row = rowsEl.querySelector(`[data-segment="${id}"]`);
+        const feedback = document.getElementById(`feedback-${id}`);
+
+        row.classList.remove("correct", "wrong");
+
+        if(given === expected){
+          correct++;
+          row.classList.add("correct");
+          feedback.textContent = `Richtig: ${choiceLongLabels[expected]}. ${data[current].feedback[id]}`;
+        }else{
+          row.classList.add("wrong");
+          feedback.textContent = `Korrekt wäre: ${choiceLongLabels[expected]}. ${data[current].feedback[id]}`;
+        }
+
+        feedback.classList.add("show");
+      });
+
+      scoreValueEl.textContent = `${correct}/6`;
+      document.getElementById(`badge-${current}`).textContent = `${correct}/6`;
+
+      resultEl.textContent = correct === 6
+        ? `Alles richtig für ${data[current].label}.`
+        : `${correct} von 6 richtig für ${data[current].label}.`;
+      resultEl.classList.add("show");
+    }
+
+    function reset(){
+      answersGiven = {};
+      renderRows();
+      resultEl.classList.remove("show");
+      updateScore();
+    }
+
+    function updateScore(){
+      const answered = Object.keys(answersGiven).length;
+      scoreValueEl.textContent = `${answered}/6`;
+    }
+
+    function updateActiveState(){
+      document.querySelectorAll(".substance").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.key === current);
+      });
+    }
+
+    document.getElementById("checkBtn").addEventListener("click", check);
+    document.getElementById("resetBtn").addEventListener("click", reset);
+
+    initSubstances();
+    setSubstance(current);
+  </script>
+</body>
+</html>
