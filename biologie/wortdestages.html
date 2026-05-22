@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wort des Tages</title>
+  <style>
+    :root{
+      --text:#17151f;
+      --muted:rgba(23,21,31,0.48);
+      --line:rgba(23,21,31,0.09);
+      --card:rgba(255,255,255,0.72);
+      --accent:#17151f;
+      --radius:30px;
+      --shadow:0 26px 90px rgba(42,32,70,0.12);
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255,188,214,0.86) 0 13%, transparent 31%),
+        radial-gradient(circle at 82% 16%, rgba(176,224,230,0.84) 0 12%, transparent 29%),
+        radial-gradient(circle at 72% 78%, rgba(207,190,255,0.88) 0 15%, transparent 35%),
+        radial-gradient(circle at 18% 82%, rgba(210,231,255,0.86) 0 12%, transparent 31%),
+        linear-gradient(135deg, #fff7ef 0%, #f8edf4 34%, #eef4ff 70%, #f3eefc 100%);
+      overflow:hidden;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      pointer-events:none;
+      border-radius:45% 55% 62% 38% / 47% 36% 64% 53%;
+      filter:blur(1px);
+      opacity:0.72;
+      z-index:0;
+    }
+
+    body::before{
+      width:520px;
+      height:520px;
+      left:-180px;
+      top:-150px;
+      background:
+        radial-gradient(circle at 35% 38%, rgba(255,255,255,0.58), transparent 32%),
+        linear-gradient(135deg, rgba(255,183,197,0.62), rgba(194,226,255,0.46));
+      transform:rotate(-18deg);
+    }
+
+    body::after{
+      width:620px;
+      height:620px;
+      right:-220px;
+      bottom:-230px;
+      background:
+        radial-gradient(circle at 42% 34%, rgba(255,255,255,0.48), transparent 30%),
+        linear-gradient(135deg, rgba(203,194,255,0.62), rgba(209,221,255,0.54));
+      transform:rotate(21deg);
+    }
+
+    .orb{
+      position:fixed;
+      pointer-events:none;
+      z-index:0;
+      border-radius:999px;
+      filter:blur(10px);
+      opacity:0.42;
+    }
+
+    .orb.one{
+      width:160px;
+      height:160px;
+      left:62%;
+      top:9%;
+      background:#ffc8dd;
+    }
+
+    .orb.two{
+      width:130px;
+      height:130px;
+      left:8%;
+      bottom:14%;
+      background:#bde0fe;
+    }
+
+    .orb.three{
+      width:190px;
+      height:190px;
+      right:12%;
+      top:54%;
+      background:#c8d8ff;
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      width:min(100%, 560px);
+    }
+
+    .card{
+      position:relative;
+      background:var(--card);
+      backdrop-filter:blur(26px);
+      border:1px solid rgba(255,255,255,0.68);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:36px;
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(120deg, rgba(255,255,255,0.58), transparent 38%),
+        radial-gradient(circle at 88% 20%, rgba(255,255,255,0.5), transparent 24%);
+      pointer-events:none;
+    }
+
+    .screen{
+      position:relative;
+      z-index:1;
+      display:none;
+      animation:fadeUp 360ms ease both;
+    }
+
+    .screen.active{
+      display:block;
+    }
+
+    .label{
+      display:inline-flex;
+      padding:7px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.48);
+      color:rgba(23,21,31,0.54);
+      border:1px solid rgba(255,255,255,0.58);
+      font-size:12px;
+      font-weight:720;
+      letter-spacing:0.035em;
+      text-transform:uppercase;
+      margin-bottom:22px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(38px, 7vw, 64px);
+      line-height:0.94;
+      letter-spacing:-0.068em;
+      font-weight:800;
+    }
+
+    .input-wrap{
+      margin-top:32px;
+      display:flex;
+      gap:10px;
+      padding:8px;
+      background:rgba(255,255,255,0.54);
+      border:1px solid rgba(255,255,255,0.66);
+      border-radius:21px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+
+    input{
+      flex:1;
+      min-width:0;
+      border:0;
+      outline:0;
+      background:transparent;
+      padding:15px 14px;
+      font-size:18px;
+      color:var(--text);
+      text-transform:uppercase;
+      letter-spacing:0.04em;
+      font-weight:650;
+    }
+
+    input::placeholder{
+      color:rgba(23,21,31,0.28);
+      font-weight:520;
+      letter-spacing:0;
+      text-transform:none;
+    }
+
+    button{
+      border:0;
+      border-radius:16px;
+      padding:14px 18px;
+      background:var(--accent);
+      color:white;
+      font-size:14px;
+      font-weight:760;
+      cursor:pointer;
+      transition:transform 160ms ease, opacity 160ms ease, background 160ms ease;
+      white-space:nowrap;
+    }
+
+    button:hover{
+      transform:translateY(-1px);
+    }
+
+    button:active{
+      transform:translateY(0);
+      opacity:0.86;
+    }
+
+    button.secondary{
+      background:rgba(255,255,255,0.58);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,0.68);
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top:28px;
+      flex-wrap:wrap;
+    }
+
+    .letters{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      min-height:78px;
+      margin:36px 0 10px;
+    }
+
+    .letter{
+      width:54px;
+      height:62px;
+      display:grid;
+      place-items:center;
+      border-radius:18px;
+      background:rgba(255,255,255,0.78);
+      border:1px solid rgba(255,255,255,0.82);
+      box-shadow:0 12px 28px rgba(35,28,52,0.08);
+      font-size:28px;
+      font-weight:820;
+      letter-spacing:-0.02em;
+      transition:
+        transform 560ms cubic-bezier(.2,.8,.2,1),
+        background 240ms ease,
+        color 240ms ease,
+        border-color 240ms ease,
+        box-shadow 240ms ease;
+      user-select:none;
+    }
+
+    .letter.resolved{
+      background:#17151f;
+      color:white;
+      border-color:#17151f;
+      box-shadow:0 18px 38px rgba(23,21,31,0.2);
+    }
+
+    .result-label{
+      text-align:center;
+      min-height:24px;
+      font-size:13px;
+      font-weight:740;
+      color:rgba(23,21,31,0.42);
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+    }
+
+    .shake{
+      animation:shake 360ms ease;
+    }
+
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    @keyframes fadeUp{
+      from{
+        opacity:0;
+        transform:translateY(12px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    @keyframes shake{
+      0%, 100%{ transform:translateX(0); }
+      25%{ transform:translateX(-6px); }
+      50%{ transform:translateX(6px); }
+      75%{ transform:translateX(-3px); }
+    }
+
+    @media (max-width:520px){
+      body{
+        padding:18px;
+      }
+
+      .card{
+        padding:25px;
+        border-radius:24px;
+      }
+
+      .input-wrap{
+        flex-direction:column;
+      }
+
+      button{
+        width:100%;
+      }
+
+      .letter{
+        width:46px;
+        height:54px;
+        border-radius:15px;
+        font-size:24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+  <div class="orb three"></div>
+
+  <main class="app">
+    <section class="card">
+      <div id="screenInput" class="screen active">
+        <div class="label">Wort des Tages</div>
+        <h1>Wort eingeben.</h1>
+
+        <form id="wordForm" class="input-wrap" autocomplete="off">
+          <input id="wordInput" type="text" placeholder="z. B. Biologie" aria-label="Wort eingeben" />
+          <button type="submit">Starten</button>
+        </form>
+      </div>
+
+      <div id="screenGame" class="screen">
+        <div class="label">Wort des Tages</div>
+        <div id="letters" class="letters" aria-live="polite"></div>
+        <div id="resultLabel" class="result-label"></div>
+
+        <div class="actions">
+          <button id="resolveButton" type="button">Auflösen</button>
+          <button id="shuffleButton" class="secondary" type="button">Neu mischen</button>
+          <button id="backButton" class="secondary" type="button">Neues Wort</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+  </main>
+
+  <script>
+    const screenInput = document.getElementById("screenInput");
+    const screenGame = document.getElementById("screenGame");
+    const wordForm = document.getElementById("wordForm");
+    const wordInput = document.getElementById("wordInput");
+    const lettersEl = document.getElementById("letters");
+    const resultLabel = document.getElementById("resultLabel");
+    const resolveButton = document.getElementById("resolveButton");
+    const shuffleButton = document.getElementById("shuffleButton");
+    const backButton = document.getElementById("backButton");
+
+    let originalWord = "";
+    let currentLetters = [];
+
+    function normaliseWord(value){
+      return value.trim().replace(/\s+/g, "").toLocaleUpperCase("de-CH");
+    }
+
+    function shuffleArray(array){
+      const shuffled = [...array];
+
+      for(let i = shuffled.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      if(shuffled.join("") === array.join("") && shuffled.length > 1){
+        [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
+      }
+
+      return shuffled;
+    }
+
+    function setScreen(target){
+      screenInput.classList.toggle("active", target === "input");
+      screenGame.classList.toggle("active", target === "game");
+    }
+
+    function renderLetters(letters, resolved = false){
+      lettersEl.innerHTML = "";
+
+      letters.forEach((letter, index) => {
+        const tile = document.createElement("div");
+        tile.className = resolved ? "letter resolved" : "letter";
+        tile.textContent = letter;
+        tile.style.transform = `translateY(${resolved ? 0 : Math.sin(index) * 8}px) rotate(${resolved ? 0 : (index % 2 === 0 ? -2 : 2)}deg)`;
+        lettersEl.appendChild(tile);
+      });
+    }
+
+    function startGame(){
+      const cleaned = normaliseWord(wordInput.value);
+
+      if(!cleaned){
+        wordForm.classList.remove("shake");
+        void wordForm.offsetWidth;
+        wordForm.classList.add("shake");
+        wordInput.focus();
+        return;
+      }
+
+      originalWord = cleaned;
+      wordInput.value = cleaned;
+      currentLetters = shuffleArray([...originalWord]);
+      resultLabel.textContent = "";
+      renderLetters(currentLetters);
+      setScreen("game");
+    }
+
+    function resolveWord(){
+      const tiles = [...document.querySelectorAll(".letter")];
+      const originalLetters = [...originalWord];
+
+      resultLabel.textContent = "Originalwort";
+      resolveButton.disabled = true;
+      shuffleButton.disabled = true;
+
+      tiles.forEach((tile, index) => {
+        setTimeout(() => {
+          tile.textContent = originalLetters[index];
+          tile.classList.add("resolved");
+          tile.style.transform = "translateY(0) rotate(0deg)";
+        }, index * 85);
+      });
+
+      setTimeout(() => {
+        resolveButton.disabled = false;
+        shuffleButton.disabled = false;
+      }, originalLetters.length * 85 + 220);
+    }
+
+    function reshuffle(){
+      currentLetters = shuffleArray([...originalWord]);
+      resultLabel.textContent = "";
+      renderLetters(currentLetters);
+    }
+
+    wordInput.addEventListener("input", () => {
+      const cursorPosition = wordInput.selectionStart;
+      wordInput.value = wordInput.value.toLocaleUpperCase("de-CH");
+      wordInput.setSelectionRange(cursorPosition, cursorPosition);
+    });
+
+    wordForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      startGame();
+    });
+
+    resolveButton.addEventListener("click", resolveWord);
+    shuffleButton.addEventListener("click", reshuffle);
+
+    backButton.addEventListener("click", () => {
+      originalWord = "";
+      currentLetters = [];
+      wordInput.value = "";
+      lettersEl.innerHTML = "";
+      resultLabel.textContent = "";
+      setScreen("input");
+      setTimeout(() => wordInput.focus(), 80);
+    });
+  </script>
+</body>
+</html>
