@@ -1,0 +1,24 @@
+Titel;Beschreibung;Datei;Link;Kategorie
+Aminosäuren-Rechner;Wandelt DNA-Sequenzen in RNA und Protein um und hilft bei Genetik und Translation.;aminosauren.png;https://samueltobler.github.io/biologie/rna-rechner;Biologie
+Zähler;Zählt Daten einfach und schnell und eignet sich für Strichlisten und Live-Auswertungen.;counter.png;https://samueltobler.github.io/biologie/counter;Tool
+Grundumsatzrechner;Berechnet den Grundumsatz anhand von Körperdaten und gibt einen schnellen Überblick.;grundumsatz.png;https://samueltobler.github.io/biologie/grundumsatz;Biologie
+Imposter (Bio-Version);Impostor-Spiel mit Biobegriffen für spielerische Repetition und Einstieg.;impostor.png;https://samueltobler.github.io/biologie/imposter;Spiel
+Montagsmaler;Montagsmaler mit Biobegriffen zum Zeichnen und Begriffe erraten als Repetition.;montagsmaler.png;https://samueltobler.github.io/biologie/montagsmaler;Spiel
+Notenrechner;Notenberechnung nur mit Punkten für schnelle und klare Ergebnisse.;notenrechner.png;https://samueltobler.github.io/biologie/notenrechner;Tool
+Plagiat-Check;Vergleicht Texte auf Ähnlichkeiten und zeigt mögliche Übereinstimmungen.;plagiatscan.png;https://samueltobler.github.io/biologie/similarity;Tool
+Prüfungsuhr;Timer für Prüfungen mit klarer Anzeige und einfacher Zeitübersicht.;pruefungsuhr.png;https://samueltobler.github.io/biologie/exam-timer;Tool
+QR-Code-Generator;Erstellt QR-Codes kostenlos und ohne Weiterleitung für Links oder kurze Texte.;qrcode.png;https://samueltobler.github.io/biologie/qr;Tool
+Teststatistik;Berechnet Mittelwert, Median, Spannweite und Streuung und zeigt Resultate übersichtlich.;teststatistik.png;https://samueltobler.github.io/biologie/stats;Tool
+Automatisierte statistische Testanalyse;Berechnet Kennwerte und Noten und liefert Statistik zu Prüfungsfragen und Reliabilität des Gesamttests.;asta.png;https://samueltobler.shinyapps.io/ASTA/;Tool
+Blutgruppen; Zeigt eine zufällige Blutgruppe an und ermöglicht das Üben der passenden Erythrozyten-Spenderblutgruppen mit sofortiger Kontrolle und Lösung. Entwickelt in Zusammenarbeit mit Laura Mazza.;blutgruppen.png; https://samueltobler.github.io/biologie/blutgruppen/;Biologie
+Verhaltensbiologie als digitales Leitprogramm; Eine digitale Unterrichtseinheit zur Erarbeitung des Themas der Verhaltensbiologie und naturwissenschaftlicher Arbeitsweise.; verhaltensbiologie.png;https://samueltobler.github.io/verhaltensbiologie; Biologie 
+Muskelkontraktion - Querbrückenzyklus; Interaktive Web-App zur schrittweisen Visualisierung und Erklärung des Querbrückenzyklus bei der Muskelkontraktion.; muskelkontraktion.png; https://samueltobler.github.io/biologie/muskelkontraktion; Biologie 
+LearningApps; Eine Sammlung unterschiedlicher LearningApps zu unterschiedlichen biologischen Themen.; learningapps.png; https://learningapps.org/user/User15436466; Biologie
+Gruppengenerator; Ein Tool, um aus einer Liste von Namen automatisch zufällige Gruppen zu bilden.;gruppengenerator.png;https://samueltobler.github.io/biologie/gruppengenerator;Tool
+Zellzyklusdauer; Ein Tool, um die Dauer der Mitosephase im Zellzyklus anhand von Knoblauchzellen-Wurzelspitzen zu berechnen.; zellzyklusdauer.png; https://samueltobler.github.io/biologie/zellzyklusdauer; Biologie
+Sitzplan-Generator; Tool, das automatisch flexible Sitzpläne für Schulklassen generiert, zufällig verteilt und per Drag & Drop anpassbar macht.; sitzplan.png; https://samueltobler.github.io/biologie/sitzplan; Tools
+Prüfungsevaluation; Tool zur visuellen Auswertung von Prüfungsevaluationen, das Antwortzahlen erfasst, automatisch als übersichtliche Likert-Grafik darstellt und direkt als PNG exportiert.; prüfungsevaluation.png; https://gymitools.shinyapps.io/pruefungsevaluation; Tools
+Ampelsystem; Tool zur Darstellung von Schülerstatus, das Namen erfasst, automatisch als Ampeln anzeigt und per Klick zwischen grün, orange und rot wechseln lässt.; ampelsystem.png; https://samueltobler.github.io/biologie/ampelsystem; Tools
+Stofftransport im Nephron; Interaktive Web-App zum Üben der Stoffbewegungen im Nephron mit direkter Rückmeldung zu Wasser, NaCl, Harnstoff, Glucose und Vitaminen.; nephron.png; https://samueltobler.github.io/biologie/nephron; Biologie
+Ansätze zur linearen und nicht-linearen Notengebung;Erklärt lineare und abschnittsweise nicht-lineare Notenskalen im Schweizer Notensystem und zeigt Formeln sowie Tools zur automatisierten Berechnung.;notengebung.png;https://samueltobler.medium.com/ans%C3%A4tze-zur-linearen-und-nicht-linearen-notengebung-im-schulischen-kontext-50c5114b3874;Artikel
+Wort des Tages; App zum Entwirren eines eingegebenen Wortes mit zufällig gemischten Buchstaben; wortdestages.png; https://samueltobler.github.io/biologie/wortdestages; Spiel
