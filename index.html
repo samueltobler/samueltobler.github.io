@@ -638,7 +638,7 @@
       viewToggle.setAttribute('aria-pressed', String(isList));
       viewToggle.setAttribute('aria-label', isList ? 'Zur Kartenansicht wechseln' : 'Zur Listenansicht wechseln');
       viewToggle.setAttribute('title', isList ? 'Kartenansicht' : 'Listenansicht');
-      localStorage.setItem('projectViewMode', isList ? 'list' : 'grid');
+      localStorage.setItem('projectViewMode', isList ? 'grid' : 'list');
     }
 
     async function init(){
