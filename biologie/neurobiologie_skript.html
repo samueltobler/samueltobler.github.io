@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neurobiologie | Textbasierte Webfassung</title>
+  <style>
+    :root{
+      --bg:#fbfaf7;
+      --ink:#20242a;
+      --muted:#6c7280;
+      --line:#e8e4dc;
+      --card:#ffffffcc;
+      --mint:#dff3ea;
+      --blue:#dfeaf8;
+      --lav:#eee5fa;
+      --peach:#ffe8db;
+      --yellow:#fff4c7;
+      --rose:#fde2e8;
+      --green:#e8f7d9;
+      --shadow:0 18px 60px rgba(27, 31, 35, .08);
+      --radius:24px;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      --sans:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --serif:ui-serif, Georgia, Cambria, "Times New Roman", serif;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:
+      radial-gradient(circle at top left, rgba(223,243,234,.85), transparent 34rem),
+      radial-gradient(circle at top right, rgba(238,229,250,.9), transparent 36rem),
+      linear-gradient(180deg,#fbfaf7 0%,#f7f5ef 100%);
+      color:var(--ink);font-family:var(--sans);line-height:1.65}
+    a{color:#425c8a;text-decoration:none} a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:100vh}
+    aside{position:sticky;top:0;height:100vh;padding:28px 22px;border-right:1px solid var(--line);background:rgba(255,255,255,.6);backdrop-filter:blur(18px);overflow:auto}
+    main{padding:42px clamp(18px,4vw,64px) 80px;max-width:1180px;width:100%}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:24px}
+    .mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--mint),var(--lav));display:grid;place-items:center;font-weight:800;color:#253046;box-shadow:var(--shadow)}
+    .brand h1{font-size:1.05rem;margin:0;line-height:1.2}.brand p{margin:2px 0 0;color:var(--muted);font-size:.85rem}
+    .search{position:relative;margin:18px 0 18px}.search input{width:100%;border:1px solid var(--line);border-radius:16px;padding:13px 14px;background:white;font:inherit;outline:none}.search input:focus{border-color:#b9cde8;box-shadow:0 0 0 4px rgba(185,205,232,.35)}
+    nav{display:grid;gap:6px;margin:18px 0 26px}nav a{display:block;padding:10px 12px;border-radius:14px;color:#343a46;font-size:.94rem}nav a:hover{background:#f0ede6;text-decoration:none}.nav-kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 12px 6px}
+    .tools{display:grid;gap:8px;margin-top:20px}.btn{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 12px;font:inherit;color:#313744;cursor:pointer}.btn:hover{background:#f6f3ed}.small{font-size:.9rem;color:var(--muted)}
+    .hero{border:1px solid var(--line);border-radius:34px;padding:clamp(28px,5vw,64px);background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(255,255,255,.55));box-shadow:var(--shadow);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,var(--blue),transparent 70%);opacity:.8}.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.11em;color:#677080;font-weight:700}.hero h2{font-family:var(--serif);font-size:clamp(3rem,9vw,7rem);line-height:.92;margin:18px 0 16px;letter-spacing:-.07em}.lead{font-size:clamp(1.05rem,2vw,1.35rem);max-width:820px;color:#3f4651;margin:0}.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}.pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:white;padding:8px 12px;border-radius:999px;color:#475061;font-size:.9rem}
+    .grid{display:grid;gap:18px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .section{margin:54px 0}.chapter{scroll-margin-top:28px;margin:60px 0}.chapter > header{display:grid;gap:14px;margin-bottom:22px}.chapter-label{font-size:.82rem;text-transform:uppercase;letter-spacing:.12em;color:#7b8290;font-weight:800}.chapter h2{font-size:clamp(2rem,4vw,3.25rem);letter-spacing:-.045em;line-height:1.05;margin:0}.chapter-intro{font-size:1.08rem;max-width:900px;color:#3f4651;margin:0}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 10px 34px rgba(27,31,35,.05)}.card.mint{background:linear-gradient(135deg,var(--mint),#fff)}.card.blue{background:linear-gradient(135deg,var(--blue),#fff)}.card.lav{background:linear-gradient(135deg,var(--lav),#fff)}.card.peach{background:linear-gradient(135deg,var(--peach),#fff)}.card.yellow{background:linear-gradient(135deg,var(--yellow),#fff)}.card.rose{background:linear-gradient(135deg,var(--rose),#fff)}
+    h3{font-size:1.45rem;line-height:1.2;letter-spacing:-.025em;margin:0 0 12px}h4{font-size:1.08rem;margin:18px 0 8px}p{margin:0 0 12px}ul,ol{margin:8px 0 12px;padding-left:1.25rem}li{margin:4px 0}.muted{color:var(--muted)}
+    details{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.72);padding:0;overflow:hidden;margin:14px 0}summary{list-style:none;cursor:pointer;padding:17px 18px;font-weight:800;display:flex;justify-content:space-between;gap:14px}summary::-webkit-details-marker{display:none}summary:after{content:"+";font-weight:700;color:#697386}details[open] summary:after{content:"−"}.detail-body{padding:0 18px 18px;border-top:1px solid var(--line)}
+    .task{border-left:4px solid #c8d8ef;background:#fff;padding:14px 16px;border-radius:16px;margin:10px 0}.task strong{display:block;margin-bottom:4px}.answer{width:100%;min-height:74px;resize:vertical;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font:inherit;background:#fff;margin-top:8px}.answer:focus{outline:none;border-color:#b9cde8;box-shadow:0 0 0 4px rgba(185,205,232,.28)}
+    .flow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0}.node{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px 12px;box-shadow:0 6px 20px rgba(27,31,35,.04);font-weight:700}.arrow{color:#8b93a1;font-weight:900}.text-diagram{font-family:var(--mono);white-space:pre-wrap;background:#fcfbf8;border:1px dashed #d7d0c4;border-radius:18px;padding:16px;overflow:auto;color:#394050}.caption{font-size:.85rem;color:var(--muted);margin-top:8px}
+    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:white;margin:14px 0}th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}th{background:#f4f1ea;font-size:.9rem}tr:last-child td{border-bottom:0}.compact td,.compact th{padding:9px 10px;font-size:.92rem}
+    .checklist{display:grid;gap:8px}.checkitem{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:10px 12px}.checkitem input{margin-top:5px;accent-color:#90b8a8}
+    .linklist a{display:inline-flex;margin:4px 8px 4px 0;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:.9rem}.tag{display:inline-flex;border-radius:999px;background:#f1efe8;padding:3px 9px;font-size:.78rem;font-weight:800;color:#5b6170;margin:0 6px 6px 0}
+    .callout{border:1px solid var(--line);border-radius:22px;padding:18px;background:#fff}.callout strong{display:block;margin-bottom:6px}.hidden-by-search{display:none!important}.foot{margin-top:70px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:.92rem}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}aside{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}nav{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.two,.grid.three{grid-template-columns:1fr}.hero h2{font-size:3.5rem}}
+    @media print{aside,.tools,.search,.answer{display:none}.layout{display:block}main{padding:0}.card,.hero,details{box-shadow:none;background:white}details{break-inside:avoid}details:not([open]) .detail-body{display:block}summary:after{display:none}}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside aria-label="Navigation">
+      <div class="brand">
+        <div class="mark">N</div>
+        <div><h1>Neurobiologie</h1><p>textbasierte Webfassung</p></div>
+      </div>
+      <div class="search"><input id="search" type="search" placeholder="Inhalte suchen"></div>
+      <div class="nav-kicker">Kapitel</div>
+      <nav>
+        <a href="#k1">1 Einführung</a>
+        <a href="#k2">2 Nervensystem</a>
+        <a href="#k3">3 Gehirn</a>
+        <a href="#k4">4 Emotionen und Lernen</a>
+        <a href="#k5">5 Menschliches Lernen</a>
+        <a href="#k6">6 Hormonsystem</a>
+      </nav>
+      <div class="nav-kicker">Lernmodus</div>
+      <div class="tools">
+        <button class="btn" type="button" id="expandAll">Alle Abschnitte öffnen</button>
+        <button class="btn" type="button" id="collapseAll">Alle Abschnitte schliessen</button>
+        <button class="btn" type="button" onclick="window.print()">Drucken / als PDF sichern</button>
+      </div>
+      <p class="small">Alle Abbildungen wurden bewusst als Textdiagramme, Tabellen oder Bildbeschreibungen umgesetzt.</p>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Unterrichtsskript · Herbstsemester 2025</div>
+        <h2>Neurobiologie</h2>
+        <p class="lead">Eine moderne, minimalistische und textbasierte Webfassung des Skripts. Die Inhalte sind als Lernpfad mit Kernideen, Textdiagrammen, Aufgaben und Antwortfeldern strukturiert.</p>
+        <div class="meta">
+          <span class="pill">Samuel Tobler</span>
+          <span class="pill">6 Kapitel</span>
+          <span class="pill">Text-only, ohne Bilder</span>
+          <span class="pill">Responsive Einzelseite</span>
+        </div>
+      </section>
+
+      <section class="section grid three" aria-label="Überblick">
+        <article class="card mint"><h3>Grundidee</h3><p>Reize werden aufgenommen, elektrisch und chemisch weitergeleitet, im Nervensystem verarbeitet und führen zu einer Reaktion.</p></article>
+        <article class="card lav"><h3>Vom Organ zur Zelle</h3><p>Das Skript verbindet Organebene, Nervenzellen, Synapsen, Gehirnregionen und Hormone zu einem durchgehenden Systemverständnis.</p></article>
+        <article class="card peach"><h3>Lernen</h3><p>Die neuronale Plastizität erklärt, warum Wiederholung, Vorwissen, Emotionen und Lernstrategien den Lernerfolg beeinflussen.</p></article>
+      </section>
+
+      <section class="chapter" id="k1">
+        <header>
+          <div class="chapter-label">Kapitel 1</div>
+          <h2>Einführung in die Neurobiologie</h2>
+          <p class="chapter-intro">Das Nervensystem verknüpft Reize mit Reaktionen. Manche Abläufe geschehen reflexartig, andere werden bewusst im Gehirn verarbeitet.</p>
+        </header>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>1.1 Reize und Reaktionen</h3>
+            <p>Die Zellen des Nervensystems verknüpfen Reize wie Gerüche, Geräusche oder Berührungen mit Reaktionen. Zwischen Reiz und Reaktion liegt die elektrische Reizweiterleitung von den Sinneszellen bis zu Muskeln oder Zielorganen.</p>
+            <p>Rückenmark und Gehirn verarbeiten elektrische Signale, die über sensorische Nervenzellen eintreffen. Anschliessend wird eine Reaktion erzeugt, die über motorische Nervenzellen zum Zielorgan geleitet wird.</p>
+            <div class="flow" aria-label="Reiz-Reaktion-Fluss">
+              <span class="node">Reiz</span><span class="arrow">→</span><span class="node">Sinneszelle</span><span class="arrow">→</span><span class="node">sensorische Nervenzelle</span><span class="arrow">→</span><span class="node">Rückenmark / Gehirn</span><span class="arrow">→</span><span class="node">motorische Nervenzelle</span><span class="arrow">→</span><span class="node">Muskel / Zielorgan</span><span class="arrow">→</span><span class="node">Reaktion</span>
+            </div>
+            <p class="caption">Textdiagramm zur schematischen Übersicht des Reiz-Reaktion-Zusammenhangs.</p>
+          </article>
+          <article class="card blue">
+            <h3>Aufgaben</h3>
+            <div class="task"><strong>Aufgabe 1</strong>Ordne die unterstrichenen Begriffe des ursprünglichen Textes im Reiz-Reaktion-Schema ein.<textarea class="answer" data-key="k1-a1" placeholder="Notizen"></textarea></div>
+            <div class="task"><strong>Aufgabe 2</strong>Die Nervenweiterleitung erfolgt nur in eine Richtung. Warum ist diese Einspurigkeit wichtig?<textarea class="answer" data-key="k1-a2"></textarea></div>
+            <div class="task"><strong>Aufgabe 3 · Wissen anwenden</strong>Wie könnte eine elektrische Erregung molekular ausgelöst werden?<textarea class="answer" data-key="k1-a3"></textarea></div>
+            <div class="task"><strong>Aufgabe 4 · Für die Schnellen</strong>Muskelkontraktion, Hormonausschüttung, Herzfrequenz und Blutdruck werden über das Nervensystem gesteuert. Wie unterscheiden sich diese Prozessgruppen?<textarea class="answer" data-key="k1-a4"></textarea></div>
+          </article>
+        </div>
+
+        <details open>
+          <summary>1.2 Die Zellen des Nervensystems</summary>
+          <div class="detail-body">
+            <p>Das Nervensystem besteht aus über 150 Milliarden Zellen, die Informationen in Form elektrischer und chemischer Signale austauschen. Hauptsächlich unterscheidet man Neuronen und Gliazellen.</p>
+            <table class="compact">
+              <thead><tr><th>Zelltyp</th><th>Funktion</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Nervenzellen / Neuronen</strong></td><td>Aufnahme, Verarbeitung und Weiterleitung elektrischer Signale.</td></tr>
+                <tr><td><strong>Gliazellen</strong></td><td>Stabilisieren Neuronen, versorgen sie mit Nährstoffen und isolieren Axone elektrisch. Die Isolation beschleunigt die Reizweiterleitung.</td></tr>
+              </tbody>
+            </table>
+            <h4>Nervenzellen</h4>
+            <p>Neuronen unterscheiden sich in Form und Länge stark. Interneuronen verschalten andere Nervenzellen im Rückenmark oder Gehirn. Motorneuronen können vom Rückenmark bis in die Zehen reichen und bei Erwachsenen bis zu etwa einem Meter lang werden.</p>
+            <p>Wie andere eukaryotische Zellen besitzen Neuronen Zellkern und Organellen. Ihre Besonderheit sind lange spezialisierte Leitungsbahnen, über die elektrische Signale schnell und gezielt übertragen werden.</p>
+            <h4>Aufbau eines Neurons</h4>
+            <div class="flow">
+              <span class="node">Dendriten</span><span class="arrow">→</span><span class="node">Soma</span><span class="arrow">→</span><span class="node">Axonhügel</span><span class="arrow">→</span><span class="node">Axon</span><span class="arrow">→</span><span class="node">Endknöpfchen</span><span class="arrow">→</span><span class="node">Synapse</span>
+            </div>
+            <p>Chemische Signale werden an den Dendriten aufgenommen und in elektrische Signale umgewandelt. Der Zellkörper leitet die Signale zum Axonhügel. Wird dort die nötige Signalstärke erreicht, entsteht ein Aktionspotenzial. Dieses läuft entlang des Axons zu den Endknöpfchen. Dort werden Neurotransmitter freigesetzt, die über den synaptischen Spalt zur Zielzelle diffundieren.</p>
+            <p>Myelin umhüllt Axone abschnittsweise. An den Ranvier'schen Schnürringen liegen Übergänge zwischen Myelinsegmenten. Diese Bauweise beschleunigt die Signalweiterleitung.</p>
+            <div class="grid two">
+              <div class="task"><strong>Aufgabe 1</strong>Beschrifte Dendriten, Soma, Axonhügel, Axon, Myelin, Ranvier'sche Schnürringe, Endknöpfchen, synaptischen Spalt und Zielzelle. Markiere die Richtung der Erregungsweiterleitung.<textarea class="answer" data-key="k1-12-a1"></textarea></div>
+              <div class="task"><strong>Aufgabe 2</strong>Welche Verschaltung eignet sich besser für Reflexe wie den Kniesehnenreflex: nur Rückenmark oder zusätzlich Gehirn? Begründe.<textarea class="answer" data-key="k1-12-a2"></textarea></div>
+              <div class="task"><strong>Aufgabe 3 · Basiskonzept</strong>Erkläre, wie das Prinzip der Oberflächenvergrösserung im dichten Netz der Dendriten sichtbar wird.<textarea class="answer" data-key="k1-12-a3"></textarea></div>
+              <div class="task"><strong>Aufgabe 4 · Wissen anwenden</strong>Beim Guillain-Barré-Syndrom treten verzögerte Bewegungen oder Lähmungen auf. Welche Struktur des Nervensystems könnte betroffen sein?<textarea class="answer" data-key="k1-12-a4"></textarea></div>
+            </div>
+            <div class="linklist">
+              <a href="https://learningapps.org/view41520268">LearningApp Neuron 1</a>
+              <a href="https://learningapps.org/view36439025">LearningApp Neuron 2</a>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter" id="k2">
+        <header>
+          <div class="chapter-label">Kapitel 2</div>
+          <h2>Der Aufbau des Nervensystems</h2>
+          <p class="chapter-intro">Das Nervensystem ist das Steuer- und Kommunikationsnetz des Körpers. Es nimmt Informationen auf, verarbeitet sie und löst passende Reaktionen aus.</p>
+        </header>
+
+        <details open>
+          <summary>2.1 Das zentrale und periphere Nervensystem</summary>
+          <div class="detail-body">
+            <p>Das Nervensystem wird in das zentrale Nervensystem und das periphere Nervensystem unterteilt.</p>
+            <table>
+              <thead><tr><th>Teil</th><th>Bestandteile</th><th>Grundfunktion</th></tr></thead>
+              <tbody>
+                <tr><td><strong>ZNS</strong></td><td>Gehirn und Rückenmark</td><td>Verarbeitung und Koordination von Signalen.</td></tr>
+                <tr><td><strong>PNS</strong></td><td>Alle Nerven ausserhalb des ZNS</td><td>Verbindung von Sinnesorganen, Muskeln und Organen mit dem ZNS.</td></tr>
+              </tbody>
+            </table>
+            <div class="task"><strong>Auftrag zum Film</strong>Lies die Fragen zuerst, mache während des Films Notizen und vervollständige sie anschliessend in Zweiergruppen.<textarea class="answer" data-key="k2-film"></textarea></div>
+            <div class="grid two">
+              <div class="task"><strong>Frage 1</strong>Woraus besteht das ZNS? Was ist dessen Funktion?<textarea class="answer" data-key="k2-f1"></textarea></div>
+              <div class="task"><strong>Frage 2</strong>Woraus bestehen Nervenfasern? Wie unterscheiden sich afferente und efferente Nervenfasern?<textarea class="answer" data-key="k2-f2"></textarea></div>
+              <div class="task"><strong>Frage 3</strong>Woraus besteht das PNS?<textarea class="answer" data-key="k2-f3"></textarea></div>
+              <div class="task"><strong>Frage 4</strong>Wie kann man das Nervensystem sonst noch unterteilen?<textarea class="answer" data-key="k2-f4"></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Das Zusammenspiel von PNS und ZNS</summary>
+          <div class="detail-body">
+            <p>Am Reflexbogen lässt sich die Verschaltung gut darstellen. Die Zellkörper afferenter Neuronen liegen im Spinalganglion des PNS. Ihre Fortsätze treten über die Hinterwurzel ins Rückenmark ein und enden in der grauen Substanz. Dort interagieren sie mit anderen Neuronen, im einfachsten Fall direkt mit einem Motoneuron, das eine Muskelkontraktion auslöst.</p>
+            <div class="flow">
+              <span class="node">Sinnesorgan</span><span class="arrow">→</span><span class="node">afferentes Neuron</span><span class="arrow">→</span><span class="node">Spinalganglion</span><span class="arrow">→</span><span class="node">Rückenmark</span><span class="arrow">→</span><span class="node">Motoneuron</span><span class="arrow">→</span><span class="node">Muskel</span>
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>2.2 Alles unter Kontrolle?</summary>
+          <div class="detail-body">
+            <p>Das PNS wird funktional weiter unterteilt. Das somatische Nervensystem ermöglicht willentliche Bewegungen. Das vegetative oder autonome Nervensystem steuert unwillkürliche Reaktionen.</p>
+            <div class="text-diagram">Nervensystem
+├─ ZNS
+│  ├─ Gehirn
+│  └─ Rückenmark
+└─ PNS
+   ├─ somatisches Nervensystem: willentliche Bewegungen
+   └─ vegetatives Nervensystem: unwillkürliche Reaktionen</div>
+            <table>
+              <thead><tr><th>Reaktion</th><th>ZNS: Gehirn oder Rückenmark?</th><th>PNS: somatisch oder vegetativ?</th><th>Begründung</th></tr></thead>
+              <tbody>
+                <tr><td>Hand zurückziehen nach heisser Herdplatte</td><td></td><td></td><td></td></tr>
+                <tr><td>Fussball wegschiessen</td><td></td><td></td><td></td></tr>
+                <tr><td>Verdauungstätigkeit nach dem Essen nimmt zu</td><td></td><td></td><td></td></tr>
+                <tr><td>Knie zuckt beim Patellarsehnenreflex</td><td></td><td></td><td></td></tr>
+                <tr><td>Herzschlag steigt bei Aufregung</td><td></td><td></td><td></td></tr>
+                <tr><td>Diese Tabelle ausfüllen</td><td></td><td></td><td></td></tr>
+                <tr><td>Kopf drehen, um einem Geräusch zu folgen</td><td></td><td></td><td></td></tr>
+              </tbody>
+            </table>
+            <p class="caption">Hinweis: Schnelle, einfache Reflexe werden meist im Rückenmark verschaltet. Bewusste oder komplexe Reaktionen werden im Gehirn verarbeitet.</p>
+          </div>
+        </details>
+
+        <details open>
+          <summary>2.3 Unbewusst im Gleichgewicht</summary>
+          <div class="detail-body">
+            <p>Unbewusste Reaktionen des PNS müssen gegensätzliche Zustände steuern können: Leistung, Stress und Fluchtbereitschaft einerseits; Verdauung, Ruhe und Regeneration andererseits.</p>
+            <div class="grid two">
+              <article class="card peach"><h3>Sympathikus</h3><p>Der Sympathikus bereitet den Körper auf Aktivität, Jagd oder Flucht vor. Puls und Atemfrequenz steigen. Die Skelettmuskulatur wird stärker durchblutet und angespannt. Pupillen weiten sich, die Leber gibt Glukose ins Blut ab, Verdauung wird gehemmt, Adrenalin unterstützt die Leistungsbereitschaft und Schweissdrüsen helfen gegen Überhitzung.</p><div class="task"><strong>Frage</strong>Welche körperlichen Veränderungen werden ausgelöst? Warum sind sie für Jagd oder Flucht wichtig?<textarea class="answer" data-key="k2-symp"></textarea></div></article>
+              <article class="card mint"><h3>Parasympathikus</h3><p>Der Parasympathikus übernimmt in Ruhephasen. Pupillen verengen sich, Puls und Atmung werden ruhiger. Speichelfluss und Verdauung setzen ein. Der Magen-Darm-Trakt wird stärker durchblutet, die Gallenblase unterstützt die Fettverdauung und der Körper regeneriert, repariert Gewebe und speichert Energie.</p><div class="task"><strong>Frage</strong>Welche körperlichen Veränderungen werden ausgelöst? Warum sind sie für Erholung und Regeneration wichtig?<textarea class="answer" data-key="k2-para"></textarea></div></article>
+            </div>
+            <h4>Konsolidierungsaufgaben</h4>
+            <div class="grid two">
+              <div class="task"><strong>Aufgabe 1</strong>Welcher Teil des vegetativen Nervensystems ist aktiv, wenn man im Frühling in die kalte Thur springt? Wie sieht es nach einigen Minuten aus?<textarea class="answer" data-key="k2-k1"></textarea></div>
+              <div class="task"><strong>Aufgabe 2</strong>Was bedeutet Gegenspielerprinzip bei Sympathikus und Parasympathikus?<textarea class="answer" data-key="k2-k2"></textarea></div>
+              <div class="task"><strong>Aufgabe 3</strong>Was könnte mit «Unbewusst im Gleichgewicht» gemeint sein?<textarea class="answer" data-key="k2-k3"></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary>2.4 Fun Facts zum Parasympathikus</summary>
+          <div class="detail-body">
+            <ul>
+              <li>Tiefes, langsames Bauchatmen aktiviert Dehnungsrezeptoren des Vagusnervs und dadurch den Parasympathikus.</li>
+              <li>Ein warmes Bad entspannt die Muskulatur in den Gefässen, regt die Verdauungsdurchblutung an und signalisiert dem Körper Sicherheit.</li>
+              <li>Kaugummi kauen stimuliert den Trigeminusnerv und Speicheldrüsen, die parasympathisch gesteuert werden. Das kann vor einer Prüfung beruhigend wirken, ohne ganz müde zu machen.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter" id="k3">
+        <header>
+          <div class="chapter-label">Kapitel 3</div>
+          <h2>Das menschliche Gehirn</h2>
+          <p class="chapter-intro">Das Gehirn steuert Bewegungen, verarbeitet Sinneseindrücke, speichert Erinnerungen und ermöglicht Denken, Fühlen und Planen. Obwohl es nur etwa 1.4 kg wiegt, verbraucht es rund 20 Prozent unserer Energie.</p>
+        </header>
+
+        <div class="grid two">
+          <article class="card rose"><h3>3.1 Der Fall von Phineas Gage</h3><p>Phineas Gage überlebte 1848 einen Unfall, bei dem eine Eisenstange durch seinen Kopf schoss und Teile der Gehirnregion hinter der Stirn zerstörte. Intelligenz und Wahrnehmung blieben weitgehend erhalten, doch seine Persönlichkeit veränderte sich stark. Er wurde impulsiver, unzuverlässiger und konnte sein Verhalten schlechter kontrollieren.</p></article>
+          <article class="card"><h3>Leitfragen</h3><div class="task"><strong>Aufgabe 1</strong>Was sagt uns dieser Fall über die Funktionsweise unseres Gehirns?<textarea class="answer" data-key="k3-gage1"></textarea></div><div class="task"><strong>Aufgabe 2</strong>Während der Pubertät reagieren viele Jugendliche spontaner und risikofreudiger. Womit könnte das zusammenhängen?<textarea class="answer" data-key="k3-gage2"></textarea></div></article>
+        </div>
+
+        <details open>
+          <summary>3.2 Aufbau des menschlichen Gehirns</summary>
+          <div class="detail-body">
+            <p>Das menschliche Gehirn lässt sich grob in Nachhirn, Hinterhirn, Mittelhirn, Zwischenhirn und Endhirn unterteilen. Die Grosshirnrinde des Endhirns bildet den grössten Teil und überdeckt fast das gesamte restliche Gehirn.</p>
+            <table>
+              <thead><tr><th>Bereich</th><th>Bestandteile / Funktion</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Hinterhirn</strong></td><td>Kleinhirn: steuert komplexe Bewegungsabläufe und Gleichgewicht. Brücke: verbindet Mittelhirn und Nachhirn.</td></tr>
+                <tr><td><strong>Mittelhirn</strong></td><td>Leitet Erregungen von Augen und Ohren ans Gehirn. Kontrolliert unwillkürliche Augenbewegungen.</td></tr>
+                <tr><td><strong>Nachhirn</strong></td><td>Steuert wichtige Körperfunktionen wie Puls, Blutdruck, Atmung und Reflexe wie Schlucken oder Niesen.</td></tr>
+                <tr><td><strong>Zwischenhirn</strong></td><td>Thalamus kombiniert Erregungen von Sinnesorganen und filtert Informationen. Hypothalamus reguliert das autonome Nervensystem. Epiphyse steuert den Schlaf-Wach-Rhythmus. Hypophyse steuert die Hormonabgabe.</td></tr>
+                <tr><td><strong>Endhirn / Grosshirn</strong></td><td>Grosshirnrinde mit Sehrinde, sensorischem Cortex und motorischem Cortex. Das limbische System mit Amygdala und Hippocampus ist wichtig für Gefühle, Lernen und Erinnern.</td></tr>
+              </tbody>
+            </table>
+            <div class="text-diagram">Beispiel Signalweg bei einer Wegbeschreibung
+Hören der Frage → auditiver Cortex → Wernicke-Areal: Sprachverständnis
+→ präfrontaler Cortex: Planen und Ordnen der Antwort
+→ Broca-Areal: Sprachproduktion
+→ motorischer Cortex: Steuerung von Mund, Zunge und Kehlkopf</div>
+            <div class="task"><strong>Aufgabe 2</strong>Beschreibe mithilfe der Gehirnregionen den Weg des Signals, wenn eine Person nach einer Wegbeschreibung gefragt wird.<textarea class="answer" data-key="k3-signal"></textarea></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Schlaganfall und Funktionseinschränkungen</summary>
+          <div class="detail-body">
+            <p>Bei einem Schlaganfall werden Hirnareale nicht mehr ausreichend mit Sauerstoff versorgt. Die betroffenen Nervenzellen sterben ab. Je nach Lage des geschädigten Bereichs können Sprachverlust, motorische Einschränkungen, Sehstörungen oder andere Ausfälle auftreten.</p>
+            <div class="task"><strong>Aufgabe 3 · Wissen anwenden</strong>Erkläre, warum die Auswirkungen eines Schlaganfalls von Sprachverlust bis zu motorischen Einschränkungen reichen können. Welche Funktionseinschränkungen hätten unterschiedliche betroffene Hirnareale?<textarea class="answer" data-key="k3-stroke"></textarea></div>
+            <div class="linklist"><a href="https://learningapps.org/view41522345">Memory Gehirnbestandteile</a></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>3.5 Interessantes aus der Forschung: Optogenetik</summary>
+          <div class="detail-body">
+            <p>Mit Optogenetik können Forschende Nervenzellen mit Lichtimpulsen gezielt aktivieren oder ausschalten. Dazu werden Nervenzellen gentechnisch so verändert, dass sie auf Licht einer bestimmten Wellenlänge reagieren.</p>
+            <p>Die Methode hilft, Funktionen einzelner Gehirnregionen zu untersuchen. Sie gilt auch als vielversprechend für Therapien von Krankheiten wie Parkinson oder Epilepsie, bei denen Nervenzellgruppen fehlerhaft oder unkontrolliert arbeiten.</p>
+            <div class="linklist"><a href="https://www.youtube.com/watch?v=m8fTyXDySMQ">Video Optogenetik</a></div>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter" id="k4">
+        <header>
+          <div class="chapter-label">Kapitel 4</div>
+          <h2>Emotionen und Lernen</h2>
+          <p class="chapter-intro">Emotionen entstehen durch das Zusammenspiel verschiedener Gehirnregionen. Lernen beruht auf veränderbaren neuronalen Verschaltungen.</p>
+        </header>
+
+        <details open>
+          <summary>4.1 Anatomische Grundlage von Emotionen</summary>
+          <div class="detail-body">
+            <p>Emotionen sind komplexe Gefühlszustände wie Trauer, Wut, Angst oder Freude. Eine zentrale Rolle spielt das limbische System.</p>
+            <table>
+              <thead><tr><th>Struktur</th><th>Funktion</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Amygdala</strong></td><td>Bewertet die emotionale Bedeutung von Reizen, besonders bei Angst oder Gefahr; verbunden mit allen Sinnesorganen.</td></tr>
+                <tr><td><strong>Hippocampus</strong></td><td>Speichert Erfahrungen und verknüpft sie mit Gefühlen.</td></tr>
+                <tr><td><strong>Gyrus cinguli</strong></td><td>Hilft, emotionale Reaktionen zu verarbeiten und zu steuern.</td></tr>
+                <tr><td><strong>Hypothalamus</strong></td><td>Löst körperliche Reaktionen auf Emotionen aus, etwa Hormone oder einen höheren Herzschlag.</td></tr>
+                <tr><td><strong>VTA und Nucleus accumbens</strong></td><td>Bilden das Belohnungszentrum, in dem Glücksgefühle und Freude entstehen.</td></tr>
+              </tbody>
+            </table>
+            <div class="grid two">
+              <div class="task"><strong>Aufgabe 1</strong>Warum war die starke Ausprägung des limbischen Systems bei evolutiv alten Tierarten für die Analyse von Gerüchen überlebenswichtig?<textarea class="answer" data-key="k4-limb1"></textarea></div>
+              <div class="task"><strong>Aufgabe 2</strong>Alkohol, Nikotin oder kurze Videos können die Dopaminausschüttung kurzfristig erhöhen. Welche Folgen könnte das haben?<textarea class="answer" data-key="k4-limb2"></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>4.2 Lernen auf zellulärer Ebene</summary>
+          <div class="detail-body">
+            <p>Die Grundlage des Lernens liegt in der Anpassungsfähigkeit neuronaler Verschaltungen. Axone und Dendriten sind zentral für neuronale Plastizität und für Veränderungen der Effizienz von Synapsen.</p>
+            <div class="text-diagram">Textbasierte Synapse
+Präsynapse / Axon-Endknöpfchen
+  ├─ Vesikel mit Neurotransmittern
+  └─ Ausschüttung in den synaptischen Spalt
+Synaptischer Spalt
+  └─ Diffusion der Neurotransmitter
+Postsynapse
+  ├─ Rezeptoren
+  └─ Umwandlung in ein neues elektrisches Signal</div>
+            <div class="task"><strong>Zusammenfassung</strong>Die neuronale Plastizität beschreibt, dass die ______ Verschaltung im Gehirn anpassungsfähig ist. Dabei kann sich die Effektivität von ______, also Verbindungen zwischen zwei Neuronen, verändern. Beim gleichen ______ kann es zu mehr oder weniger ______ kommen.<textarea class="answer" data-key="k4-luecken"></textarea></div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>4.3 Kurz- und Langzeitplastizität</summary>
+          <div class="detail-body">
+            <p>Das Kurzzeitgedächtnis speichert Informationen für Sekunden bis Minuten. Es beruht auf einer vorübergehenden Verstärkung neuronaler Verbindungen, etwa indem Endknöpfchen mehr Transmitter in Vesikel einpacken oder mehr Vesikel freisetzen.</p>
+            <p>Werden Informationen wiederholt oder mit Inhalten aus dem Langzeitgedächtnis verknüpft, können sich Synapsen dauerhaft verändern. Dies nennt man Langzeitplastizität.</p>
+            <h4>Langzeitpotenzierung in Schritten</h4>
+            <ol>
+              <li>Präsynaptisch wird Glutamat freigesetzt.</li>
+              <li>Glutamat bindet an AMPA-Rezeptoren der Postsynapse.</li>
+              <li>Natrium-Ionen strömen ein und die Membran wird depolarisiert.</li>
+              <li>Bei genügend starker Depolarisation öffnen sich NMDA-Rezeptoren.</li>
+              <li>Calcium-Ionen strömen ein.</li>
+              <li>Calcium löst Signalprozesse aus, die zusätzliche AMPA-Rezeptoren einbauen.</li>
+              <li>Calcium fördert retrograde Botenstoffe, welche die Transmitterfreisetzung präsynaptisch verstärken.</li>
+              <li>Die Signalübertragung wird langfristig stärker. Das bildet eine Grundlage für Lernen und Gedächtnis.</li>
+            </ol>
+            <div class="grid two">
+              <div class="task"><strong>Aufgabe 1</strong>Ergänze die Synapse bei starker Erregung mit Glutamat, Calcium-Ionen, retrograden Botenstoffen, AMPA-Rezeptoren und NMDA-Rezeptoren.<textarea class="answer" data-key="k4-ltp1"></textarea></div>
+              <div class="task"><strong>Aufgabe 2</strong>Fasse die Rolle von Calcium-Ionen bei der Langzeitpotenzierung zusammen.<textarea class="answer" data-key="k4-ltp2"></textarea></div>
+              <div class="task"><strong>Aufgabe 3</strong>Auch gespeicherte Inhalte können vergessen werden. Was könnte der zelluläre Grund dafür sein?<textarea class="answer" data-key="k4-ltp3"></textarea></div>
+              <div class="task"><strong>Aufgabe 4 · Wissen verknüpfen</strong>Wie könnten Gegenmechanismen bei lang andauernder Stimulation aussehen? Warum braucht man bei dauerhaft erhöhter Dopaminausschüttung immer stärkere Reize?<textarea class="answer" data-key="k4-ltp4"></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary>4.4 Filmtipp</summary>
+          <div class="detail-body">
+            <p>Der Pixar-Film «Inside Out 2» zeigt auf amüsante Weise das Zusammenspiel von Emotionen und die Umstrukturierung des Gehirns während der Pubertät.</p>
+            <div class="linklist"><a href="https://www.youtube.com/watch?v=LEjhY15eCx0">Trailer Inside Out 2</a></div>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter" id="k5">
+        <header>
+          <div class="chapter-label">Kapitel 5</div>
+          <h2>Exkurs: Menschliches Lernen</h2>
+          <p class="chapter-intro">Dieses Kapitel überträgt die zellulären Grundlagen des Lernens auf Alltagslernen, Vorwissen, Emotionen, Scheitern und konkrete Lernstrategien.</p>
+        </header>
+
+        <details open>
+          <summary>5.1 Lernen beruht auf verknüpftem Vorwissen</summary>
+          <div class="detail-body">
+            <p>Beim Lernen müssen Begriffe wiederholt werden, damit Synapsen verstärkt werden und Inhalte langfristig abrufbar bleiben. Vorwissen erleichtert Lernen, weil neue Informationen an bestehende Netzwerke angeschlossen werden können.</p>
+            <p>Beispiel: Französisch fällt Lernenden leichter, wenn sie bereits Spanisch oder Italienisch sprechen. Ähnliche Wörter und Strukturen aktivieren bestehendes Wissen.</p>
+            <div class="callout"><strong>Zwei zentrale Behauptungen</strong><ol><li>Kurzzeitgedächtnis und Langzeitgedächtnis arbeiten zusammen.</li><li>Verständnis beruht auf der Kombination verschiedener Informationen und Wissensbestandteile.</li></ol></div>
+            <h4>Wissen als Netzwerk</h4>
+            <p>Wenn wir an einen Hund denken, aktivieren wir Aussehen, Fellgefühl, Geräusche und Erfahrungen. In den Lernwissenschaften spricht man von konzeptuellen Netzwerken. Wird ein Teil aktiviert, kann der Rest leichter abrufbar werden.</p>
+            <div class="text-diagram">Konzeptuelles Netzwerk: Hund
+Aussehen ↔ Fell ↔ Bellen ↔ Erfahrungen ↔ Emotionen ↔ Begriffe</div>
+            <h4>Piaget: Wissen wird erweitert und angepasst</h4>
+            <p>Jean Piaget zeigte, dass Lernen nicht nur durch äussere Reize entsteht. Besonders bei komplexen Aufgaben sind aktive mentale Prozesse beteiligt.</p>
+            <ul>
+              <li>Neue Informationen werden in bestehende Schemata eingefügt.</li>
+              <li>Bestehende Schemata werden angepasst, wenn neue Informationen nicht passen.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details open>
+          <summary>5.2 Auch Ängste können erlernt sein</summary>
+          <div class="detail-body">
+            <p>Konzeptuelles Wissen ist oft mit Emotionen verknüpft. Wer von einer Wespe gestochen wurde, verbindet eine nächste Begegnung vielleicht mit Unbehagen. Solche erlernten Reaktionen können evolutiv hilfreich sein, tauchen aber auch im Schulalltag auf.</p>
+            <h4>Dweck und erlernte Hilflosigkeit</h4>
+            <p>Carol Dweck untersuchte, wie Lehrpersonen und Erfahrungen die Leistung von Schüler:innen beeinflussen. In einer Studie lösten Kinder Aufgaben, die von zwei Lehrpersonen gestellt wurden. Lehrperson A gab lösbare Aufgaben, Lehrperson B unlösbare. In einer späteren Testphase waren alle Aufgaben lösbar, trotzdem arbeiteten viele Kinder bei Aufgaben von Lehrperson B langsamer. Sie hatten gelernt, dass diese Aufgaben «unlösbar» seien.</p>
+            <table>
+              <thead><tr><th>Attribution</th><th>Typischer Gedanke</th><th>Folge</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Fähigkeit-Attribution</strong></td><td>«Ich habe es nicht geschafft, weil ich darin schlecht bin.»</td><td>Häufig schlechtere Leistung und erlernte Hilflosigkeit.</td></tr>
+                <tr><td><strong>Aufwand-Attribution</strong></td><td>«Ich habe es nicht geschafft, weil ich mir nicht genug Mühe gegeben habe.»</td><td>Mehr Handlungsspielraum und bessere Anpassung.</td></tr>
+              </tbody>
+            </table>
+            <p>Hilflose Schüler:innen unterschätzen oft ihren Erfolg, überschätzen ihr Scheitern und ordnen Misserfolge eher ihrer Fähigkeit als ihrem Aufwand zu.</p>
+            <h4>Hilflosigkeit überwinden</h4>
+            <p>Peterson und Buchanan beschrieben drei Dimensionen der Ursachenzuschreibung: Beständigkeit, Weite des Einflusses und Personalisierung. Derick Wade formulierte fünf Aspekte hilfreicher Ziele:</p>
+            <ol>
+              <li>spezifisch</li><li>messbar</li><li>erreichbar</li><li>persönlich relevant</li><li>zeitlich begrenzt</li>
+            </ol>
+          </div>
+        </details>
+
+        <details open>
+          <summary>5.3 Aus dem Scheitern lernen</summary>
+          <div class="detail-body">
+            <p>Scheitern ist in der Schule oft negativ besetzt, weil Prüfungen und Leistungsentscheidungen Druck erzeugen. Für das Lernen selbst kann kognitives Scheitern jedoch wertvoll sein.</p>
+            <p>Aktuelle Forschung zeigt: Wenn Lernende vor der Instruktion selbst an Aufgaben arbeiten, ist die spätere Lernleistung häufig besser.</p>
+            <ul>
+              <li>Beim Problemlösen wird Vorwissen aktiviert, auch wenn noch nicht klar ist, welches Wissen relevant ist.</li>
+              <li>Eigene Wissenslücken werden sichtbar. Neues Wissen kann dadurch gezielter in bestehende Netzwerke eingebaut werden.</li>
+            </ul>
+            <p>Das bedeutet: Aufgaben vor der Theorie sind nicht Selbstzweck. Sie sollen Verständnis aufbauen, auch wenn das zuerst mühsam wirkt.</p>
+          </div>
+        </details>
+
+        <details open>
+          <summary>5.4 Wissenschaftlich fundierte Lernstrategien</summary>
+          <div class="detail-body">
+            <p>Die Strategien beruhen auf Dunlosky et al. (2013) und zeigen im Durchschnitt robuste Lerneffekte. Lernprozesse bleiben individuell.</p>
+            <div class="grid two">
+              <article class="card mint"><h3>Selbsttests</h3><p>Eigene Fragen formulieren, Karteikarten nutzen, Wissenslücken erkennen. Besonders nützlich für Fakten, Begriffe, Konzepte und Verfahren.</p></article>
+              <article class="card blue"><h3>Verteiltes Lernen</h3><p>Lernen auf mehrere Zeitpunkte verteilen statt alles in einer Sitzung erledigen. Fördert langfristiges Behalten und tieferes Verständnis.</p></article>
+              <article class="card lav"><h3>Selbsterklärung</h3><p>Fragen stellen wie «Warum ist das so?» oder «Welche neue Information gibt mir das?». Neues Wissen wird mit Vorwissen verknüpft.</p></article>
+              <article class="card yellow"><h3>Abwechselndes Üben</h3><p>Unterschiedliche Aufgabenarten und Themen mischen. Das verbessert Unterscheidung, Reaktivierung und Transfer.</p></article>
+            </div>
+            <h4>Weniger wirksam, wenn isoliert angewendet</h4>
+            <ul>
+              <li><strong>Reines Markieren:</strong> höchstens für den ersten Überblick sinnvoll; sollte mit Karteikarten, Fragen oder Notizen ergänzt werden.</li>
+              <li><strong>Wiederholtes Lesen:</strong> kann kurzfristig helfen, führt aber allein selten zu tiefem Verständnis; besser mit Selbsttests oder Selbsterklärung kombinieren.</li>
+            </ul>
+            <div class="callout"><strong>Für Interessierte</strong><p>Der Attributionstest nach Seligman und Kolleg:innen dient der Selbsteinschätzung eigener Attributionstendenzen. Er ist kein diagnostisches Instrument.</p><div class="linklist"><a href="https://samueltobler.github.io/biologie/attributionstest">Attributionstest</a></div></div>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter" id="k6">
+        <header>
+          <div class="chapter-label">Kapitel 6</div>
+          <h2>Hormonsystem des Menschen</h2>
+          <p class="chapter-intro">Das Hormonsystem ist ein zweites Kommunikationssystem des Körpers. Es arbeitet langsamer als das Nervensystem, wirkt dafür oft länger und auf grössere Körperbereiche.</p>
+        </header>
+
+        <details open>
+          <summary>6.1 Was sind Hormone?</summary>
+          <div class="detail-body">
+            <p>Hormone sind chemische Botenstoffe. Sie werden meist über den Blutkreislauf zu Organen und Geweben transportiert und lösen dort Reaktionen aus. Einige Hormone wirken lokal auf benachbarte Zellen, andere wie Insulin oder Cortisol auf den ganzen Körper.</p>
+            <h4>Von der Ausschüttung zur Wirkung</h4>
+            <ol>
+              <li>Nervenimpulse lösen die Hormonausschüttung in Hormondrüsen aus.</li>
+              <li>Endokrine Zellen geben Hormone in die extrazelluläre Flüssigkeit ab.</li>
+              <li>Hormone gelangen in Blutgefässe und werden im Körper verteilt.</li>
+              <li>Sie binden an passende Rezeptoren von Zielzellen.</li>
+              <li>Die Wirkung hält je nach Hormon Minuten bis Stunden an.</li>
+            </ol>
+            <table>
+              <thead><tr><th>Kriterium</th><th>Nervensystem</th><th>Hormonsystem</th></tr></thead>
+              <tbody>
+                <tr><td>Signalart</td><td>Elektrische Signale und Neurotransmitter</td><td>Chemische Botenstoffe</td></tr>
+                <tr><td>Übertragungsweg</td><td>Nervenbahnen und Synapsen</td><td>Meist Blut</td></tr>
+                <tr><td>Geschwindigkeit</td><td>Schnell</td><td>Langsamer</td></tr>
+                <tr><td>Wirkdauer</td><td>Oft kurz und präzise</td><td>Oft länger und breiter</td></tr>
+              </tbody>
+            </table>
+            <div class="grid two">
+              <div class="task"><strong>Aufgabe 1</strong>Vergleiche Hormon- und Nervensystem bezüglich Signalart, Geschwindigkeit und Übertragungsweg.<textarea class="answer" data-key="k6-vgl"></textarea></div>
+              <div class="task"><strong>Aufgabe 2</strong>Erkläre am Beispiel Cortisol, wie Nervensystem und Hormonsystem zusammenhängen.<textarea class="answer" data-key="k6-cortisol"></textarea></div>
+              <div class="task"><strong>Aufgabe 3 · Basiskonzept</strong>Erkläre das Schlüssel-Schloss-Konzept bei Hormonen und Zielzellen.<textarea class="answer" data-key="k6-schloss"></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>6.2 Hypothalamus und Hormondrüsen</summary>
+          <div class="detail-body">
+            <p>Der Hypothalamus im Zwischenhirn verbindet Nervensystem und Hormonsystem. Zusammen mit der Hypophyse reguliert er endokrine Organe und damit Hormonkonzentrationen im Blut.</p>
+            <table>
+              <thead><tr><th>Drüse / Organ</th><th>Hormon</th><th>Funktion</th></tr></thead>
+              <tbody>
+                <tr><td>Hypophyse</td><td>Somatotropin</td><td>Knochenwachstum und Proteinsynthese.</td></tr>
+                <tr><td>Hypophyse</td><td>Adiuretin</td><td>Regulierung des Wasserhaushalts.</td></tr>
+                <tr><td>Hypophyse</td><td>Oxytocin</td><td>Bindung zwischen Kind und Mutter sowie Partnerbindung.</td></tr>
+                <tr><td>Schilddrüse</td><td>Thyroxin</td><td>Grundumsatz und Wachstum.</td></tr>
+                <tr><td>Nebennierenrinde</td><td>Cortisol</td><td>Ab- und Umbau von Proteinen zu Zucker.</td></tr>
+                <tr><td>Nebenniere</td><td>Adrenalin</td><td>Glykogenabbau und Steigerung des Blutzuckerspiegels.</td></tr>
+                <tr><td>Bauchspeicheldrüse</td><td>Insulin</td><td>Senkung des Blutzuckerspiegels und Glykogenbildung.</td></tr>
+                <tr><td>Bauchspeicheldrüse</td><td>Glukagon</td><td>Steigerung des Blutzuckerspiegels und Glykogenabbau.</td></tr>
+                <tr><td>Eierstöcke</td><td>Östrogene</td><td>Ausbildung weiblicher Sexualorgane und Zyklusregulation.</td></tr>
+                <tr><td>Eierstöcke</td><td>Progesteron</td><td>Erhalt der Schwangerschaft.</td></tr>
+                <tr><td>Hoden</td><td>Testosteron</td><td>Ausbildung männlicher Sexualorgane und Muskelzunahme.</td></tr>
+              </tbody>
+            </table>
+            <div class="grid two">
+              <div class="task"><strong>Aufgabe 1</strong>Verschaff dir einen Überblick über die Hormondrüsen und ihre Hormone.<textarea class="answer" data-key="k6-overview"></textarea></div>
+              <div class="task"><strong>Aufgabe 2</strong>Testosteron wird an mehreren Orten gebildet. Welchen Vorteil könnte diese verteilte Produktion haben?<textarea class="answer" data-key="k6-testosteron"></textarea></div>
+              <div class="task"><strong>Aufgabe 3</strong>Ein Freund überlegt, Testosteron für den Muskelaufbau zu nehmen. Ist das eine gute Idee?<textarea class="answer" data-key="k6-anabol"></textarea></div>
+              <div class="task"><strong>Aufgabe 4</strong>Insulin und Glukagon wirken als Gegenspieler. Wie halten sie den Körper im Gleichgewicht?<textarea class="answer" data-key="k6-insulin-glukagon"></textarea></div>
+            </div>
+            <div class="task"><strong>Lückentext</strong>Das Nervensystem nutzt ______, um Informationen schnell über ______ zu übertragen. Das Hormonsystem arbeitet mit ______, den Hormonen, die meist über das ______ transportiert werden. Die Schnittstelle zwischen beiden Systemen liegt im ______.<textarea class="answer" data-key="k6-luecken"></textarea></div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>6.3 Diabetes: wenn das Hormonsystem versagt</summary>
+          <div class="detail-body">
+            <p>Diabetes führt zu einem dauerhaft erhöhten Blutzuckerspiegel. In der Schweiz sind rund 525'000 Personen betroffen, in den USA mehr als 10 Prozent. Unbehandelt kann Diabetes Blutgefässe, Nerven, Augen, Nieren, Herz und weitere Organe schädigen.</p>
+            <p>Grund ist das Fehlen oder die ungenügende Wirkung von Insulin. Insulin sorgt normalerweise dafür, dass Zucker aus dem Blut in Körperzellen aufgenommen und für Energie oder Speicherung genutzt wird.</p>
+            <table>
+              <thead><tr><th>Zustand</th><th>Was geschieht?</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Gesund</strong></td><td>Bei steigendem Blutzucker wird Insulin ausgeschüttet. Insulin bindet an Rezeptoren, Glucosetransporter ermöglichen die Aufnahme von Glucose in Zellen.</td></tr>
+                <tr><td><strong>Diabetes Typ 1</strong></td><td>Insulin fehlt zu einem grossen Teil oder vollständig. Daher gelangt kaum Glucose in die Zellen.</td></tr>
+                <tr><td><strong>Diabetes Typ 2</strong></td><td>Zellen reagieren weniger empfindlich auf Insulin. Die Reaktion ist schwächer, deshalb wird weniger Glucose aufgenommen.</td></tr>
+              </tbody>
+            </table>
+            <p>In frühen Phasen von Diabetes Typ 2 liegt oft eine Insulinresistenz vor. Der Körper produziert mehr Insulin, um Glucose trotzdem in die Zellen zu bringen. Dauerhaft hohe Insulinspiegel können Fettspeicherung fördern und Fettabbau hemmen.</p>
+            <p>Spürbare Folgen eines zu hohen Blutzuckerspiegels sind starker Durst, häufiges Wasserlassen, Müdigkeit, Gewichtsverlust trotz Appetit, verschwommenes Sehen und schlechtere Wundheilung.</p>
+            <div class="grid two">
+              <div class="task"><strong>Aufgabe 1</strong>Fasse zusammen, wie Insulinresistenz zu einem steigenden Blutzuckerspiegel führen kann.<textarea class="answer" data-key="k6-diab1"></textarea></div>
+              <div class="task"><strong>Aufgabe 2</strong>Welche Faktoren zeigen, dass Insulin ein Hormon und kein Neurotransmitter ist?<textarea class="answer" data-key="k6-diab2"></textarea></div>
+            </div>
+            <h4>Weiterführende Informationen</h4>
+            <div class="linklist"><a href="https://www.diabetesschweiz.ch/ueber-diabetes/risikotest">Diabetes-Risikotest</a><a href="https://www.srf.ch/play/tv/10-vor-10/video/gender-streit-um-boxerin-khelif?urn=urn%3Asrf%3Avideo%3Ab9e4b643-b36b-4dc6-b496-ba4ec165a3ae">SRF 10 vor 10: Hormone und Sport</a></div>
+          </div>
+        </details>
+      </section>
+
+      <section class="section card">
+        <h2 style="margin-top:0">Lerncheck</h2>
+        <p>Die folgende Liste fasst zentrale Kompetenzen der Webfassung zusammen.</p>
+        <div class="checklist">
+          <label class="checkitem"><input type="checkbox" data-check="c1"> <span>Ich kann den Weg vom Reiz zur Reaktion erklären.</span></label>
+          <label class="checkitem"><input type="checkbox" data-check="c2"> <span>Ich kann den Aufbau eines Neurons beschreiben.</span></label>
+          <label class="checkitem"><input type="checkbox" data-check="c3"> <span>Ich kann ZNS, PNS, somatisches und vegetatives Nervensystem unterscheiden.</span></label>
+          <label class="checkitem"><input type="checkbox" data-check="c4"> <span>Ich kann Sympathikus und Parasympathikus vergleichen.</span></label>
+          <label class="checkitem"><input type="checkbox" data-check="c5"> <span>Ich kann wichtige Gehirnregionen und ihre Funktionen nennen.</span></label>
+          <label class="checkitem"><input type="checkbox" data-check="c6"> <span>Ich kann erklären, wie Langzeitplastizität Lernen ermöglicht.</span></label>
+          <label class="checkitem"><input type="checkbox" data-check="c7"> <span>Ich kann wissenschaftlich fundierte Lernstrategien anwenden.</span></label>
+          <label class="checkitem"><input type="checkbox" data-check="c8"> <span>Ich kann Nervensystem und Hormonsystem vergleichen.</span></label>
+          <label class="checkitem"><input type="checkbox" data-check="c9"> <span>Ich kann die Rolle von Insulin bei Diabetes erklären.</span></label>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <p>Textbasierte HTML-Fassung des Unterrichtsskripts «Neurobiologie» von Samuel Tobler, Herbstsemester 2025. Umsetzung ohne Bilder, externe Fonts oder externe Bibliotheken.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+    $$('#expandAll').forEach(btn => btn.addEventListener('click', () => $$('details').forEach(d => d.open = true)));
+    $$('#collapseAll').forEach(btn => btn.addEventListener('click', () => $$('details').forEach(d => d.open = false)));
+
+    const search = $('#search');
+    search.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      $$('.chapter, .section').forEach(sec => {
+        if(!q){ sec.classList.remove('hidden-by-search'); return; }
+        const hit = sec.innerText.toLowerCase().includes(q);
+        sec.classList.toggle('hidden-by-search', !hit);
+        if(hit) $$('details', sec).forEach(d => d.open = true);
+      });
+    });
+
+    $$('.answer').forEach(area => {
+      const key = 'neuro-answer-' + area.dataset.key;
+      area.value = localStorage.getItem(key) || '';
+      area.addEventListener('input', () => localStorage.setItem(key, area.value));
+    });
+
+    $$('input[type="checkbox"][data-check]').forEach(box => {
+      const key = 'neuro-check-' + box.dataset.check;
+      box.checked = localStorage.getItem(key) === '1';
+      box.addEventListener('change', () => localStorage.setItem(key, box.checked ? '1' : '0'));
+    });
+  </script>
+</body>
+</html>
