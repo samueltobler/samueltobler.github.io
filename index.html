@@ -1,698 +1,682 @@
 <!doctype html>
 <html lang="de-CH">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kanti Wil</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Samuel Tobler</title>
+  <meta name="description" content="Samuel Tobler" />
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <!-- Font Awesome für Icons (Footer) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
+    :root{
+      --bg1:#f6f8ff;
+      --bg2:#ffffff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --border: rgba(15,23,42,.10);
+      --shadow: 0 18px 55px rgba(2,6,23,.10);
+      --shadow2: 0 10px 30px rgba(2,6,23,.08);
+      --radius: 22px;
+      --focus: rgba(59,130,246,.35);
+      --chip: rgba(2,6,23,.04);
     }
 
-    :root {
-      --radius: 15px;
-      --text: #2b2633;
-      --muted: #6b6474;
-      --surface: rgba(255, 255, 255, 0.90);
-      --surface-strong: rgba(255, 255, 255, 0.96);
-      --border: rgba(0, 0, 0, 0.08);
-      --primary: #9b6bff;
-      --primary-soft: rgba(155, 107, 255, 0.24);
-      --accent: #ff7c6b;
-      --accent-soft: rgba(255, 124, 107, 0.28);
-      --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.055);
-      --shadow-card: 0 15px 38px rgba(0, 0, 0, 0.08);
-      --root-bg: #f6efff;
-      --page-bg:
-        radial-gradient(900px 620px at 8% -8%, var(--accent-soft), transparent 60%),
-        radial-gradient(860px 620px at 96% 2%, var(--primary-soft), transparent 58%),
-        radial-gradient(900px 700px at 45% 115%, rgba(255, 124, 107, 0.16), transparent 60%),
-        linear-gradient(180deg, #fff8f7 0%, #f7f2ff 52%, #fff8f7 100%);
-    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
 
-    html {
-      min-height: 100%;
-      background-color: var(--root-bg);
-      background-image: var(--page-bg);
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-attachment: fixed;
-      overscroll-behavior-y: none;
-    }
-
-    body {
-      min-height: 100dvh;
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.45;
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       color: var(--text);
-      background: transparent;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      isolation: isolate;
-      overflow-x: hidden;
-      overscroll-behavior-y: none;
-    }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      min-height: 100dvh;
-      background: var(--page-bg);
+      background:
+        radial-gradient(900px 520px at 18% 10%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(900px 520px at 80% 15%, rgba(16,185,129,.14), transparent 60%),
+        radial-gradient(900px 520px at 55% 95%, rgba(168,85,247,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 55%, var(--bg1) 100%);
+
       background-repeat: no-repeat;
+      background-attachment: fixed;
       background-size: cover;
-      background-position: center top;
-      pointer-events: none;
+
+      line-height:1.45;
     }
 
-    :focus-visible {
-      outline: 3px solid rgba(124, 156, 255, 0.9);
-      outline-offset: 3px;
+    a{ color:inherit; text-decoration:none; }
+
+    .wrap{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 34px 18px 56px;
     }
 
-    button,
-    input {
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 16px;
+      flex-wrap:wrap;
+      padding: 10px 0 18px;
+    }
+
+    .brand{ min-width: 260px; }
+    .title{
+      margin:0;
+      font-size: clamp(30px, 3.2vw, 46px);
+      letter-spacing:-0.02em;
+    }
+
+    .subtitle{
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .subtitle a{
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(15,23,42,.18);
+    }
+    .subtitle a:hover{
+      border-bottom-color: rgba(15,23,42,.35);
+    }
+
+    .intro{
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 62ch;
+      font-size: 14px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 260px;
+      flex: 1;
+      justify-content:flex-end;
+    }
+
+    .viewtoggle{
+      flex: 0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      min-width: 48px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor:pointer;
       font: inherit;
+      font-size: 14px;
+      white-space:nowrap;
     }
 
-    button {
+    .viewtoggle i{
+      width: 16px;
+      text-align:center;
+      font-size: 15px;
+    }
+
+    .viewtoggle:hover{
+      border-color: rgba(15,23,42,.22);
+    }
+
+    .viewtoggle:focus{
+      outline:none;
+      border-color: rgba(59,130,246,.35);
+      box-shadow: 0 0 0 4px var(--focus), var(--shadow2);
+    }
+
+    .search{
+      position:relative;
+      width: min(460px, 100%);
+    }
+
+    .search input{
+      width:100%;
+      padding: 12px 14px 12px 42px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      outline:none;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .search input::placeholder{ color: rgba(71,85,105,.85); }
+
+    .search .icon{
+      position:absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      opacity: .65;
+      pointer-events:none;
+      color: #0f172a;
+    }
+
+    .search input:focus{
+      border-color: rgba(59,130,246,.35);
+      box-shadow: 0 0 0 4px var(--focus), var(--shadow2);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+      padding-bottom: 100px;
+    }
+
+    .section-title{
+      grid-column: 1 / -1;
+      margin: 22px 0 2px;
+      font-size: 18px;
+      letter-spacing:-0.01em;
+      color: var(--text);
+    }
+
+    .card{
+      grid-column: span 4;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      position:relative;
       cursor: pointer;
     }
 
-    .appbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: rgba(255, 255, 255, 0.80);
-      border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: saturate(140%) blur(10px);
+    .grid.list-view .card{
+      grid-column: 1 / -1;
+      display:flex;
+      align-items:stretch;
+      min-height: 118px;
     }
 
-    .appbar-inner,
-    .board {
-      width: min(1050px, 100%);
-      margin-inline: auto;
-      padding-inline: 22px;
+    .grid.list-view .thumbwrap{
+      width: 150px;
+      min-width: 150px;
+      aspect-ratio: auto;
     }
 
-    .appbar-inner {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      align-items: center;
-      gap: 14px;
-      min-height: 66px;
-      padding-block: 9px;
+    .grid.list-view .thumbimg{
+      width: 82%;
+      height: 82%;
     }
 
-    .brand-wrap {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      min-width: 0;
+    .grid.list-view .content{
+      flex: 1;
+      justify-content:center;
     }
 
-    .logo {
-      display: grid;
-      place-items: center;
-      width: 36px;
-      height: 36px;
-      flex: 0 0 auto;
-      border-radius: 12px;
-      color: #ffffff;
-      font-size: 19px;
-      background: conic-gradient(from 210deg, var(--accent), var(--primary));
-      box-shadow: var(--shadow-soft);
-    }
-
-    .brand {
-      display: grid;
-      gap: 1px;
-      min-width: 0;
-    }
-
-    .brand-title {
+    .grid.list-view .ctitle{
       font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    .brand-subtitle {
-      max-width: 640px;
-      font-size: 12.5px;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .grid.list-view .desc{
+      max-width: 80ch;
     }
 
-    .toolbar {
-      display: flex;
-      justify-content: end;
-      align-items: center;
+    .card:focus-within{
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .thumbwrap{
+      aspect-ratio: 16/9;
+      width: 100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .thumbimg{
+      width: 92%;
+      height: 92%;
+      object-fit: contain;
+      display:block;
+      filter: drop-shadow(0 14px 30px rgba(2,6,23,.18));
+    }
+
+    .content{
+      padding: 14px 14px 16px;
+      display:flex;
+      flex-direction:column;
       gap: 8px;
-      min-width: 0;
     }
 
-    .search-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
     }
 
-    .icon-button {
-      display: inline-grid;
-      place-items: center;
-      width: 38px;
-      height: 38px;
-      flex: 0 0 auto;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      background: var(--surface-strong);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.045);
+    .ctitle{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:-0.01em;
     }
 
-    .icon-button:hover {
-      background: #ffffff;
+    .chip{
+      font-size: 12px;
+      color: rgba(15,23,42,.70);
+      background: var(--chip);
+      border: 1px solid rgba(15,23,42,.08);
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space:nowrap;
     }
 
-    .icon-button:active {
-      transform: translateY(1px);
-    }
-
-    .search-input {
-      width: 0;
-      min-width: 0;
-      height: 38px;
-      padding: 0;
-      border: 0;
-      border-radius: 12px;
-      color: var(--text);
-      background: var(--surface-strong);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.045);
-      opacity: 0;
-      pointer-events: none;
-      transition: width 180ms ease, padding 180ms ease, opacity 120ms ease;
-    }
-
-    .search-wrap.is-open .search-input {
-      width: min(320px, 42vw);
-      padding: 0 13px;
-      border: 1px solid var(--border);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .search-input::placeholder {
-      color: var(--muted);
-    }
-
-    .board {
-      padding-top: 24px;
-      padding-bottom: 88px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
-      gap: 15px;
-    }
-
-    .card {
-      min-height: 100%;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .card-inner {
-      display: grid;
-      gap: 11px;
-      padding: 16px;
-    }
-
-    .meta {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 11px;
-      align-items: center;
-    }
-
-    .emoji {
-      display: grid;
-      place-items: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 13px;
-      background: linear-gradient(135deg, rgba(255, 124, 107, 0.14), rgba(155, 107, 255, 0.14));
-      font-size: 20px;
-    }
-
-    .who {
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.25;
-    }
-
-    .sub {
-      margin-top: 2px;
+    .desc{
+      margin:0;
       color: var(--muted);
       font-size: 13px;
     }
 
-    .msg {
-      font-size: 15px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
+    .hit{
+      position:absolute;
+      inset:0;
+      border-radius: inherit;
+      z-index: 5;
+    }
+    .hit:focus{ outline:none; }
+
+    .card, .card .hit { cursor: pointer; }
+
+    @media (hover: hover) and (pointer: fine){
+      .card:hover{
+        transform: translateY(-4px);
+        border-color: rgba(15,23,42,.22);
+        box-shadow: 0 22px 70px rgba(2,6,23,.12);
+      }
+
+      .card:hover .ctitle,
+      .card .hit:hover ~ .content .ctitle{
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .card:hover .chip,
+      .card .hit:hover ~ .content .chip{
+        border-color: rgba(15,23,42,.18);
+      }
+
+      .card::after{
+        content: "↗";
+        position:absolute;
+        top: 10px;
+        right: 12px;
+        width: 30px;
+        height: 30px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius: 999px;
+        background: rgba(255,255,255,.75);
+        border: 1px solid rgba(15,23,42,.10);
+        box-shadow: 0 10px 30px rgba(2,6,23,.08);
+        color: rgba(15,23,42,.70);
+        opacity: 0;
+        transform: translateY(-3px);
+        transition: 160ms ease;
+        pointer-events:none;
+        z-index: 6;
+      }
+
+      .card:hover::after{ opacity: 1; transform: translateY(0); }
     }
 
-    .state {
-      grid-column: 1 / -1;
-      padding: 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-      color: var(--muted);
-      box-shadow: var(--shadow-soft);
-      font-size: 15px;
+    @media (max-width: 980px){
+      .card{ grid-column: span 6; }
+      .topbar{ justify-content:flex-start; }
     }
 
-    .state strong {
-      color: var(--text);
+    @media (max-width: 620px){
+      .wrap{ padding-bottom: 44px; }
+      .topbar{ align-items:stretch; }
+      .search{ width: 100%; }
+      .card{ grid-column: span 12; }
+      .grid.list-view .card{ min-height: 96px; }
+      .grid.list-view .thumbwrap{ width: 104px; min-width: 104px; }
+      .grid.list-view .row{ align-items:flex-start; }
+      .grid.list-view .chip{ display:none; }
     }
 
-
-    .footer {
-      margin-top: 64px;
-      text-align: center;
-      font-size: 11px;
-      color: rgba(1, 1, 1, 0.2);
+    @media (prefers-reduced-motion: reduce){
+      .card{ transition:none; }
+      .card::after{ transition:none; }
     }
 
-    .footer a {
-      color: rgba(1, 1, 1, 0.2);
-      text-decoration: none;
+    a.card,
+    a.card *{
+      cursor: pointer !important;
     }
 
-    .footer a:hover {
-      text-decoration: underline;
+    /* Footer (neu) */
+    .footer{
+
+      padding: 18px 0 0;
     }
 
-    @media (hover: hover) {
-      .card {
-        transition: transform 160ms ease, box-shadow 160ms ease;
-      }
+    .pubbtn{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(15,23,42,.92);
+      color: #fff;
+      box-shadow: var(--shadow2);
+    }
+    .pubbtn:hover{ background: rgba(15,23,42,.98); }
 
-      .card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-card);
-      }
+    .footerlinks{
+      display:flex;
+      align-items:center;
+      gap: 14px;
+      flex-wrap:wrap;
+      margin-top: 16px;
+      color: #89949f;
+      font-size: 18px;
     }
 
-    @media (max-width: 700px) {
-      .appbar-inner {
-        grid-template-columns: 1fr;
-        align-items: stretch;
-        gap: 8px;
-      }
+    .footerlinks a{
+      color: #89949f;
+      display:inline-flex;
+      align-items:center;
+    }
+    .footerlinks a:hover{ color: rgba(15,23,42,.70); }
 
-      .toolbar {
-        justify-content: start;
-      }
-
-      .search-wrap {
-        flex: 1;
-      }
-
-      .search-wrap.is-open .search-input {
-        width: 100%;
-      }
+    .footnote{
+      margin-top: 18px;
+      color: #89949f;
+      font-size: 12px;
     }
 
-    @media (max-width: 520px) {
-      .appbar-inner,
-      .board {
-        padding-inline: 16px;
-      }
-
-      .brand-subtitle {
-        white-space: normal;
-        line-height: 1.3;
-      }
-
-      .board {
-        padding-top: 18px;
-      }
-
-      .msg {
-        font-size: 14.5px;
-      }
+    .footnote a{
+      color: #89949f;
+      text-decoration:none;
+      border-bottom: 1px solid rgba(137,148,159,.45);
     }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-      }
+    .footnote a:hover{
+      border-bottom-color: rgba(137,148,159,.75);
     }
   </style>
 </head>
 
 <body>
-  <header class="appbar">
-    <div class="appbar-inner">
-      <div class="brand-wrap">
-        <div class="logo" aria-hidden="true">❤</div>
-        <div class="brand">
-          <div class="brand-title">Willkommen an der Kanti Wil</div>
-          <div class="brand-subtitle">Wünsche und Tipps von Schüler:innen eure Schulzeit an der Kanti Wil</div>
-        </div>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1 class="title">Samuel Tobler</h1>
+        <p class="subtitle" style="font-size: 0.75em">Dr. sc. ETH in Learning Sciences</p>
+        <p class="intro">
+          I am a high school biology teacher with an academic background in biology and learning sciences. Below, you’ll find a selection of my projects.
+        </p>
       </div>
 
-      <div class="toolbar" aria-label="Werkzeuge">
-        <div class="search-wrap" id="searchWrap">
-          <button class="icon-button" id="searchButton" type="button" aria-label="Suche öffnen" aria-expanded="false" aria-controls="searchInput">
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-          </button>
-          <input class="search-input" id="searchInput" type="search" placeholder="Suchen …" autocomplete="off">
+      <div class="topbar">
+        <div class="search" aria-label="Tools durchsuchen">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M16.3 16.3 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input id="q" type="search" placeholder="Search projects..." autocomplete="off" />
         </div>
 
-        <button class="icon-button" id="shuffleButton" type="button" aria-label="Antworten neu mischen">
-          <i class="fa-solid fa-shuffle" aria-hidden="true"></i>
+        <button class="viewtoggle" id="viewToggle" type="button" aria-pressed="false" aria-label="Zur Listenansicht wechseln" title="Kastenansicht">
+          <i class="fas fa-list" aria-hidden="true"></i>
+          <span></span>
         </button>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main>
-    <section class="board" aria-label="Nachrichten">
-      <div id="grid" class="grid" role="list" aria-live="polite">
-        <p class="state">Einträge werden geladen …</p>
-      </div>
+    <main>
+      <section class="grid" id="grid" aria-live="polite"></section>
 
-      <div class="footer">
-        by <a href="https://samueltobler.github.io" target="_blank" rel="noopener noreferrer">Samuel Tobler</a> |
-        <a href="https://samueltobler.github.io/gymi-tools" target="_blank" rel="noopener noreferrer">Gymi-Tools</a>
-      </div>
-    </section>
-  </main>
+      <!-- Footer (eingefügt) -->
+      <footer class="footer" aria-label="Footer">
+        <a href="https://scholar.google.com/citations?user=r0Rpr2IAAAAJ&hl=en" target="_blank" rel="noopener noreferrer">
+          <span class="pubbtn">
+            <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+            All Publications
+          </span>
+        </a>
+<br><br><br>
+        <div class="footerlinks" aria-label="Links">
+          <a href="https://github.com/samueltobler" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <i class="fab fa-github" aria-hidden="true"></i>
+          </a>
+
+          <a href="https://linkedin.com/in/samueltobler" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <i class="fab fa-linkedin" aria-hidden="true"></i>
+          </a>
+
+          <span aria-hidden="true" style="color:#89949f">|</span>
+
+          <a href="https://linktr.ee/samueltobler.photo" target="_blank" rel="noopener noreferrer" aria-label="Fotografie">
+            <i class="fa fa-camera" aria-hidden="true"></i>
+          </a>
+
+          <a href="https://samueltobler.github.io/writing" target="_blank" rel="noopener noreferrer" aria-label="Writing">
+            <i class="fas fa-pen-nib" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <div class="footnote">
+          with <i class="fas fa-pizza-slice" aria-hidden="true"></i> and <i class="fas fa-heart" aria-hidden="true"></i> in zurich
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          <a href="mailto:contact@samueltobler.ch" target="_blank" rel="noopener noreferrer">contact</a>
+        </div>
+      </footer>
+    </main>
+  </div>
 
   <script>
-    "use strict";
+    const q = document.getElementById('q');
+    const grid = document.getElementById('grid');
+    const viewToggle = document.getElementById('viewToggle');
 
-    const SHEET_ID = "1hlCxUuxBEJhBOiJtbEpka9_ecqfcmd5cUUlckWUCVvc";
-    const SHEET_TAB = "Formularantworten 1";
-    const OPENSHEET_URL = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_TAB)}`;
-    const FETCH_TIMEOUT_MS = 10000;
+    const CSV_URL  = "https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/img/data-home.csv";
+    const IMG_BASE = "https://raw.githubusercontent.com/samueltobler/samueltobler.github.io/main/img/";
+    const BG_FILES = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png", "bg7.png", "bg8.png"];
 
-    const grid = document.querySelector("#grid");
-    const searchWrap = document.querySelector("#searchWrap");
-    const searchButton = document.querySelector("#searchButton");
-    const searchInput = document.querySelector("#searchInput");
-    const shuffleButton = document.querySelector("#shuffleButton");
+    function norm(s){ return (s || '').toLowerCase().trim(); }
 
-    let allMessages = [];
-
-    const dateFormatter = new Intl.DateTimeFormat("de-CH", {
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    });
-
-    function clean(value) {
-      return String(value ?? "").trim();
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
     }
 
-    function firstValue(row, keys) {
-      for (const key of keys) {
-        const value = clean(row[key]);
-        if (value) return value;
-      }
+    function parseSemicolonCSV(text){
+      const lines = text.replace(/\r/g,'').split('\n').filter(l => l.trim().length);
+      if(lines.length < 2) return [];
+      const header = lines[0].split(';').map(h => h.trim());
 
-      return "";
+      const idxTitel  = header.indexOf('Titel');
+      const idxBeschr = header.indexOf('Beschreibung');
+      const idxDatei  = header.indexOf('Datei');
+      const idxLink   = header.indexOf('Link');
+      const idxKat    = header.indexOf('Kategorie');
+
+      return lines.slice(1).map(line => {
+        const cols = line.split(';');
+        return {
+          titel: (cols[idxTitel] ?? '').trim(),
+          beschreibung: (cols[idxBeschr] ?? '').trim(),
+          datei: (cols[idxDatei] ?? '').trim(),
+          link: (cols[idxLink] ?? '').trim(),
+          kategorie: (cols[idxKat] ?? '').trim(),
+        };
+      }).filter(r => r.titel && r.datei && r.link);
     }
 
-    function parseDate(value) {
-      const text = clean(value);
-
-      let match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      if (match) {
-        const [, year, month, day] = match.map(Number);
-        return validDate(year, month, day);
-      }
-
-      match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?$/);
-      if (match) {
-        const [, month, day, year] = match.map(Number);
-        return validDate(year, month, day);
-      }
-
-      match = text.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?$/);
-      if (match) {
-        const [, day, month, year] = match.map(Number);
-        return validDate(year, month, day);
-      }
-
-      return null;
-    }
-
-    function validDate(year, month, day) {
-      const date = new Date(Date.UTC(year, month - 1, day));
-
-      const isValid =
-        date.getUTCFullYear() === year &&
-        date.getUTCMonth() === month - 1 &&
-        date.getUTCDate() === day;
-
-      return isValid ? date : null;
-    }
-
-    function formatDate(value) {
-      const date = parseDate(value);
-      return date ? dateFormatter.format(date) : clean(value);
-    }
-
-    function normaliseRow(row, index) {
-      const timestamp = firstValue(row, ["Zeitstempel", "Timestamp", "date", "Datum"]);
-
-      return {
-        id: `${timestamp}-${index}`,
-        who: firstValue(row, ["Name", "who"]) || "Unbekannt",
-        klasse: firstValue(row, ["Klasse (z.B. 3aW)", "Klasse", "klasse"]),
-        date: timestamp,
-        emoji: firstValue(row, ["Wähle 1 Emoji als Profilbild", "Emoji", "emoji"]) || "💬",
-        text: firstValue(row, ["Deine Nachricht", "Nachricht", "text", "Message"])
-      };
-    }
-
-    function shuffle(array) {
-      const result = [...array];
-
-      for (let i = result.length - 1; i > 0; i -= 1) {
+    function shuffleInPlace(arr){
+      for(let i = arr.length - 1; i > 0; i--){
         const j = Math.floor(Math.random() * (i + 1));
-        [result[i], result[j]] = [result[j], result[i]];
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function pickRandomBgUrl(){
+      const bg = BG_FILES[Math.floor(Math.random() * BG_FILES.length)];
+      return IMG_BASE + bg;
+    }
+
+    function groupRowsByKategorie(rows){
+      const groups = new Map();
+
+      for(const row of rows){
+        const key = row.kategorie || 'Tool';
+        if(!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(row);
       }
 
-      return result;
+      return Array.from(groups.entries())
+        .sort(([a], [b]) => a.localeCompare(b, 'de-CH'))
+        .map(([kategorie, items]) => ({
+          kategorie,
+          items: shuffleInPlace(items)
+        }));
     }
 
-    function createTextElement(tagName, className, text) {
-      const element = document.createElement(tagName);
-      element.className = className;
-      element.textContent = text;
-      return element;
+    function makeSectionTitle(kategorie){
+      const title = document.createElement('h2');
+      title.className = 'section-title';
+      title.textContent = kategorie;
+      title.dataset.kategorie = kategorie;
+      return title;
     }
 
-    function createCard(message) {
-      const article = document.createElement("article");
-      article.className = "card";
-      article.setAttribute("role", "listitem");
+    function makeCard({ titel, beschreibung, datei, link, kategorie }){
+      const img = IMG_BASE + datei;
+      const tag = kategorie || 'Tool';
+      const bgUrl = pickRandomBgUrl();
 
-      const inner = document.createElement("div");
-      inner.className = "card-inner";
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = link;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.setAttribute('aria-label', `${titel} öffnen`);
 
-      const meta = document.createElement("div");
-      meta.className = "meta";
+      a.dataset.title = titel;
+      a.dataset.desc = beschreibung;
+      a.dataset.kategorie = tag;
 
-      const emoji = createTextElement("div", "emoji", message.emoji);
-      emoji.setAttribute("aria-hidden", "true");
+      a.innerHTML = `
+        <div class="thumbwrap" style="background-image:url('${escapeHtml(bgUrl)}')">
+          <img class="thumbimg" src="${escapeHtml(img)}" alt="${escapeHtml(titel)}" loading="lazy">
+        </div>
 
-      const person = document.createElement("div");
-      const who = createTextElement("div", "who", message.who);
-
-      const subParts = [
-        message.klasse ? `Klasse ${message.klasse}` : "",
-        formatDate(message.date)
-      ].filter(Boolean);
-
-      const sub = createTextElement("div", "sub", subParts.join(" · "));
-
-      person.append(who, sub);
-      meta.append(emoji, person);
-
-      const text = createTextElement("div", "msg", message.text);
-
-      inner.append(meta, text);
-      article.append(inner);
-
-      return article;
+        <div class="content">
+          <div class="row">
+            <h2 class="ctitle">${escapeHtml(titel)}</h2>
+            <span class="chip">${escapeHtml(tag)}</span>
+          </div>
+          <p class="desc">${escapeHtml(beschreibung)}</p>
+        </div>
+      `;
+      return a;
     }
 
-    function renderState(message, strongText = "") {
-      grid.replaceChildren();
+    function applyFilter(){
+      const term = norm(q.value);
+      const cards = Array.from(grid.querySelectorAll('.card'));
 
-      const state = document.createElement("p");
-      state.className = "state";
-
-      if (strongText) {
-        const strong = document.createElement("strong");
-        strong.textContent = strongText;
-        state.append(strong, document.createTextNode(` ${message}`));
-      } else {
-        state.textContent = message;
-      }
-
-      grid.append(state);
-    }
-
-    function renderMessages(messages) {
-      grid.replaceChildren();
-
-      if (!messages.length) {
-        renderState("Keine passenden Einträge gefunden.");
-        return;
-      }
-
-      const fragment = document.createDocumentFragment();
-
-      for (const message of messages) {
-        fragment.append(createCard(message));
-      }
-
-      grid.append(fragment);
-    }
-
-    function searchableText(message) {
-      return [
-        message.who,
-        message.klasse,
-        message.date,
-        formatDate(message.date),
-        message.emoji,
-        message.text
-      ].join(" ").toLowerCase();
-    }
-
-    function applySearch() {
-      const query = clean(searchInput.value).toLowerCase();
-
-      if (!query) {
-        renderMessages(allMessages);
-        return;
-      }
-
-      const results = allMessages.filter(message => searchableText(message).includes(query));
-      renderMessages(results);
-    }
-
-    function openSearch() {
-      searchWrap.classList.add("is-open");
-      searchButton.setAttribute("aria-expanded", "true");
-      searchButton.setAttribute("aria-label", "Suche fokussieren");
-      window.requestAnimationFrame(() => searchInput.focus());
-    }
-
-    function toggleSearch() {
-      if (!searchWrap.classList.contains("is-open")) {
-        openSearch();
-        return;
-      }
-
-      searchInput.focus();
-    }
-
-    async function fetchJson(url) {
-      const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-      try {
-        const response = await fetch(url, {
-          cache: "no-store",
-          signal: controller.signal
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        return await response.json();
-      } finally {
-        window.clearTimeout(timeout);
-      }
-    }
-
-    async function loadMessages() {
-      try {
-        const rows = await fetchJson(OPENSHEET_URL);
-
-        if (!Array.isArray(rows)) {
-          throw new Error("Unerwartetes Datenformat");
-        }
-
-        allMessages = shuffle(
-          rows
-            .map(normaliseRow)
-            .filter(message => message.text)
+      for(const card of cards){
+        const hay = norm(
+          card.dataset.title + ' ' +
+          card.dataset.desc + ' ' +
+          (card.dataset.kategorie || '') + ' ' +
+          card.innerText
         );
+        card.style.display = (!term || hay.includes(term)) ? '' : 'none';
+      }
 
-        applySearch();
-      } catch (error) {
-        const reason = error.name === "AbortError"
-          ? "Die Anfrage hat zu lange gedauert."
-          : error.message;
-
-        renderState(
-          `${reason} Prüfe die Sheet-Freigabe, den Tabnamen «Formularantworten 1» und die Spalten Zeitstempel, Name, Klasse (z.B. 3aW), Wähle 1 Emoji als Profilbild, Deine Nachricht.`,
-          "Keine Daten geladen."
+      const sectionTitles = Array.from(grid.querySelectorAll('.section-title'));
+      for(const title of sectionTitles){
+        const kategorie = title.dataset.kategorie;
+        const hasVisibleCard = cards.some(card =>
+          card.dataset.kategorie === kategorie && card.style.display !== 'none'
         );
+        title.style.display = hasVisibleCard ? '' : 'none';
       }
     }
 
-    searchButton.addEventListener("click", toggleSearch);
+    function setViewMode(mode){
+      const isList = mode === 'list';
+      grid.classList.toggle('list-view', isList);
+      viewToggle.innerHTML = isList
+        ? '<i class="fas fa-th-large" aria-hidden="true"></i>'
+        : '<i class="fas fa-list" aria-hidden="true"></i>';
+      viewToggle.setAttribute('aria-pressed', String(isList));
+      viewToggle.setAttribute('aria-label', isList ? 'Zur Kartenansicht wechseln' : 'Zur Listenansicht wechseln');
+      viewToggle.setAttribute('title', isList ? 'Kartenansicht' : 'Listenansicht');
+      localStorage.setItem('projectViewMode', isList ? 'grid' : 'list');
+    }
 
-    searchInput.addEventListener("input", applySearch);
+    async function init(){
+      try{
+        const res = await fetch(CSV_URL, { cache: 'no-store' });
+        if(!res.ok) throw new Error(`data.csv nicht gefunden (${res.status})`);
+        const text = await res.text();
+        const rows = parseSemicolonCSV(text);
 
-    searchInput.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        searchInput.value = "";
-        applySearch();
-        searchInput.blur();
+        const groups = groupRowsByKategorie(rows);
+
+        grid.innerHTML = '';
+        for(const group of groups){
+          grid.appendChild(makeSectionTitle(group.kategorie));
+          for(const row of group.items){
+            grid.appendChild(makeCard(row));
+          }
+        }
+        applyFilter();
+      }catch(err){
+        grid.innerHTML = `
+          <div style="grid-column:1/-1;padding:16px;border:1px solid rgba(15,23,42,.10);border-radius:18px;background:rgba(255,255,255,.75);box-shadow:0 10px 30px rgba(2,6,23,.08);color:#0f172a">
+            <strong>Fehler beim Laden der Tools.</strong><br>
+            <span style="color:rgba(71,85,105,.9)">CSV oder Bilder konnten nicht geladen werden.</span>
+          </div>
+        `;
+        console.error(err);
       }
+    }
+
+    viewToggle.addEventListener('click', () => {
+      setViewMode(grid.classList.contains('list-view') ? 'grid' : 'list');
     });
 
-    shuffleButton.addEventListener("click", () => {
-      allMessages = shuffle(allMessages);
-      applySearch();
-    });
+    setViewMode(localStorage.getItem('projectViewMode') === 'list' ? 'list' : 'grid');
 
-    loadMessages();
+    q.addEventListener('input', applyFilter);
+    init();
   </script>
 </body>
 </html>
