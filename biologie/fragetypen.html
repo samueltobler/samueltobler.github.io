@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fragetypen – Übersicht</title>
+  <style>
+    :root{
+      --ink:#263244;
+      --muted:#667385;
+      --border:#d8dfec;
+      --surface:rgba(255,255,255,0.82);
+      --surface-strong:rgba(255,255,255,0.92);
+      --blue:#d6e6f8;
+      --blue-strong:#b7d1ef;
+      --lilac:#e5d9f4;
+      --rose:#f1d3e6;
+      --peach:#f8d2bf;
+      --coral:#f7b39e;
+      --shadow:0 12px 30px rgba(63, 86, 114, 0.08);
+      --radius:20px;
+    }
+
+    *{box-sizing:border-box}
+
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--ink);
+      line-height:1.4;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(183,209,239,0.95) 0, rgba(183,209,239,0.68) 28%, rgba(183,209,239,0) 56%),
+        radial-gradient(circle at 85% 10%, rgba(247,179,158,0.9) 0, rgba(247,179,158,0.75) 12%, rgba(247,179,158,0) 34%),
+        radial-gradient(circle at 84% 36%, rgba(229,217,244,0.95) 0, rgba(229,217,244,0.8) 18%, rgba(229,217,244,0) 34%),
+        radial-gradient(circle at 35% 88%, rgba(229,217,244,0.55) 0, rgba(229,217,244,0) 26%),
+        linear-gradient(180deg, #eff5ff 0%, #edf4ff 52%, #e5eefc 100%);
+      min-height:100vh;
+    }
+
+    main{
+      width:min(1180px, calc(100% - 28px));
+      margin:0 auto;
+      padding:28px 0 26px;
+    }
+
+    .hero{
+      background:var(--surface);
+      border:1px solid rgba(255,255,255,0.45);
+      border-radius:28px;
+      padding:24px 24px 18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(28px, 4vw, 42px);
+      line-height:1.08;
+      letter-spacing:-0.04em;
+      text-align:center;
+    }
+
+    .lead{
+      margin:10px auto 0;
+      max-width:760px;
+      text-align:center;
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:18px;
+      padding-top:16px;
+      border-top:1px solid rgba(38,50,68,0.08);
+    }
+
+    .chip-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .chip{
+      appearance:none;
+      border:1px solid var(--border);
+      background:var(--surface-strong);
+      color:var(--ink);
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:13px;
+      cursor:pointer;
+      transition:transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+
+    .chip:hover,
+    .chip:focus-visible{
+      transform:translateY(-1px);
+      outline:none;
+      border-color:#bfd0e7;
+    }
+
+    .chip[aria-pressed="true"]{
+      background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(241,211,230,0.8));
+      border-color:#cbb7da;
+      box-shadow:0 4px 12px rgba(120, 111, 168, 0.08);
+    }
+
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:16px;
+      margin-top:16px;
+    }
+
+    .section{
+      background:var(--surface);
+      border:1px solid rgba(255,255,255,0.45);
+      border-radius:24px;
+      padding:14px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+
+    .section[hidden]{display:none}
+
+    .section-header{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height:54px;
+      border-radius:16px;
+      padding:12px 14px;
+      margin-bottom:12px;
+      border:1px solid rgba(95, 115, 133, 0.14);
+    }
+
+    .section.text .section-header{background:linear-gradient(180deg, rgba(214,230,248,0.95), rgba(214,230,248,0.7))}
+    .section.choice .section-header{background:linear-gradient(180deg, rgba(229,217,244,0.95), rgba(229,217,244,0.72))}
+    .section.structure .section-header{background:linear-gradient(180deg, rgba(248,210,191,0.88), rgba(248,210,191,0.65))}
+    .section.visual .section-header{background:linear-gradient(180deg, rgba(241,211,230,0.95), rgba(241,211,230,0.72))}
+
+    .section-icon{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      background:rgba(255,255,255,0.62);
+      display:grid;
+      place-items:center;
+      font-size:16px;
+      flex:0 0 auto;
+    }
+
+    .section-title{
+      margin:0;
+      font-size:18px;
+      line-height:1.15;
+    }
+
+    .cards{
+      display:grid;
+      gap:12px;
+    }
+
+    .card{
+      display:grid;
+      gap:10px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.88);
+      transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+
+    .card:hover,
+    .card:focus-within{
+      transform:translateY(-2px);
+      box-shadow:0 10px 22px rgba(63,86,114,0.09);
+      border-color:#c8d4e6;
+    }
+
+    .visual-box{
+      height:78px;
+      border-radius:14px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.7), rgba(237,244,255,0.85));
+      border:1px solid rgba(95,115,133,0.12);
+      overflow:hidden;
+    }
+
+    svg{width:100%;height:100%;display:block}
+
+    .card-head{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .card h3{
+      margin:0;
+      font-size:16px;
+      line-height:1.15;
+    }
+
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+
+    .badge{
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      color:#4f5f72;
+      background:#f4f7fb;
+      border:1px solid #d9e3ee;
+      white-space:nowrap;
+    }
+
+    .badge.eval-auto{background:#eaf5ff;border-color:#cfe0f6}
+    .badge.eval-part{background:#fff1e9;border-color:#f2d7c7}
+    .badge.eval-man{background:#f6f1ff;border-color:#ded4f0}
+
+    .card p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .empty-state{
+      display:none;
+      margin-top:16px;
+      padding:16px;
+      text-align:center;
+      color:var(--muted);
+      background:var(--surface);
+      border:1px dashed #cbd5e3;
+      border-radius:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    .stroke{stroke:#70879d;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    .thin{stroke:#9bb0c2;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    .fill-blue{fill:#8fb7df}
+    .fill-blue-dark{fill:#6f9cc8}
+    .fill-lilac{fill:#d7c4ec}
+    .fill-peach{fill:#f2c3ad}
+    .fill-rose{fill:#ecc5dc}
+    .fill-soft{fill:#f7fbff}
+    .fill-sand{fill:#f6ddb0}
+
+    @media (max-width:1080px){
+      .grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
+    }
+
+    @media (max-width:700px){
+      main{width:min(100% - 18px, 1180px); padding-top:18px;}
+      .hero{padding:18px 16px 16px}
+      h1,.lead{text-align:left}
+      .toolbar{align-items:flex-start}
+      .grid{grid-template-columns:1fr}
+      .section-header{min-height:auto}
+    }
+
+    @media print{
+      body{background:white}
+      main{width:100%;padding:0}
+      .hero,.section{box-shadow:none;backdrop-filter:none}
+      .toolbar,.footer{display:none}
+      .grid{grid-template-columns:repeat(4, 1fr);gap:10px}
+      .card{break-inside:avoid;transform:none !important;box-shadow:none}
+      .visual-box{height:64px}
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>Prüfungen vielfältig gestalten</h1>
+      <p class="lead">Eine Übersicht unterschiedlicher Fragetypen für das schriftliche Prüfen.</p>
+
+      <div class="toolbar" aria-label="Werkzeuge zur Ansicht">
+        <div class="chip-row" role="group" aria-label="Bereich filtern">
+          <button class="chip" type="button" data-filter="all" aria-pressed="true">Alle</button>
+          <button class="chip" type="button" data-filter="text" aria-pressed="false">Text</button>
+          <button class="chip" type="button" data-filter="choice" aria-pressed="false">Auswahl</button>
+          <button class="chip" type="button" data-filter="structure" aria-pressed="false">Struktur</button>
+          <button class="chip" type="button" data-filter="visual" aria-pressed="false">Visuell</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Übersicht der Fragetypen">
+      <section class="section text" data-category="text">
+        <div class="section-header">
+          <div class="section-icon" aria-hidden="true">T</div>
+          <h2 class="section-title">Textbasierte Aufgaben</h2>
+        </div>
+        <div class="cards">
+          <article class="card" data-order="1" data-eval="2">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <rect x="22" y="16" width="176" height="46" rx="8" class="fill-soft" stroke="#c9d7e4"/>
+                <line x1="36" y1="28" x2="78" y2="28" class="stroke"/>
+                <line x1="87" y1="28" x2="133" y2="28" class="thin"/>
+                <line x1="142" y1="28" x2="182" y2="28" class="stroke"/>
+                <rect x="36" y="40" width="40" height="13" rx="4" fill="#fff" stroke="#99adc0"/>
+                <line x1="86" y1="46" x2="101" y2="46" class="thin"/>
+                <rect x="110" y="40" width="40" height="13" rx="4" fill="#fff" stroke="#99adc0"/>
+                <line x1="161" y1="46" x2="182" y2="46" class="thin"/>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Lückentext</h3>
+              <div class="meta">
+                <span class="badge">Text</span>
+                <span class="badge eval-part">teilautomatisch</span>
+              </div>
+            </div>
+            <p>Begriffe oder Zahlen in einen vorgegebenen Text einsetzen.</p>
+          </article>
+
+          <article class="card" data-order="2" data-eval="3">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <rect x="26" y="20" width="168" height="38" rx="7" fill="#fff" stroke="#becbd7"/>
+                <line x1="40" y1="33" x2="164" y2="33" class="stroke"/>
+                <line x1="40" y1="45" x2="132" y2="45" class="thin"/>
+                <circle cx="178" cy="33" r="2.5" class="fill-blue-dark"/>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Kurzantwort</h3>
+              <div class="meta">
+                <span class="badge">Freitext</span>
+                <span class="badge eval-man">manuell</span>
+              </div>
+            </div>
+            <p>Kurze freie Antwort in einem ein- oder mehrzeiligen Textfeld.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section choice" data-category="choice">
+        <div class="section-header">
+          <div class="section-icon" aria-hidden="true">A</div>
+          <h2 class="section-title">Auswahlaufgaben</h2>
+        </div>
+        <div class="cards">
+          <article class="card" data-order="1" data-eval="1">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <circle cx="38" cy="20" r="6" fill="#fff" stroke="#7f92a3"/>
+                <circle cx="38" cy="39" r="6" class="fill-blue-dark"/>
+                <circle cx="38" cy="58" r="6" fill="#fff" stroke="#7f92a3"/>
+                <line x1="58" y1="20" x2="141" y2="20" class="thin"/>
+                <line x1="58" y1="39" x2="178" y2="39" class="stroke"/>
+                <line x1="58" y1="58" x2="128" y2="58" class="thin"/>
+                <circle cx="38" cy="39" r="2.3" fill="#fff"/>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Single Choice</h3>
+              <div class="meta">
+                <span class="badge">Auswahl</span>
+                <span class="badge eval-auto">automatisch</span>
+              </div>
+            </div>
+            <p>Mehrere Optionen; genau eine Antwort ist korrekt.</p>
+          </article>
+
+          <article class="card" data-order="2" data-eval="1">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <rect x="31" y="14" width="12" height="12" rx="3" class="fill-blue-dark"/>
+                <path d="M34 20l3 3 5-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <rect x="31" y="33" width="12" height="12" rx="3" fill="#fff" stroke="#7f92a3"/>
+                <rect x="31" y="52" width="12" height="12" rx="3" class="fill-blue-dark"/>
+                <path d="M34 58l3 3 5-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <line x1="58" y1="20" x2="142" y2="20" class="stroke"/>
+                <line x1="58" y1="39" x2="160" y2="39" class="thin"/>
+                <line x1="58" y1="58" x2="181" y2="58" class="stroke"/>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Multiple Choice</h3>
+              <div class="meta">
+                <span class="badge">Auswahl</span>
+                <span class="badge eval-auto">automatisch</span>
+              </div>
+            </div>
+            <p>Mehrere Optionen; mehrere Antworten können korrekt sein.</p>
+          </article>
+
+          <article class="card" data-order="3" data-eval="1">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <circle cx="52" cy="22" r="10" fill="#fff" stroke="#8ca0b0"/>
+                <circle cx="52" cy="56" r="10" class="fill-lilac" stroke="#a293bc"/>
+                <rect x="145" y="12" width="42" height="20" rx="10" fill="#fff" stroke="#8ca0b0"/>
+                <rect x="145" y="46" width="42" height="20" rx="10" fill="#fff" stroke="#8ca0b0"/>
+                <path d="M62 22 C92 14, 108 56, 145 56" class="stroke"/>
+                <path d="M62 56 C92 64, 111 27, 145 22" class="thin"/>
+                <circle cx="145" cy="56" r="3.2" class="fill-blue-dark"/>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Zuordnen</h3>
+              <div class="meta">
+                <span class="badge">Beziehung</span>
+                <span class="badge eval-auto">automatisch</span>
+              </div>
+            </div>
+            <p>Elemente aus zwei Gruppen sinnvoll miteinander verbinden.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section structure" data-category="structure">
+        <div class="section-header">
+          <div class="section-icon" aria-hidden="true">S</div>
+          <h2 class="section-title">Strukturierte Eingaben</h2>
+        </div>
+        <div class="cards">
+          <article class="card" data-order="1" data-eval="1">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <rect x="34" y="14" width="28" height="16" rx="4" fill="#fff" stroke="#90a2b1"/>
+                <rect x="34" y="48" width="28" height="16" rx="4" fill="#fff" stroke="#90a2b1"/>
+                <path d="M67 22h22m0 0l-6-5m6 5l-6 5" class="thin"/>
+                <path d="M67 56h22m0 0l-6-5m6 5l-6 5" class="thin"/>
+                <rect x="97" y="12" width="84" height="20" rx="5" fill="#fff" stroke="#aab8c6"/>
+                <rect x="97" y="46" width="84" height="20" rx="5" fill="#fff" stroke="#aab8c6"/>
+                <line x1="108" y1="22" x2="142" y2="22" class="stroke"/>
+                <line x1="108" y1="56" x2="159" y2="56" class="stroke"/>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Sortieren</h3>
+              <div class="meta">
+                <span class="badge">Reihenfolge</span>
+                <span class="badge eval-auto">automatisch</span>
+              </div>
+            </div>
+            <p>Elemente in die richtige Reihenfolge bringen.</p>
+          </article>
+
+          <article class="card" data-order="2" data-eval="1">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <rect x="34" y="27" width="152" height="24" rx="5" fill="#fff" stroke="#95a9b9"/>
+                <line x1="47" y1="39" x2="119" y2="39" class="stroke"/>
+                <line x1="126" y1="39" x2="166" y2="39" class="thin"/>
+                <path d="M171 36l5 5 5-5" class="stroke"/>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Lückenliste / Dropdown</h3>
+              <div class="meta">
+                <span class="badge">Kontext</span>
+                <span class="badge eval-auto">automatisch</span>
+              </div>
+            </div>
+            <p>Die passende Auswahl direkt in einem Text oder Satz treffen.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section visual" data-category="visual">
+        <div class="section-header">
+          <div class="section-icon" aria-hidden="true">V</div>
+          <h2 class="section-title">Visuelle / grafische Aufgaben</h2>
+        </div>
+        <div class="cards">
+          <article class="card" data-order="1" data-eval="2">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <rect x="22" y="14" width="74" height="50" rx="7" fill="#e7f3ff" stroke="#a7bfd4"/>
+                <circle cx="39" cy="28" r="7" class="fill-sand" stroke="#b79849"/>
+                <path d="M34 52 C45 43, 55 45, 65 55 C74 47, 84 48, 92 56" fill="#9bd0de" stroke="#649aac"/>
+                <path d="M57 43 c2-9 7-13 15-11" class="stroke"/>
+                <path d="M63 34 c-8 2-11 7-11 14" class="thin"/>
+                <line x1="96" y1="24" x2="126" y2="24" class="thin"/>
+                <line x1="96" y1="53" x2="126" y2="53" class="thin"/>
+                <rect x="129" y="17" width="58" height="14" rx="4" fill="#fff" stroke="#aab8c6"/>
+                <rect x="129" y="46" width="58" height="14" rx="4" fill="#fff" stroke="#aab8c6"/>
+                <line x1="139" y1="24" x2="169" y2="24" class="stroke"/>
+                <line x1="139" y1="53" x2="159" y2="53" class="stroke"/>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Beschriftung</h3>
+              <div class="meta">
+                <span class="badge">Grafik / Bild</span>
+                <span class="badge eval-part">teilautomatisch</span>
+              </div>
+            </div>
+            <p>Teile einer Grafik oder eines Bildes korrekt benennen.</p>
+          </article>
+
+          <article class="card" data-order="2" data-eval="3">
+            <div class="visual-box" aria-hidden="true">
+              <svg viewBox="0 0 220 78">
+                <line x1="34" y1="61" x2="188" y2="61" class="thin"/>
+                <line x1="34" y1="16" x2="34" y2="61" class="thin"/>
+                <path d="M42 54 L68 46 L93 42 L118 30 L143 22 L166 33 L188 17" class="stroke"/>
+                <g class="fill-blue-dark">
+                  <circle cx="42" cy="54" r="3.4"/>
+                  <circle cx="68" cy="46" r="3.4"/>
+                  <circle cx="93" cy="42" r="3.4"/>
+                  <circle cx="118" cy="30" r="3.4"/>
+                  <circle cx="143" cy="22" r="3.4"/>
+                  <circle cx="166" cy="33" r="3.4"/>
+                  <circle cx="188" cy="17" r="3.4"/>
+                </g>
+              </svg>
+            </div>
+            <div class="card-head">
+              <h3>Diagramm / Graph interpretieren</h3>
+              <div class="meta">
+                <span class="badge">Daten</span>
+                <span class="badge eval-man">manuell</span>
+              </div>
+            </div>
+            <p>Kurven, Daten oder Trends lesen, beschreiben und deuten.</p>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <div class="empty-state" id="emptyState">Für diesen Filter ist kein Bereich sichtbar.</div>
+
+    <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const sections = Array.from(document.querySelectorAll('.section'));
+      const buttons = Array.from(document.querySelectorAll('.chip[data-filter]'));
+      const emptyState = document.getElementById('emptyState');
+
+      function applyFilter(category){
+        let visibleCount = 0;
+        sections.forEach(section => {
+          const show = category === 'all' || section.dataset.category === category;
+          section.hidden = !show;
+          if(show) visibleCount += 1;
+        });
+
+        buttons.forEach(button => {
+          button.setAttribute('aria-pressed', String(button.dataset.filter === category));
+        });
+
+        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => applyFilter(button.dataset.filter));
+      });
+
+      applyFilter('all');
+    })();
+  </script>
+</body>
+</html>
