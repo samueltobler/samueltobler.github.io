@@ -23,6 +23,21 @@ svg{width:100%;height:425px;display:block}
 .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 button{border:0;border-radius:12px;padding:13px 15px;font-weight:720;font-size:1rem;cursor:pointer;color:white;transition:.12s transform,.12s filter}
 button:active{transform:translateY(1px)}
+ .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
 .epsp{background:var(--epsp)} .ipsp{background:var(--ipsp)} .reset{background:#485467;grid-column:1/-1}
 .panel{border:1px solid #e5e7ee;border-radius:12px;padding:15px;background:#fbfcff}
 .panel h2{font-size:1rem;margin:0 0 8px}.panel p{margin:0;color:var(--muted);line-height:1.4}
@@ -100,6 +115,11 @@ button:active{transform:translateY(1px)}
       </div>
     </aside>
   </div>
+  <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+
 </main>
 <script>
 const REST=-70, THRESH=-55, MIN=-80, MAX=-45;
