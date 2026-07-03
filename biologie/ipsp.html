@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Summation am Axonhügel</title>
+<style>
+:root{
+  --bg:#f7f8fb; --card:#ffffff; --ink:#172033; --muted:#667085;
+  --epsp:#2f80ed; --ipsp:#9b51e0; --axon:#26344d; --threshold:#e4572e; --rest:#3c8d5a;
+  --grid:#e6e9f0;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:1120px;margin:0 auto;padding:24px 22px 34px}
+h1{font-size:clamp(1.6rem,2.4vw,2.3rem);margin:0 0 8px}
+.lead{display:none}
+.grid{display:grid;grid-template-columns:1.48fr .92fr;gap:18px;align-items:stretch}
+.card{background:var(--card);border:1px solid #e5e7ee;border-radius:16px;box-shadow:0 8px 24px rgba(16,24,40,.045);overflow:hidden}
+.scene{position:relative;min-height:492px;padding:18px 18px 10px}
+svg{width:100%;height:425px;display:block}
+.controls{padding:20px;display:flex;flex-direction:column;gap:16px}
+.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{border:0;border-radius:12px;padding:13px 15px;font-weight:720;font-size:1rem;cursor:pointer;color:white;transition:.12s transform,.12s filter}
+button:active{transform:translateY(1px)}
+.epsp{background:var(--epsp)} .ipsp{background:var(--ipsp)} .reset{background:#485467;grid-column:1/-1}
+.panel{border:1px solid #e5e7ee;border-radius:12px;padding:15px;background:#fbfcff}
+.panel h2{font-size:1rem;margin:0 0 8px}.panel p{margin:0;color:var(--muted);line-height:1.4}
+.meterWrap{height:330px;display:grid;grid-template-columns:106px 1fr;gap:18px;align-items:stretch;padding:8px 14px 22px 2px}
+.scale{position:relative;border-left:1.4px solid #aeb8c9;margin:12px 0 0 84px;overflow:visible}
+.tick{position:absolute;left:-10px;width:10px;border-top:1.2px solid #7d8aa0}.tick span{position:absolute;left:-82px;top:-12px;font-size:1rem;color:#344054;width:72px;text-align:right;font-weight:650}
+.barBox{position:relative;margin:12px 4px 0 0;border-radius:10px;background:linear-gradient(to top,#eef2f7,#ffffff);border:1px solid #d8deea;overflow:visible}
+.bar{position:absolute;left:0;right:0;bottom:0;height:0%;background:linear-gradient(to top,rgba(47,128,237,.13),rgba(47,128,237,.32));transition:height .16s ease;border-radius:0 0 10px 10px}
+.line{position:absolute;left:0;right:0;border-top:1.5px dashed}.line.rest{border-color:var(--rest)}.line.thr{border-color:var(--threshold)}
+.line label{position:absolute;right:8px;top:-24px;font-size:.98rem;background:white;padding:2px 6px;border-radius:6px;color:#2f3a4f;border:1px solid #dce2ec;font-weight:650;white-space:nowrap}
+.readout{font-size:2.15rem;font-weight:820;margin:2px 0 0}.status{font-weight:750;margin-top:8px}.status.ok{color:var(--threshold)}.status.no{color:#3c8d5a}.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.86rem;color:var(--muted);padding:0 18px 18px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.note{font-size:.9rem;color:var(--muted);line-height:1.4}
+.impulse{position:absolute;width:8px;height:8px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(47,128,237,.08),0 0 9px rgba(47,128,237,.25)}
+.impulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid currentColor;opacity:.20;animation:ripple .8s ease-out infinite}
+.impulse.ip{box-shadow:0 0 0 2px rgba(155,81,224,.08),0 0 10px rgba(155,81,224,.28)}
+.trail{position:absolute;width:3px;height:3px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);opacity:.22;animation:fadeTrail .55s linear forwards}
+.ap{position:absolute;width:8px;height:20px;border-radius:999px;background:var(--threshold);transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(228,87,46,.10),0 0 12px rgba(228,87,46,.28);pointer-events:none}
+.apWave{position:absolute;width:13px;height:25px;border-radius:999px;border:1.3px solid var(--threshold);transform:translate(-50%,-50%);opacity:.28;pointer-events:none;animation:ripple .62s ease-out infinite}
+@keyframes ripple{from{transform:translate(-50%,-50%) scale(.65);opacity:.55}to{transform:translate(-50%,-50%) scale(1.45);opacity:0}}
+@keyframes fadeTrail{to{opacity:0;transform:translate(-50%,-50%) scale(.25)}}
+.synPulse{animation:pulse .35s ease}@keyframes pulse{0%{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}50%{filter:drop-shadow(0 0 10px currentColor)}100%{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}}
+.small{font-size:.84rem;color:var(--muted)}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.scene{min-height:420px}svg{height:360px}.meterWrap{height:285px;grid-template-columns:104px 1fr}.scale{margin-left:82px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Summation am Axonhügel</h1>
+  <p class="lead">Drücke EPSP oder IPSP. Das Signal wandert zum Axonhügel. Dort werden alle eintreffenden Signale kurzzeitig addiert. Wird die Schwelle erreicht, startet automatisch ein Aktionspotenzial im Axon.</p>
+  <div class="grid">
+    <section class="card scene" id="scene">
+      <svg viewBox="0 0 760 430" aria-label="Neuron mit Dendriten, Soma, Axonhügel und Axon">
+        <defs>
+          <marker id="arrow" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto" markerUnits="strokeWidth"><path d="M0,1 L4,2.5 L0,4" fill="none" stroke="#26344d" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></marker>
+        </defs>
+        <path d="M84 76 C135 98,190 132,260 198 C280 206,300 211,319 214" fill="none" stroke="#8190aa" stroke-width="4.2" stroke-linecap="round"/>
+        <path d="M60 153 C125 178,185 201,258 210 C283 213,305 214,325 215" fill="none" stroke="#8190aa" stroke-width="4.2" stroke-linecap="round"/>
+        <path d="M65 348 C125 315,185 282,260 232 C285 222,306 217,326 216" fill="none" stroke="#8190aa" stroke-width="4.2" stroke-linecap="round"/>
+        <path d="M280 30 C254 72,241 124,280 178 C294 196,309 207,325 214" fill="none" stroke="#8190aa" stroke-width="4.2" stroke-linecap="round"/>
+        <path d="M280 400 C255 358,247 306,286 252 C301 234,314 223,328 217" fill="none" stroke="#8190aa" stroke-width="4.2" stroke-linecap="round"/>
+        <ellipse cx="325" cy="215" rx="68" ry="56" fill="#edf3fb" stroke="#51617a" stroke-width="2.4"/>
+        <circle cx="325" cy="215" r="16" fill="#cbd8eb" stroke="#51617a" stroke-width="1.8"/>
+        <path d="M392 215 C430 215,462 216,505 216" fill="none" stroke="#26344d" stroke-width="8.2" stroke-linecap="round"/>
+        <path d="M505 216 C590 216,660 216,730 216" fill="none" stroke="#26344d" stroke-width="5.2" stroke-linecap="round" marker-end="url(#arrow)"/>
+        <text x="318" y="314" text-anchor="middle" font-size="15" fill="#172033" font-weight="700">Soma</text>
+        <text x="461" y="178" text-anchor="middle" font-size="15" fill="#172033" font-weight="700">Axonhügel</text>
+        <text x="620" y="185" text-anchor="middle" font-size="15" fill="#172033" font-weight="700">Axon</text>
+        <g id="synapses">
+          <circle id="s1" cx="84" cy="76" r="5.2" fill="#2f80ed"/><circle id="s2" cx="60" cy="153" r="5.2" fill="#2f80ed"/><circle id="s3" cx="65" cy="348" r="5.2" fill="#2f80ed"/><circle id="s4" cx="280" cy="30" r="5.2" fill="#9b51e0"/><circle id="s5" cx="280" cy="400" r="5.2" fill="#9b51e0"/>
+        </g>
+        <text x="93" y="48" font-size="13" fill="#667085">erregende Synapsen</text>
+        <text x="310" y="36" font-size="13" fill="#667085">hemmende Synapsen</text>
+        <circle id="hillock" cx="462" cy="216" r="7" fill="#e4572e"/>
+      </svg>
+      <div class="legend"><span><i class="dot" style="background:var(--epsp)"></i>EPSP: depolarisiert</span><span><i class="dot" style="background:var(--ipsp)"></i>IPSP: hyperpolarisiert</span><span><i class="dot" style="background:var(--threshold)"></i>Schwelle löst Aktionspotenzial aus</span></div>
+    </section>
+
+    <aside class="card controls">
+      <div class="btnrow">
+        <button class="epsp" id="epspBtn">EPSP senden</button>
+        <button class="ipsp" id="ipspBtn">IPSP senden</button>
+        <button class="reset" id="resetBtn">Reset</button>
+      </div>
+      <div class="panel">
+        <h2>Membranspannung am Axonhügel</h2>
+        <div class="meterWrap">
+          <div class="scale" id="scale"></div>
+          <div class="barBox" id="barBox">
+            <div class="bar" id="bar"></div>
+            <div class="line rest" id="restLine"><label>Ruhe −70 mV</label></div>
+            <div class="line thr" id="thrLine"><label>Schwelle −55 mV</label></div>
+          </div>
+        </div>
+        <div class="readout"><span id="voltage">−70</span> mV</div>
+        <div class="status no" id="status">Schwelle nicht erreicht</div>
+      </div>
+    </aside>
+  </div>
+</main>
+<script>
+const REST=-70, THRESH=-55, MIN=-80, MAX=-45;
+let events=[], last=performance.now(), refractoryUntil=0, apRunning=false;
+let epspIndex=0, ipspIndex=0;
+const epspSyn=[
+  {id:'s1',path:'M84 76 C135 98 190 132 260 198 C280 206 300 211 319 214 C358 215 405 216 462 216'},
+  {id:'s2',path:'M60 153 C125 178 185 201 258 210 C283 213 305 214 325 215 C362 215 408 216 462 216'},
+  {id:'s3',path:'M65 348 C125 315 185 282 260 232 C285 222 306 217 326 216 C363 216 408 216 462 216'}
+];
+const ipspSyn=[
+  {id:'s4',path:'M280 30 C254 72 241 124 280 178 C294 196 309 207 325 214 C362 215 408 216 462 216'},
+  {id:'s5',path:'M280 400 C255 358 247 306 286 252 C301 234 314 223 328 217 C365 216 410 216 462 216'}
+];
+const hill={x:462,y:216};
+const scene=document.getElementById('scene'), svg=document.querySelector('svg');
+const voltageEl=document.getElementById('voltage'), statusEl=document.getElementById('status'), bar=document.getElementById('bar');
+const restLine=document.getElementById('restLine'), thrLine=document.getElementById('thrLine'), scale=document.getElementById('scale');
+function pct(v){return ((v-MIN)/(MAX-MIN))*100}
+restLine.style.bottom=pct(REST)+'%'; thrLine.style.bottom=pct(THRESH)+'%';
+[-80,-70,-60,-55,-50].forEach(v=>{const t=document.createElement('div');t.className='tick';t.style.bottom=pct(v)+'%';t.innerHTML='<span>'+v+'</span>';scale.appendChild(t)});
+function svgToScene(pt){const r=svg.getBoundingClientRect(), sc=scene.getBoundingClientRect(); return {x:(r.left-sc.left)+pt.x*r.width/760, y:(r.top-sc.top)+pt.y*r.height/430};}
+function addSignal(type){
+  const src = type==='epsp' ? epspSyn[epspIndex++%epspSyn.length] : ipspSyn[ipspIndex++%ipspSyn.length];
+  document.getElementById(src.id).classList.add('synPulse'); setTimeout(()=>document.getElementById(src.id).classList.remove('synPulse'),350);
+  animateDot(src.path,type,1150,()=>{events.push({type, start:performance.now(), amp:type==='epsp'?5.8:-6.5, tau:type==='epsp'?1700:1900}); flashHillock(type);});
+}
+function makeSvgPath(d){
+  const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d',d);
+  return p;
+}
+function flashHillock(type){
+  const h=document.getElementById('hillock');
+  h.setAttribute('fill',type==='epsp'?'#2f80ed':'#9b51e0');
+  h.setAttribute('r','10');
+  setTimeout(()=>{h.setAttribute('fill','#e4572e');h.setAttribute('r','7');},220);
+}
+function animateDot(pathData,type,dur,done){
+  const path=makeSvgPath(pathData), len=path.getTotalLength();
+  const dot=document.createElement('div'); dot.className='impulse '+(type==='ipsp'?'ip':'');
+  dot.style.background=type==='epsp'?'var(--epsp)':'var(--ipsp)'; dot.style.color=type==='epsp'?'var(--epsp)':'var(--ipsp)'; scene.appendChild(dot);
+  const start=performance.now(); let lastTrail=0;
+  function step(now){
+    const p=Math.min(1,(now-start)/dur), ease=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    const pt=path.getPointAtLength(len*ease); const pos=svgToScene({x:pt.x,y:pt.y}); dot.style.left=pos.x+'px'; dot.style.top=pos.y+'px'; dot.style.opacity=(1-p*.25).toFixed(2);
+    if(now-lastTrail>85){
+      lastTrail=now; const tr=document.createElement('div'); tr.className='trail'; tr.style.background=type==='epsp'?'var(--epsp)':'var(--ipsp)'; tr.style.left=pos.x+'px'; tr.style.top=pos.y+'px'; scene.appendChild(tr); setTimeout(()=>tr.remove(),600);
+    }
+    if(p<1) requestAnimationFrame(step); else {dot.remove(); done&&done();}
+  } requestAnimationFrame(step);
+}
+function currentVoltage(now){
+  let sum=0; events=events.filter(e=>now-e.start<6500);
+  for(const e of events){const t=now-e.start; if(t<0) continue; sum += e.amp*Math.exp(-t/e.tau);} 
+  return Math.max(MIN,Math.min(MAX,REST+sum));
+}
+function fireAP(){
+  if(apRunning) return; apRunning=true; refractoryUntil=performance.now()+1100;
+  statusEl.textContent='Schwelle erreicht: Aktionspotenzial läuft'; statusEl.className='status ok';
+  const start={x:462,y:216}, end={x:725,y:216};
+  const ap=document.createElement('div'); ap.className='ap'; scene.appendChild(ap);
+  const wave=document.createElement('div'); wave.className='apWave'; scene.appendChild(wave);
+  const t0=performance.now(), dur=1050;
+  function step(now){
+    const p=Math.min(1,(now-t0)/dur); const pos=svgToScene({x:start.x+(end.x-start.x)*p,y:216});
+    ap.style.left=pos.x+'px'; ap.style.top=pos.y+'px'; wave.style.left=pos.x+'px'; wave.style.top=pos.y+'px';
+    if(p<1) requestAnimationFrame(step); else {ap.remove(); wave.remove(); apRunning=false; events=[]; statusEl.textContent='Schwelle nicht erreicht'; statusEl.className='status no';}
+  } requestAnimationFrame(step);
+}
+function loop(now){
+  const v=currentVoltage(now); voltageEl.textContent=Math.round(v).toString().replace('-', '−'); bar.style.height=pct(v)+'%';
+  if(v>=THRESH && now>refractoryUntil){fireAP();} else if(!apRunning){statusEl.textContent='Schwelle nicht erreicht'; statusEl.className='status no';}
+  requestAnimationFrame(loop);
+}
+document.getElementById('epspBtn').onclick=()=>addSignal('epsp');
+document.getElementById('ipspBtn').onclick=()=>addSignal('ipsp');
+document.getElementById('resetBtn').onclick=()=>{events=[];apRunning=false;refractoryUntil=0;document.querySelectorAll('.impulse,.trail,.ap,.apWave').forEach(e=>e.remove());voltageEl.textContent='−70';bar.style.height=pct(REST)+'%';statusEl.textContent='Schwelle nicht erreicht';statusEl.className='status no';};
+bar.style.height=pct(REST)+'%';
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
