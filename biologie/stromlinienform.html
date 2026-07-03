@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fischform und Wasserwiderstand</title>
+  <style>
+    :root{
+      --bg:#f6fafc;
+      --card:#ffffff;
+      --ink:#15242d;
+      --muted:#6a7881;
+      --line:#e4edf1;
+      --water-1:#e8fbff;
+      --water-2:#bfe9f2;
+      --water-3:#a7dbe6;
+      --blue:#1b7c99;
+      --green:#27875c;
+      --yellow:#b27a16;
+      --red:#c84d4d;
+      --shadow:0 18px 60px rgba(31,72,90,0.10);
+      --radius:28px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(27,124,153,0.11), transparent 32rem),
+        linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);
+    }
+
+    .app{
+      width:min(1120px,calc(100vw - 28px));
+      margin:0 auto;
+      padding:22px 0 26px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:14px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(1.45rem,2.8vw,2.35rem);
+      line-height:1.05;
+      letter-spacing:-0.045em;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 315px;
+      gap:16px;
+      align-items:stretch;
+    }
+
+    .card{
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(228,237,241,0.95);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      backdrop-filter:blur(14px);
+    }
+
+    .stage-card{
+      min-height:610px;
+      display:grid;
+      grid-template-rows:auto 1fr;
+    }
+
+    .topbar{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:18px;
+      align-items:center;
+      padding:18px 20px 16px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .kicker{
+      margin:0 0 8px;
+      color:var(--muted);
+      font-size:0.76rem;
+      font-weight:850;
+      letter-spacing:0.085em;
+      text-transform:uppercase;
+    }
+
+    .bar{
+      height:13px;
+      border-radius:999px;
+      background:#edf5f7;
+      border:1px solid #dce9ee;
+      overflow:hidden;
+    }
+
+    .bar-fill{
+      width:0%;
+      height:100%;
+      border-radius:999px;
+      background:var(--green);
+      transition:width 180ms ease, background-color 180ms ease;
+    }
+
+    .result{
+      min-width:174px;
+      text-align:right;
+    }
+
+    .score{
+      font-size:clamp(2.05rem,4vw,3.25rem);
+      line-height:0.92;
+      letter-spacing:-0.065em;
+      font-weight:850;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .score small{
+      color:var(--muted);
+      font-size:0.95rem;
+      letter-spacing:0;
+      font-weight:800;
+    }
+
+    .badge{
+      display:inline-flex;
+      margin-top:9px;
+      border-radius:999px;
+      padding:7px 11px;
+      color:var(--green);
+      background:rgba(39,135,92,0.10);
+      font-size:0.82rem;
+      font-weight:850;
+    }
+
+    .canvas-wrap{
+      position:relative;
+      min-height:510px;
+      background:linear-gradient(180deg,var(--water-1) 0%,var(--water-2) 55%,var(--water-3) 100%);
+    }
+
+    canvas{
+      display:block;
+      width:100%;
+      height:100%;
+      min-height:510px;
+    }
+
+    .panel{
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .controls{
+      display:grid;
+      gap:19px;
+    }
+
+    .control label{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+      font-size:0.95rem;
+      font-weight:830;
+    }
+
+    output{
+      color:var(--blue);
+      font-size:0.86rem;
+      font-weight:830;
+      white-space:nowrap;
+    }
+
+    input[type="range"]{
+      width:100%;
+      margin:0;
+      accent-color:var(--blue);
+      cursor:pointer;
+    }
+
+    .range-hints{
+      display:flex;
+      justify-content:space-between;
+      margin-top:7px;
+      color:var(--muted);
+      font-size:0.76rem;
+    }
+
+    .effect{
+      padding:17px;
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:#fbfdfe;
+    }
+
+    .effect-main{
+      margin:0 0 8px;
+      font-size:1.22rem;
+      line-height:1.2;
+      font-weight:850;
+      letter-spacing:-0.025em;
+    }
+
+    .effect-text{
+      margin:0;
+      color:var(--muted);
+      font-size:0.94rem;
+      line-height:1.42;
+    }
+
+    .impact-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    .impact{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#f6fafb;
+      font-size:0.88rem;
+    }
+
+    .impact span:first-child{
+      color:var(--muted);
+      font-weight:760;
+    }
+
+    .impact span:last-child{
+      font-weight:850;
+    }
+
+    .mini-note{
+      margin:0;
+      color:var(--muted);
+      font-size:0.88rem;
+      line-height:1.45;
+    }
+
+    .mini-note strong{
+      color:var(--ink);
+    }
+
+    .buttons{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:auto;
+    }
+
+    button{
+      appearance:none;
+      border:1px solid transparent;
+      border-radius:16px;
+      padding:12px 10px;
+      color:#ffffff;
+      background:var(--blue);
+      font:inherit;
+      font-size:0.9rem;
+      font-weight:850;
+      cursor:pointer;
+      transition:transform 120ms ease,filter 120ms ease,box-shadow 120ms ease;
+    }
+
+    button.secondary{
+      color:var(--ink);
+      background:#f3f7f9;
+      border-color:var(--line);
+    }
+
+    button:hover{filter:brightness(0.98)}
+    button:active{transform:translateY(1px)}
+    button:focus-visible{outline:3px solid rgba(27,124,153,0.24);outline-offset:2px}
+
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    @media (max-width:900px){
+      .app{width:min(100vw - 22px,760px);padding-top:18px}
+      header{align-items:flex-start;flex-direction:column}
+      .layout{grid-template-columns:1fr}
+      .stage-card{min-height:520px}
+      .canvas-wrap,canvas{min-height:390px}
+      .topbar{grid-template-columns:1fr}
+      .result{text-align:left}
+      .score{font-size:2.3rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Fischform und Wasserwiderstand</h1>
+    </header>
+
+    <main class="layout">
+      <section class="card stage-card" aria-label="Animation der Wasserströmung um einen Fischkörper">
+        <div class="topbar">
+          <div>
+            <p class="kicker">Widerstand</p>
+            <div class="bar" aria-hidden="true"><div class="bar-fill" id="barFill"></div></div>
+          </div>
+          <div class="result" aria-live="polite">
+            <div class="score"><span id="score">0</span><small>/100</small></div>
+            <div class="badge" id="badge">gering</div>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="canvas"></canvas>
+        </div>
+      </section>
+
+      <aside class="card panel" aria-label="Steuerung">
+        <section class="controls">
+          <p class="kicker">Einstellen</p>
+
+          <div class="control">
+            <label for="shape">Körperform <output id="shapeOut">stromlinienförmig</output></label>
+            <input id="shape" type="range" min="0" max="100" value="78" />
+            <div class="range-hints"><span>stumpf</span><span>glatt zulaufend</span></div>
+          </div>
+
+          <div class="control">
+            <label for="width">Körperhöhe <output id="widthOut">mittel</output></label>
+            <input id="width" type="range" min="0" max="100" value="42" />
+            <div class="range-hints"><span>schmal</span><span>hoch</span></div>
+          </div>
+
+          <div class="control">
+            <label for="speed">Tempo <output id="speedOut">mittel</output></label>
+            <input id="speed" type="range" min="0" max="100" value="45" />
+            <div class="range-hints"><span>langsam</span><span>schnell</span></div>
+          </div>
+        </section>
+
+        <section class="effect" aria-live="polite">
+          <p class="kicker">Auswirkung</p>
+          <p class="effect-main" id="effectMain">Der Fisch gleitet leicht durchs Wasser.</p>
+          <p class="effect-text" id="effectText">Er braucht wenig Energie und kann sein Tempo gut halten.</p>
+        </section>
+
+        <section class="impact-grid" aria-label="Einfache Wirkung des Widerstands">
+          <div class="impact"><span>Bremswirkung</span><span id="brakeOut">gering</span></div>
+          <div class="impact"><span>Energiebedarf</span><span id="energyOut">gering</span></div>
+          <div class="impact"><span>Tempo halten</span><span id="tempoOut">leicht</span></div>
+        </section>
+
+        <p class="mini-note"><strong>Einfach gesagt:</strong> Mehr Widerstand bedeutet mehr Wirbel hinter dem Körper. Der Fisch wird stärker gebremst und braucht mehr Kraft.</p>
+
+        <div class="buttons">
+          <button id="idealBtn" type="button">Günstig</button>
+          <button id="bluntBtn" type="button" class="secondary">Ungünstig</button>
+        </div>
+      </aside>
+    </main>
+
+    <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+  </div>
+
+  <script>
+    // Vereinfachte Unterrichts-Simulation:
+    // Der Index von 0 bis 100 ist kein Messwert. Er zeigt nur den Zusammenhang:
+    // stumpfer + höher + schneller = mehr Wasserwiderstand.
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const controls = {
+      shape: document.getElementById('shape'),
+      width: document.getElementById('width'),
+      speed: document.getElementById('speed')
+    };
+
+    const ui = {
+      shapeOut: document.getElementById('shapeOut'),
+      widthOut: document.getElementById('widthOut'),
+      speedOut: document.getElementById('speedOut'),
+      score: document.getElementById('score'),
+      badge: document.getElementById('badge'),
+      barFill: document.getElementById('barFill'),
+      effectMain: document.getElementById('effectMain'),
+      effectText: document.getElementById('effectText'),
+      brakeOut: document.getElementById('brakeOut'),
+      energyOut: document.getElementById('energyOut'),
+      tempoOut: document.getElementById('tempoOut')
+    };
+
+    let dpr = window.devicePixelRatio || 1;
+    let W = 0;
+    let H = 0;
+    let time = 0;
+    let cachedIndex = -1;
+
+    const streamLines = Array.from({ length: 13 }, (_, i) => ({
+      y: 0.18 + i * 0.052,
+      phase: Math.random() * 140
+    }));
+
+    const particles = Array.from({ length: 22 }, (_, i) => ({
+      x: Math.random(),
+      y: Math.random(),
+      size: 1.2 + Math.random() * 1.9,
+      phase: i * 0.7 + Math.random() * 8
+    }));
+
+    function clamp(value, min, max){
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function lerp(a, b, n){
+      return a + (b - a) * n;
+    }
+
+    function resize(){
+      const rect = canvas.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      W = Math.max(320, rect.width);
+      H = Math.max(320, rect.height);
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function getState(){
+      return {
+        shape: Number(controls.shape.value) / 100,
+        width: Number(controls.width.value) / 100,
+        speed: Number(controls.speed.value) / 100
+      };
+    }
+
+    function threeWords(value, low, mid, high){
+      if(value < 0.34) return low;
+      if(value < 0.67) return mid;
+      return high;
+    }
+
+    function calculateIndex(state){
+      // Didaktische Logik: Tempo wirkt stark, weil schnelles Schwimmen deutlich mehr bremst.
+      const bluntness = 1 - state.shape;
+      const bodyHeight = Math.pow(state.width, 1.16);
+      const speedEffect = Math.pow(state.speed, 2.05);
+      const raw = 0.08 + bluntness * 0.34 + bodyHeight * 0.22 + speedEffect * 0.50;
+      return Math.round(clamp(raw, 0, 1) * 100);
+    }
+
+    function colourFor(index){
+      if(index < 34) return { main:'var(--green)', soft:'rgba(39,135,92,0.10)', word:'gering' };
+      if(index < 67) return { main:'var(--yellow)', soft:'rgba(178,122,22,0.12)', word:'mittel' };
+      return { main:'var(--red)', soft:'rgba(200,77,77,0.12)', word:'hoch' };
+    }
+
+    function updateUI(state, index){
+      ui.shapeOut.textContent = threeWords(state.shape, 'stumpf', 'normal', 'stromlinienförmig');
+      ui.widthOut.textContent = threeWords(state.width, 'schmal', 'mittel', 'hoch');
+      ui.speedOut.textContent = threeWords(state.speed, 'langsam', 'mittel', 'schnell');
+
+      if(index === cachedIndex) return;
+      cachedIndex = index;
+
+      const colour = colourFor(index);
+      ui.score.textContent = index;
+      ui.badge.textContent = colour.word;
+      ui.badge.style.color = colour.main;
+      ui.badge.style.background = colour.soft;
+      ui.barFill.style.width = index + '%';
+      ui.barFill.style.backgroundColor = colour.main;
+
+      if(index < 34){
+        ui.effectMain.textContent = 'Der Fisch gleitet leicht durchs Wasser.';
+        ui.effectText.textContent = 'Er braucht wenig Energie und kann sein Tempo gut halten.';
+        ui.brakeOut.textContent = 'gering';
+        ui.energyOut.textContent = 'gering';
+        ui.tempoOut.textContent = 'leicht';
+      }else if(index < 67){
+        ui.effectMain.textContent = 'Der Fisch wird spürbar gebremst.';
+        ui.effectText.textContent = 'Er muss mehr Kraft aufwenden, um gleich schnell zu bleiben.';
+        ui.brakeOut.textContent = 'mittel';
+        ui.energyOut.textContent = 'mittel';
+        ui.tempoOut.textContent = 'anstrengender';
+      }else{
+        ui.effectMain.textContent = 'Der Fisch kommt schwerer voran.';
+        ui.effectText.textContent = 'Viel Bewegung geht in Wirbeln verloren. Ohne mehr Kraft würde er langsamer.';
+        ui.brakeOut.textContent = 'hoch';
+        ui.energyOut.textContent = 'hoch';
+        ui.tempoOut.textContent = 'schwierig';
+      }
+    }
+
+    function fishGeometry(state){
+      const length = lerp(255, 345, state.shape);
+      const halfHeight = lerp(39, 88, state.width);
+      const cx = W * 0.43;
+      const cy = H * 0.51 + Math.sin(time * 1.15) * 1.8;
+      return { cx, cy, length, halfHeight };
+    }
+
+    function radiusAt(pos, state){
+      // pos: 0 = Kopf links, 1 = Schwanz rechts.
+      // Bei hoher Stromlinienform laufen Kopf und Schwanz sanft zu.
+      const s = state.shape;
+      const noseRadius = lerp(0.70, 0.08, s);
+      const tailRadius = lerp(0.58, 0.035, s);
+
+      if(pos < 0.34){
+        const n = pos / 0.34;
+        return lerp(noseRadius, 1, Math.sin(n * Math.PI / 2));
+      }
+
+      if(pos < 0.58) return 1;
+
+      const n = (pos - 0.58) / 0.42;
+      return lerp(1, tailRadius, Math.pow(n, lerp(0.52, 1.95, s)));
+    }
+
+    function bounds(geo){
+      return {
+        front: geo.cx - geo.length / 2,
+        back: geo.cx + geo.length / 2,
+        top: geo.cy - geo.halfHeight,
+        bottom: geo.cy + geo.halfHeight
+      };
+    }
+
+    function clearWater(){
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, '#e8fbff');
+      g.addColorStop(0.58, '#bfe9f2');
+      g.addColorStop(1, '#a7dbe6');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.strokeStyle = '#ffffff';
+      for(const p of particles){
+        const x = (p.x * W + time * 9 + Math.sin(time + p.phase) * 4) % W;
+        const y = p.y * H + Math.sin(time * 0.75 + p.phase) * 7;
+        ctx.beginPath();
+        ctx.arc(x, y, p.size, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function flowY(baseY, x, geo){
+      const b = bounds(geo);
+      const active = x > b.front - 70 && x < b.back + 42;
+      if(!active) return baseY;
+
+      const verticalDistance = baseY - geo.cy;
+      const side = Math.sign(verticalDistance || 1);
+      const influenceX = Math.exp(-Math.pow((x - geo.cx) / (geo.length * 0.43), 2));
+      const influenceY = Math.exp(-Math.pow(verticalDistance / (geo.halfHeight * 1.24), 2));
+      return baseY + side * influenceX * influenceY * geo.halfHeight * 0.55;
+    }
+
+    function drawFlow(state, geo, index){
+      const speed = lerp(0.42, 1.58, state.speed);
+      const wakeStrength = index / 100;
+      const b = bounds(geo);
+
+      ctx.save();
+      ctx.lineWidth = 1.35;
+      ctx.strokeStyle = 'rgba(18,98,126,0.34)';
+
+      for(const line of streamLines){
+        const baseY = line.y * H;
+        const offset = (time * 82 * speed + line.phase) % 112;
+        ctx.beginPath();
+
+        for(let x = -132; x <= W + 60; x += 11){
+          const xx = x + offset;
+          let yy = flowY(baseY, xx, geo);
+
+          if(xx > b.back){
+            const fade = clamp((xx - b.back) / 255, 0, 1);
+            yy += Math.sin(xx * 0.044 + time * lerp(1.2, 4.2, state.speed) + line.phase) * wakeStrength * fade * 23;
+          }
+
+          if(x === -132) ctx.moveTo(xx, yy);
+          else ctx.lineTo(xx, yy);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawWake(state, geo, index){
+      const wake = index / 100;
+      const b = bounds(geo);
+      const length = lerp(58, 245, wake);
+      const height = lerp(15, geo.halfHeight * 1.28, wake);
+
+      ctx.save();
+      const plume = ctx.createLinearGradient(b.back, 0, b.back + length, 0);
+      plume.addColorStop(0, `rgba(28,86,108,${0.11 + wake * 0.16})`);
+      plume.addColorStop(1, 'rgba(28,86,108,0)');
+      ctx.fillStyle = plume;
+      ctx.beginPath();
+      ctx.ellipse(b.back + length / 2, geo.cy, length / 2, height, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const count = Math.round(2 + wake * 7);
+      ctx.strokeStyle = `rgba(22,76,98,${0.18 + wake * 0.24})`;
+      ctx.lineWidth = 1.05 + wake * 0.85;
+      for(let i = 0; i < count; i++){
+        const p = (i + 0.45) / count;
+        const x = b.back + 20 + p * length;
+        const y = geo.cy + Math.sin(time * 1.3 + i * 1.7) * height * 0.43;
+        const r = 6 + wake * 17 + p * 8;
+        const start = time * (0.85 + state.speed) + i * 0.9;
+        ctx.beginPath();
+        ctx.arc(x, y, r, start, start + Math.PI * 1.5);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFish(state, geo){
+      const sampleCount = 68;
+      const front = geo.cx - geo.length / 2;
+      const top = [];
+      const bottom = [];
+      const bodyWave = 1.25 * state.shape;
+
+      for(let i = 0; i <= sampleCount; i++){
+        const pos = i / sampleCount;
+        const x = front + pos * geo.length;
+        const r = radiusAt(pos, state);
+        const swim = Math.sin(time * 2.05 + pos * Math.PI * 1.5) * bodyWave;
+        top.push([x, geo.cy - geo.halfHeight * r + swim]);
+        bottom.push([x, geo.cy + geo.halfHeight * r + swim]);
+      }
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(13,55,72,0.16)';
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetY = 8;
+
+      ctx.beginPath();
+      ctx.moveTo(top[0][0], top[0][1]);
+      top.forEach(([x, y]) => ctx.lineTo(x, y));
+      [...bottom].reverse().forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+
+      const bodyGradient = ctx.createLinearGradient(front, geo.cy - geo.halfHeight, front + geo.length, geo.cy + geo.halfHeight);
+      bodyGradient.addColorStop(0, '#ffffff');
+      bodyGradient.addColorStop(0.52, '#eaf2f5');
+      bodyGradient.addColorStop(1, '#d4e1e6');
+      ctx.fillStyle = bodyGradient;
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(27,70,88,0.33)';
+      ctx.lineWidth = 1.45;
+      ctx.stroke();
+
+      ctx.beginPath();
+      for(let i = 6; i <= sampleCount - 6; i++){
+        const pos = i / sampleCount;
+        const x = front + pos * geo.length;
+        const y = geo.cy + Math.sin(pos * Math.PI * 1.1) * geo.halfHeight * 0.05;
+        if(i === 6) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = 'rgba(27,124,153,0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#16242d';
+      ctx.beginPath();
+      ctx.arc(front + geo.length * 0.12, geo.cy - geo.halfHeight * 0.22, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawDirectionArrow(state){
+      const x = 34;
+      const y = H - 34;
+      const len = lerp(54, 116, state.speed);
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(21,36,45,0.33)';
+      ctx.fillStyle = 'rgba(21,36,45,0.48)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + len, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x + len, y);
+      ctx.lineTo(x + len - 10, y - 6);
+      ctx.lineTo(x + len - 10, y + 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.font = '750 12px system-ui, sans-serif';
+      ctx.fillText('Strömung', x, y - 12);
+      ctx.restore();
+    }
+
+    function render(){
+      const state = getState();
+      const index = calculateIndex(state);
+      const geo = fishGeometry(state);
+
+      updateUI(state, index);
+      clearWater();
+      drawFlow(state, geo, index);
+      drawWake(state, geo, index);
+      drawFish(state, geo);
+      drawDirectionArrow(state);
+
+      time += 0.016;
+      requestAnimationFrame(render);
+    }
+
+    function setPreset(kind){
+      if(kind === 'ideal'){
+        controls.shape.value = 92;
+        controls.width.value = 32;
+        controls.speed.value = 45;
+      }else{
+        controls.shape.value = 10;
+        controls.width.value = 80;
+        controls.speed.value = 45;
+      }
+      cachedIndex = -1;
+    }
+
+    document.getElementById('idealBtn').addEventListener('click', () => setPreset('ideal'));
+    document.getElementById('bluntBtn').addEventListener('click', () => setPreset('blunt'));
+    window.addEventListener('resize', resize);
+
+    resize();
+    render();
+  </script>
+</body>
+</html>
