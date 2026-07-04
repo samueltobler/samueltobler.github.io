@@ -1,0 +1,1518 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signalweiterleitung im Axon</title>
+  <style>
+    :root{
+      --bg:#f7f9fc;
+      --panel:#ffffff;
+      --text:#172033;
+      --muted:#6b7280;
+      --line:#e5eaf2;
+      --accent:#2563eb;
+      --accent-soft:#eef4ff;
+      --na:#1e88e5;
+      --k:#f28c28;
+      --closed:#7b8190;
+      --open:#2fa66a;
+      --inactive:#d24b4b;
+      --myelin:#ead8a1;
+      --axon:#eaf1fb;
+      --radius:24px;
+      --shadow:0 18px 44px rgba(22,34,51,.07);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:radial-gradient(circle at top left,#edf4ff 0,#f7f9fc 38%,#f9fafb 100%);
+    }
+
+    .page{
+      width:min(1120px,100%);
+      margin:0 auto;
+      padding:40px 28px 0;
+    }
+
+    header.appHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:24px;
+      margin-bottom:36px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(1.55rem,3vw,2.35rem);
+      letter-spacing:-.04em;
+      font-weight:780;
+    }
+
+    .lead{display:none}
+
+    .topNav{
+      display:flex;
+      gap:8px;
+      padding:5px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.75);
+    }
+
+    button{
+      border:0;
+      border-radius:999px;
+      padding:10px 16px;
+      background:#172033;
+      color:#fff;
+      font:inherit;
+      font-size:.93rem;
+      font-weight:700;
+      cursor:pointer;
+      transition:transform .14s ease,background .14s ease,box-shadow .14s ease;
+      box-shadow:0 8px 18px rgba(23,32,51,.12);
+    }
+
+    button:hover{transform:translateY(-1px);background:#0f172a}
+    button:active{transform:translateY(0);box-shadow:none}
+    button.primary{background:var(--accent)}
+    button.primary:hover{background:#1d4ed8}
+    button.secondary{background:#eef2f7;color:#243044;box-shadow:none;border:1px solid var(--line)}
+    button.secondary:hover{background:#e5ebf3}
+    button.ghost{background:#fff;color:#243044;box-shadow:none;border:1px solid var(--line)}
+    button.ghost:hover{background:#f3f6fa}
+
+    .navButton{box-shadow:none;border:0;background:transparent;color:#526071}
+    .navButton.active{background:#172033;color:#fff}
+    .navButton:not(.active):hover{background:#f2f5f9;color:#172033;transform:none}
+
+    .view{display:none}
+    .view.active{display:block}
+
+    .card{
+      background:rgba(255,255,255,.94);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .pad{padding:28px}
+
+    .introGrid{
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);
+      gap:24px;
+      align-items:stretch;
+    }
+
+    .introHero{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:40px;
+      min-height:420px;
+      padding:44px;
+    }
+
+    .introHero h2,
+    .infoPanel h2,
+    .sidePanel h2{
+      margin:0;
+      font-size:1rem;
+      letter-spacing:-.01em;
+    }
+
+    .introHero p,
+    .infoPanel p{
+      margin:14px 0 0;
+      max-width:620px;
+      color:var(--muted);
+      line-height:1.58;
+      font-size:1.03rem;
+    }
+
+    .stepList{
+      margin:28px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:12px;
+      max-width:620px;
+    }
+
+    .stepList li{
+      display:grid;
+      grid-template-columns:30px 1fr;
+      gap:12px;
+      align-items:start;
+      color:#445267;
+      line-height:1.42;
+      font-size:.98rem;
+    }
+
+    .stepList span{
+      width:30px;
+      height:30px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:var(--accent-soft);
+      color:var(--accent);
+      font-weight:800;
+      font-size:.82rem;
+    }
+
+    .introTitle{
+      font-size:clamp(2rem,4.6vw,4.1rem);
+      line-height:.98;
+      letter-spacing:-.065em;
+      font-weight:820;
+      max-width:720px;
+    }
+
+
+    .introActions{display:flex;gap:12px;flex-wrap:wrap}
+
+    .infoPanel{
+      display:flex;
+      flex-direction:column;
+      gap:28px;
+      padding:34px;
+    }
+
+    .miniDiagram{
+      min-height:300px;
+      border:1px solid var(--line);
+      border-radius:24px;
+      background:linear-gradient(180deg,#f7fbff 0,#fff 100%);
+      display:grid;
+      place-items:center;
+      padding:26px;
+    }
+
+    .introSvg{width:100%;max-width:380px;height:auto;display:block}
+
+    .merksatz{display:none}
+
+    .simLayout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 280px;
+      gap:24px;
+      align-items:start;
+    }
+
+    .simMain{display:grid;gap:24px}
+
+    .simToolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .buttonRow{display:flex;gap:10px;flex-wrap:wrap}
+
+    .optionBar{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .rangeBlock{min-width:260px}
+
+    .rangeBlock label{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:10px;
+      font-size:.9rem;
+      font-weight:760;
+      color:#273346;
+    }
+
+    .rangeBlock span{color:var(--accent);white-space:nowrap}
+    input[type="range"]{width:100%;accent-color:var(--accent)}
+
+    .toggleLine{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:#4b5563;
+      font-size:.9rem;
+      white-space:nowrap;
+    }
+
+    .toggleLine input{accent-color:var(--accent)}
+
+    .canvasCard{padding:18px}
+
+    canvas{
+      display:block;
+      width:100%;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:20px;
+    }
+
+    #axonCanvas{height:430px;cursor:pointer;touch-action:manipulation}
+    #graphCanvas{height:205px}
+
+    .graphTitle{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:baseline;
+      margin:0 0 14px;
+      color:#26364c;
+      font-weight:760;
+      font-size:.95rem;
+    }
+
+    .graphTitle span{
+      color:var(--muted);
+      font-weight:520;
+      font-size:.86rem;
+    }
+
+    .sidePanel{
+      display:grid;
+      gap:24px;
+      padding:24px;
+      position:sticky;
+      top:22px;
+    }
+
+    .status{
+      padding:18px;
+      border:1px solid #dbeafe;
+      border-radius:18px;
+      background:#f5f9ff;
+      color:#27415f;
+      line-height:1.46;
+      font-size:.93rem;
+    }
+
+    .status strong{display:block;margin-bottom:6px;color:#173153}
+
+    .stateBox{display:grid;gap:10px;font-size:.9rem}
+
+    .stateLine{
+      display:grid;
+      grid-template-columns:86px 1fr;
+      gap:10px;
+      padding-bottom:10px;
+      border-bottom:1px solid #eef2f7;
+      line-height:1.35;
+    }
+
+    .stateLine b{color:#4b5563;font-weight:700}
+
+    .legendCompact{display:grid;gap:12px;font-size:.87rem;color:#394557}
+    .legendRow{display:flex;gap:8px;flex-wrap:wrap}
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:7px 10px;
+      background:#fff;
+      white-space:nowrap;
+    }
+
+    .dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;display:inline-block}
+
+    .channelIcon{
+      width:13px;
+      height:18px;
+      flex:0 0 auto;
+      display:inline-block;
+      background:#fff;
+    }
+
+    .naIcon{
+      border:2px solid var(--na);
+      border-radius:7px;
+    }
+
+    .kIcon{
+      background:var(--k);
+      clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+    }
+
+    details{display:none}
+
+    .srOnly{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    @media (max-width:980px){
+      .page{padding:28px 18px 0}
+      header.appHeader{align-items:flex-start;flex-direction:column;margin-bottom:24px}
+      .introGrid,.simLayout{grid-template-columns:1fr}
+      .introHero{min-height:auto;padding:32px}
+      .infoPanel{padding:28px}
+      .sidePanel{position:static}
+      #axonCanvas{height:400px}
+    }
+
+    @media (max-width:680px){
+      .page{padding:20px 14px 0}
+      .topNav{width:100%}
+      .navButton{flex:1}
+      .simToolbar{align-items:stretch}
+      .buttonRow,.optionBar{width:100%}
+      .buttonRow button{flex:1 1 46%}
+      .rangeBlock{min-width:100%;width:100%}
+      #axonCanvas{height:360px}
+      #graphCanvas{height:190px}
+    }
+
+    @media (max-width:440px){
+      .introHero{padding:24px}
+      .pad,.infoPanel,.sidePanel{padding:20px}
+      .buttonRow button{flex:1 1 100%}
+      .stateLine{grid-template-columns:1fr}
+      #axonCanvas{height:330px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="appHeader">
+      <div>
+        <h1>Signalweiterleitung im Axon</h1>
+        <p class="lead"></p>
+      </div>
+      <nav class="topNav" aria-label="Ansicht wählen">
+        <button class="navButton active" id="infoTab" type="button">Info</button>
+        <button class="navButton" id="simTab" type="button">Simulation</button>
+      </nav>
+    </header>
+
+    <section id="infoView" class="view active" aria-labelledby="infoTitle">
+      <div class="introGrid">
+        <div class="card introHero">
+          <div>
+            <div class="introTitle" id="infoTitle">Aktionspotenzial im Axon</div>
+            <ol class="stepList" aria-label="Ablauf eines Aktionspotenzials">
+              <li><span>1</span><div>Ein Reiz depolarisiert einen kleinen Membranabschnitt. Die Innenseite wird weniger negativ. Wird etwa -55 mV erreicht, ist der Schwellenwert überschritten.</div></li>
+              <li><span>2</span><div>Spannungsabhängige Na⁺-Kanäle öffnen sich. Na⁺ strömt entlang seines elektrochemischen Gradienten nach innen; die Spannung steigt rasch bis in den positiven Bereich.</div></li>
+              <li><span>3</span><div>Kurz danach werden die Na⁺-Kanäle inaktiviert. Gleichzeitig öffnen sich K⁺-Kanäle. K⁺ strömt nach aussen und leitet die Repolarisation ein.</div></li>
+              <li><span>4</span><div>Durch den K⁺-Ausstrom wird die Membran wieder negativ, oft kurz negativer als im Ruhepotenzial. In dieser Refraktärzeit kann derselbe Abschnitt nicht sofort erneut feuern.</div></li>
+              <li><span>5</span><div>Der benachbarte Abschnitt erreicht nun seinerseits den Schwellenwert und bildet ein neues Aktionspotenzial. So wird das Signal ohne Abschwächung entlang des Axons weitergegeben.</div></li>
+            </ol>
+          </div>
+
+
+          <div class="introActions">
+            <button class="primary" id="startSimBtn" type="button">Simulation öffnen</button>
+            <button class="ghost" id="infoResetBtn" type="button">Reset</button>
+          </div>
+        </div>
+
+        <aside class="card infoPanel">
+          <div>
+            <h2>Was du in der Animation siehst</h2>
+            <p>Blau: Na⁺ strömt zuerst hinein. Orange: K⁺ strömt danach hinaus. Die Pumpe stellt die Verteilung später wieder her.</p>
+          </div>
+          <div class="miniDiagram" aria-hidden="true">
+            <svg class="introSvg" viewBox="0 0 420 240" role="img">
+              <defs>
+                <marker id="arrowNa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e88e5"></path>
+                </marker>
+                <marker id="arrowK" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#f28c28"></path>
+                </marker>
+                <linearGradient id="memGrad" x1="0" x2="1">
+                  <stop offset="0" stop-color="#6e7891"/>
+                  <stop offset=".55" stop-color="#4d94c7"/>
+                  <stop offset="1" stop-color="#de5b54"/>
+                </linearGradient>
+              </defs>
+              <rect x="24" y="42" width="372" height="150" rx="58" fill="#eaf1fb" stroke="#c6d3e5" stroke-width="3"/>
+              <rect x="52" y="58" width="316" height="14" rx="7" fill="url(#memGrad)"/>
+              <rect x="52" y="162" width="316" height="14" rx="7" fill="url(#memGrad)"/>
+              <rect x="124" y="54" width="20" height="44" rx="9" fill="#2fa66a" stroke="#1e88e5" stroke-width="3"/>
+              <text x="134" y="47" text-anchor="middle" font-size="12" font-family="system-ui" fill="#1e88e5" font-weight="700">Na</text>
+              <circle cx="134" cy="31" r="9" fill="#1e88e5"/>
+              <circle cx="134" cy="116" r="9" fill="#1e88e5"/>
+              <path d="M134 44 L134 105" stroke="#1e88e5" stroke-width="3" marker-end="url(#arrowNa)"/>
+              <path d="M269 145 L282 155 L282 178 L269 188 L256 178 L256 155 Z" fill="#2fa66a" stroke="#f28c28" stroke-width="3"/>
+              <text x="269" y="139" text-anchor="middle" font-size="12" font-family="system-ui" fill="#f28c28" font-weight="700">K</text>
+              <circle cx="269" cy="135" r="9" fill="#f28c28"/>
+              <circle cx="269" cy="207" r="9" fill="#f28c28"/>
+              <path d="M269 147 L269 196" stroke="#f28c28" stroke-width="3" marker-end="url(#arrowK)"/>
+              <rect x="320" y="54" width="20" height="44" rx="9" fill="#d24b4b" stroke="#1e88e5" stroke-width="3"/>
+              <text x="330" y="47" text-anchor="middle" font-size="12" font-family="system-ui" fill="#1e88e5" font-weight="700">Na</text>
+              <path d="M323 60 L337 91 M337 60 L323 91" stroke="#fff" stroke-width="3"/>
+            </svg>
+          </div>
+          <div class="legendRow">
+            <span class="tag"><span class="dot" style="background:var(--na)"></span>Na⁺-Ion</span>
+            <span class="tag"><span class="dot" style="background:var(--k)"></span>K⁺-Ion</span>
+            <span class="tag"><span class="channelIcon naIcon"></span>Na⁺-Kanal</span>
+            <span class="tag"><span class="channelIcon kIcon"></span>K⁺-Kanal</span>
+            <span class="tag"><span class="dot" style="background:var(--open)"></span>offen</span>
+            <span class="tag"><span class="dot" style="background:var(--inactive)"></span>inaktiviert</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="simView" class="view" aria-labelledby="simTitle">
+      <div class="simLayout">
+        <div class="simMain">
+          <div class="card pad">
+            <div class="simToolbar">
+              <div class="buttonRow" aria-label="Simulationssteuerung">
+                <button class="primary" id="stimulusBtn" type="button">Reiz</button>
+                <button id="pauseBtn" type="button">Pause</button>
+                <button class="secondary" id="stepBtn" type="button">Schritt</button>
+                <button class="secondary" id="resetBtn" type="button">Reset</button>
+              </div>
+              <div class="optionBar">
+                <div class="rangeBlock">
+                  <label for="myelinRange">Myelin <span id="myelinValue">kein Myelin</span></label>
+                  <input id="myelinRange" type="range" min="0" max="2" value="0" step="1">
+                </div>
+                <label class="toggleLine"><input id="ionsToggle" type="checkbox" checked> Ionen</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card canvasCard">
+            <h2 id="simTitle" class="srOnly">Animation des Axons</h2>
+            <canvas id="axonCanvas" aria-label="Animation eines Axons mit Ionenkanälen und Ionenbewegung"></canvas>
+          </div>
+
+          <div class="card canvasCard">
+            <div class="graphTitle">Membranspannung <span id="graphCaption">Abschnitt 1</span></div>
+            <canvas id="graphCanvas" aria-label="Live-Diagramm der Membranspannung"></canvas>
+          </div>
+        </div>
+
+        <aside class="card sidePanel">
+          <section class="status" id="statusBox" aria-live="polite">
+            <strong>Bereit</strong>
+            Reiz starten. Danach wandert das Signal nach rechts.
+          </section>
+
+          <section class="stateBox" aria-live="polite">
+            <h2>Abschnitt <span id="selectedLabel">1</span></h2>
+            <div class="stateLine"><b>Spannung</b><span id="voltageText">-70 mV</span></div>
+            <div class="stateLine"><b>Na⁺-Kanal</b><span id="naText">geschlossen</span></div>
+            <div class="stateLine"><b>K⁺-Kanal</b><span id="kText">geschlossen</span></div>
+            <div class="stateLine"><b>Phase</b><span id="phaseText">Ruhepotenzial</span></div>
+            <div class="stateLine"><b>Richtung</b><span id="directionText">Refraktärzeit verhindert Rückwärtsleitung.</span></div>
+          </section>
+
+          <section class="legendCompact" aria-label="Legende">
+            <h2>Legende</h2>
+            <div class="legendRow">
+              <span class="tag"><span class="channelIcon naIcon"></span>Na⁺-Kanal</span>
+              <span class="tag"><span class="channelIcon kIcon"></span>K⁺-Kanal</span>
+              <span class="tag"><span class="dot" style="background:var(--closed)"></span>geschlossen</span>
+              <span class="tag"><span class="dot" style="background:var(--open)"></span>offen</span>
+              <span class="tag"><span class="dot" style="background:var(--inactive)"></span>inaktiviert</span>
+              <span class="tag"><span class="dot" style="background:var(--myelin)"></span>Myelin</span>
+            </div>
+          </section>
+
+          <details>
+            <summary>Kurze Erklärung</summary>
+            <p>Ruhepotenzial: ca. -70 mV. Schwelle: ca. -55 mV. Depolarisation: Na⁺-Einstrom. Repolarisation: K⁺-Ausstrom. Die Pumpe stellt die Ionenverteilung langfristig wieder her.</p>
+          </details>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">
+      by <a href="https://samueltobler.github.io" target="_blank">Samuel Tobler</a> |
+      <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a><br><br><br><br>
+    </div>
+
+  <script>
+    'use strict';
+
+    // -------------------------------
+    // Simulationsmodell
+    // -------------------------------
+    const RESTING_MV = -70;
+    const THRESHOLD_MV = -55;
+    const PEAK_MV = 30;
+    const HYPER_MV = -82;
+    const SECTION_COUNT = 18;
+
+    const infoView = document.getElementById('infoView');
+    const simView = document.getElementById('simView');
+    const infoTab = document.getElementById('infoTab');
+    const simTab = document.getElementById('simTab');
+    const startSimBtn = document.getElementById('startSimBtn');
+    const infoResetBtn = document.getElementById('infoResetBtn');
+
+    const axonCanvas = document.getElementById('axonCanvas');
+    const graphCanvas = document.getElementById('graphCanvas');
+    const ax = axonCanvas.getContext('2d');
+    const gx = graphCanvas.getContext('2d');
+
+    const stimulusBtn = document.getElementById('stimulusBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const stepBtn = document.getElementById('stepBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const myelinRange = document.getElementById('myelinRange');
+    const myelinValue = document.getElementById('myelinValue');
+    const ionsToggle = document.getElementById('ionsToggle');
+
+    const statusBox = document.getElementById('statusBox');
+    const selectedLabel = document.getElementById('selectedLabel');
+    const graphCaption = document.getElementById('graphCaption');
+    const voltageText = document.getElementById('voltageText');
+    const naText = document.getElementById('naText');
+    const kText = document.getElementById('kText');
+    const phaseText = document.getElementById('phaseText');
+    const directionText = document.getElementById('directionText');
+
+    const colour = {
+      na:'#1e88e5',
+      k:'#f28c28',
+      closed:'#7b8190',
+      open:'#2fa66a',
+      inactive:'#d24b4b',
+      myelin:'#ead8a1',
+      intracellular:'#eaf1fb',
+      text:'#1f2937',
+      muted:'#667487'
+    };
+
+    let dpr = 1;
+    let geom = null;
+    let time = 0;
+    let running = false;
+    let lastFrame = performance.now();
+    let selectedSection = 0;
+    let lastSampleTime = -Infinity;
+
+    let activationTimes = new Array(SECTION_COUNT).fill(Infinity);
+    let propagated = new Array(SECTION_COUNT).fill(false);
+    let pendingActivations = [];
+    let particles = [];
+    let blockedEvents = [];
+    let graphHistory = [];
+    let statusTitle = 'Bereit';
+    let statusMessage = 'Reiz starten. Danach wandert das Signal nach rechts.';
+
+    function clamp(value, min, max){
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function lerp(a, b, t){
+      return a + (b - a) * t;
+    }
+
+    function easeInOut(x){
+      x = clamp(x, 0, 1);
+      return x * x * (3 - 2 * x);
+    }
+
+    function roundedRect(ctx, x, y, w, h, r){
+      const radius = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + w - radius, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+      ctx.lineTo(x + w, y + h - radius);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      ctx.lineTo(x + radius, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function myelinLevel(){
+      return Number(myelinRange.value);
+    }
+
+    function nodeStep(){
+      const level = myelinLevel();
+      if(level === 0) return 1;
+      if(level === 1) return 2;
+      return 3;
+    }
+
+    function isActiveSite(index){
+      if(myelinLevel() === 0) return true;
+      return index % nodeStep() === 0 || index === SECTION_COUNT - 1;
+    }
+
+    function findNextActiveSite(index, direction){
+      let i = index + direction;
+      while(i >= 0 && i < SECTION_COUNT){
+        if(isActiveSite(i)) return i;
+        i += direction;
+      }
+      return null;
+    }
+
+    function segmentCentre(index){
+      return geom.left + geom.segW * (index + 0.5);
+    }
+
+    function phaseOf(index){
+      if(!Number.isFinite(activationTimes[index])) return Infinity;
+      return time - activationTimes[index];
+    }
+
+    function isRefractory(index){
+      const p = phaseOf(index);
+      return Number.isFinite(p) && p >= 0 && p < 3.55;
+    }
+
+    function canActivate(index){
+      const p = phaseOf(index);
+      return !Number.isFinite(p) || p >= 3.75;
+    }
+
+    function membraneVoltage(index){
+      const p = phaseOf(index);
+      if(!Number.isFinite(p) || p < 0 || p >= 4.2) return RESTING_MV;
+
+      if(p < 0.28) return lerp(RESTING_MV, THRESHOLD_MV, easeInOut(p / 0.28));
+      if(p < 0.95) return lerp(THRESHOLD_MV, PEAK_MV, easeInOut((p - 0.28) / 0.67));
+      if(p < 1.22) return PEAK_MV;
+      if(p < 2.15) return lerp(PEAK_MV, RESTING_MV, easeInOut((p - 1.22) / 0.93));
+      if(p < 2.85) return lerp(RESTING_MV, HYPER_MV, easeInOut((p - 2.15) / 0.70));
+      if(p < 3.75) return lerp(HYPER_MV, RESTING_MV, easeInOut((p - 2.85) / 0.90));
+      return RESTING_MV;
+    }
+
+    function stateOf(index){
+      const active = isActiveSite(index);
+      const p = phaseOf(index);
+      const v = membraneVoltage(index);
+
+      if(!active){
+        return {
+          voltage:v,
+          na:'isoliert',
+          k:'isoliert',
+          phase:'myelinisiert',
+          direction:'Myelin isoliert diesen Abschnitt. Das Signal springt weiter.',
+          status:'Myelinabschnitt',
+          title:'Myelin leitet passiv weiter'
+        };
+      }
+
+      if(!Number.isFinite(p) || p < 0 || p >= 3.75){
+        return {
+          voltage:v,
+          na:'geschlossen',
+          k:'geschlossen',
+          phase:'Ruhepotenzial',
+          direction:'Bereit für ein neues Signal.',
+          status:'Ruhe',
+          title:'Ruhepotenzial'
+        };
+      }
+
+      if(p < 0.28){
+        return {
+          voltage:v,
+          na:'beginnt zu öffnen',
+          k:'geschlossen',
+          phase:'Schwelle erreicht',
+          direction:'Die Schwelle ist erreicht.',
+          status:'Schwelle',
+          title:'Schwellenwert erreicht'
+        };
+      }
+
+      if(p < 0.95){
+        return {
+          voltage:v,
+          na:'offen',
+          k:'geschlossen',
+          phase:'Depolarisation',
+          direction:'Na⁺ strömt ein; der nächste Abschnitt wird aktiviert.',
+          status:'Na⁺-Einstrom',
+          title:'Depolarisation'
+        };
+      }
+
+      if(p < 1.22){
+        return {
+          voltage:v,
+          na:'inaktiviert',
+          k:'öffnet verzögert',
+          phase:'Spannungsspitze',
+          direction:'Na⁺-Kanäle sind kurz blockiert.',
+          status:'Spitze',
+          title:'Na⁺-Kanäle inaktiviert'
+        };
+      }
+
+      if(p < 2.55){
+        return {
+          voltage:v,
+          na:'inaktiviert',
+          k:'offen',
+          phase:'Repolarisation',
+          direction:'K⁺ strömt aus; rückwärts ist blockiert.',
+          status:'K⁺-Ausstrom',
+          title:'Repolarisation'
+        };
+      }
+
+      if(p < 3.55){
+        return {
+          voltage:v,
+          na:'wieder aktivierbar',
+          k:'teilweise offen',
+          phase:'Hyperpolarisation',
+          direction:'Der Abschnitt erholt sich.',
+          status:'Hyperpolarisation',
+          title:'Relative Refraktärzeit'
+        };
+      }
+
+      return {
+        voltage:v,
+        na:'geschlossen',
+        k:'geschlossen',
+        phase:'Rückkehr zur Ruhe',
+        direction:'Na⁺ geht später über die Pumpe wieder nach aussen; K⁺ wird zurück nach innen gebracht.',
+        status:'Erholung',
+        title:'Rückkehr zum Ruhepotenzial'
+      };
+    }
+
+    function channelColour(text){
+      if(text.includes('offen') || text.includes('öffnen')) return colour.open;
+      if(text.includes('inaktiviert')) return colour.inactive;
+      return colour.closed;
+    }
+
+    function hexToRgb(hex){
+      const value = hex.replace('#','');
+      return {
+        r:parseInt(value.substring(0,2),16),
+        g:parseInt(value.substring(2,4),16),
+        b:parseInt(value.substring(4,6),16)
+      };
+    }
+
+    function mixHex(a, b, t){
+      const pa = hexToRgb(a);
+      const pb = hexToRgb(b);
+      const r = Math.round(lerp(pa.r, pb.r, t));
+      const g = Math.round(lerp(pa.g, pb.g, t));
+      const bl = Math.round(lerp(pa.b, pb.b, t));
+      return `rgb(${r},${g},${bl})`;
+    }
+
+    function voltageColour(v){
+      if(v <= RESTING_MV){
+        const t = clamp((v - HYPER_MV) / (RESTING_MV - HYPER_MV), 0, 1);
+        return mixHex('#4d5369', '#6e7891', t);
+      }
+      if(v <= THRESHOLD_MV){
+        const t = clamp((v - RESTING_MV) / (THRESHOLD_MV - RESTING_MV), 0, 1);
+        return mixHex('#6e7891', '#4d94c7', t);
+      }
+      const t = clamp((v - THRESHOLD_MV) / (PEAK_MV - THRESHOLD_MV), 0, 1);
+      return mixHex('#4d94c7', '#de5b54', t);
+    }
+
+    function propagationDelay(from, to){
+      const distance = Math.abs(to - from);
+      const level = myelinLevel();
+      const factor = level === 0 ? 0.92 : level === 1 ? 0.55 : 0.34;
+      return clamp(distance * factor, 0.20, 2.20);
+    }
+
+    function scheduleActivation(target, from){
+      if(target == null) return;
+      if(!canActivate(target)) return;
+      if(pendingActivations.some(ev => ev.target === target)) return;
+      pendingActivations.push({target, from, due:time + propagationDelay(from, target)});
+    }
+
+    function activateSection(index){
+      activationTimes[index] = time;
+      propagated[index] = false;
+    }
+
+    function tryPropagateFrom(index){
+      const next = findNextActiveSite(index, 1);
+      const previous = findNextActiveSite(index, -1);
+      scheduleActivation(next, index);
+
+      // Lokale Ströme wirken auch rückwärts. Dort ist der vorige Abschnitt aber refraktär.
+      if(previous !== null){
+        if(isRefractory(previous)) blockedEvents.push({from:index, to:previous, t:time});
+        else scheduleActivation(previous, index);
+      }
+    }
+
+    function updateSimulation(dt){
+      time += dt;
+
+      pendingActivations.sort((a,b) => a.due - b.due);
+      const dueNow = pendingActivations.filter(ev => ev.due <= time);
+      pendingActivations = pendingActivations.filter(ev => ev.due > time);
+      for(const ev of dueNow){
+        if(canActivate(ev.target)) activateSection(ev.target);
+      }
+
+      for(let i=0; i<SECTION_COUNT; i++){
+        const p = phaseOf(i);
+        if(Number.isFinite(p) && p >= 0.62 && !propagated[i]){
+          propagated[i] = true;
+          tryPropagateFrom(i);
+        }
+      }
+
+      emitParticles(dt);
+      particles = particles.filter(p => time - p.t <= p.dur);
+      blockedEvents = blockedEvents.filter(ev => time - ev.t < 1.1);
+      collectGraphSample();
+    }
+
+    function emitParticles(dt){
+      if(!geom || !ionsToggle.checked) return;
+      for(let i=0; i<SECTION_COUNT; i++){
+        if(!isActiveSite(i)) continue;
+        const p = phaseOf(i);
+        if(!Number.isFinite(p) || p < 0) continue;
+        const x = segmentCentre(i) + (Math.random() - 0.5) * geom.segW * 0.42;
+
+        if(p > 0.25 && p < 1.02 && Math.random() < dt * 24){
+          particles.push({type:'Na⁺', x, y0:geom.y - 46, y1:geom.y + geom.h * 0.38, t:time, dur:0.52, colour:colour.na});
+        }
+        if(p > 1.20 && p < 2.75 && Math.random() < dt * 20){
+          particles.push({type:'K⁺', x, y0:geom.y + geom.h * 0.62, y1:geom.y - 45, t:time, dur:0.62, colour:colour.k});
+        }
+      }
+      if(particles.length > 150) particles.splice(0, particles.length - 150);
+    }
+
+    function collectGraphSample(){
+      if(time - lastSampleTime < 0.035) return;
+      lastSampleTime = time;
+      graphHistory.push({t:time, v:membraneVoltage(selectedSection)});
+      graphHistory = graphHistory.filter(p => p.t >= time - 12);
+    }
+
+    // -------------------------------
+    // Zeichnen der Axon-Animation
+    // -------------------------------
+    function resizeCanvas(canvas, ctx){
+      const rect = canvas.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      const targetW = Math.max(320, Math.round(rect.width * dpr));
+      const targetH = Math.max(210, Math.round(rect.height * dpr));
+      if(canvas.width !== targetW || canvas.height !== targetH){
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function drawAxon(){
+      resizeCanvas(axonCanvas, ax);
+      const w = axonCanvas.width / dpr;
+      const h = axonCanvas.height / dpr;
+      ax.clearRect(0, 0, w, h);
+
+      const axonH = Math.max(98, Math.min(122, h * 0.30));
+      geom = {
+        left:42,
+        right:w - 28,
+        y:h * 0.50 - axonH / 2,
+        h:axonH,
+        segW:(w - 70) / SECTION_COUNT
+      };
+      geom.width = geom.segW * SECTION_COUNT;
+
+      drawBackground(w, h);
+      drawAxoplasm();
+      drawMembraneSections();
+      drawMyelin();
+      drawChannelsAndPumps();
+      drawPendingWaves();
+      drawBlockedEvents();
+      drawParticles();
+      drawSelection();
+      drawCanvasLabels(w, h);
+    }
+
+    function drawBackground(w, h){
+      ax.fillStyle = '#f8fbff';
+      ax.fillRect(0, 0, w, h);
+      ax.fillStyle = '#f2f7ff';
+      ax.fillRect(0, 0, w, geom.y - 20);
+      ax.fillStyle = '#eef5fb';
+      ax.fillRect(0, geom.y + geom.h + 20, w, h - geom.y - geom.h - 20);
+
+      ax.strokeStyle = '#e0e8f2';
+      ax.lineWidth = 1;
+      ax.beginPath();
+      ax.moveTo(0, geom.y - 20);
+      ax.lineTo(w, geom.y - 20);
+      ax.moveTo(0, geom.y + geom.h + 20);
+      ax.lineTo(w, geom.y + geom.h + 20);
+      ax.stroke();
+    }
+
+    function drawAxoplasm(){
+      roundedRect(ax, geom.left, geom.y, geom.width, geom.h, geom.h / 2);
+      ax.fillStyle = colour.intracellular;
+      ax.fill();
+      ax.lineWidth = 2;
+      ax.strokeStyle = '#c6d3e5';
+      ax.stroke();
+    }
+
+    function drawMembraneSections(){
+      const band = 12;
+      for(let i=0; i<SECTION_COUNT; i++){
+        const x = geom.left + i * geom.segW;
+        const v = membraneVoltage(i);
+        ax.fillStyle = voltageColour(v);
+        ax.fillRect(x, geom.y + 1, geom.segW + 0.5, band);
+        ax.fillRect(x, geom.y + geom.h - band - 1, geom.segW + 0.5, band);
+
+        ax.strokeStyle = 'rgba(80,93,116,.17)';
+        ax.lineWidth = 1;
+        ax.beginPath();
+        ax.moveTo(x, geom.y + band);
+        ax.lineTo(x, geom.y + geom.h - band);
+        ax.stroke();
+      }
+    }
+
+    function drawMyelin(){
+      if(myelinLevel() === 0) return;
+
+      for(let i=0; i<SECTION_COUNT; i++){
+        if(isActiveSite(i)) continue;
+        const x = geom.left + i * geom.segW + 2;
+        const w = Math.max(8, geom.segW - 4);
+        ax.fillStyle = colour.myelin;
+        ax.strokeStyle = '#cfbd7d';
+        ax.lineWidth = 1.2;
+        roundedRect(ax, x, geom.y - 18, w, 26, 10);
+        ax.fill();
+        ax.stroke();
+        roundedRect(ax, x, geom.y + geom.h - 8, w, 26, 10);
+        ax.fill();
+        ax.stroke();
+      }
+
+      for(let i=0; i<SECTION_COUNT; i++){
+        if(!isActiveSite(i)) continue;
+        const cx = segmentCentre(i);
+        ax.strokeStyle = '#375a91';
+        ax.lineWidth = 1.6;
+        ax.setLineDash([4,4]);
+        ax.beginPath();
+        ax.moveTo(cx, geom.y - 25);
+        ax.lineTo(cx, geom.y + geom.h + 25);
+        ax.stroke();
+        ax.setLineDash([]);
+      }
+    }
+
+    function drawChannelsAndPumps(){
+      for(let i=0; i<SECTION_COUNT; i++){
+        const cx = segmentCentre(i);
+        const st = stateOf(i);
+        if(isActiveSite(i)){
+          drawChannel(cx - geom.segW * 0.18, geom.y + 2, 'Na', channelColour(st.na), st.na.includes('inaktiviert'));
+          drawChannel(cx + geom.segW * 0.08, geom.y + 2, 'K', channelColour(st.k), false);
+          drawPump(cx + geom.segW * 0.29, geom.y + 5);
+        } else {
+          ax.fillStyle = 'rgba(78,86,101,.16)';
+          roundedRect(ax, cx - 5, geom.y + 3, 10, 16, 4);
+          ax.fill();
+        }
+      }
+    }
+
+    function drawChannel(x, y, label, fill, inactive){
+      const isNa = label === 'Na';
+      const width = Math.max(10, Math.min(isNa ? 16 : 20, geom.segW * (isNa ? 0.18 : 0.22)));
+      const height = 30;
+      const top = y - 9;
+      const bottom = top + height;
+      const outline = isNa ? colour.na : colour.k;
+
+      ax.fillStyle = fill;
+      ax.strokeStyle = outline;
+      ax.lineWidth = 2;
+
+      if(isNa){
+        // Na⁺-Kanäle: schmale, abgerundete Kapsel.
+        roundedRect(ax, x - width / 2, top, width, height, width / 2);
+        ax.fill();
+        ax.stroke();
+
+        ax.strokeStyle = 'rgba(255,255,255,.55)';
+        ax.lineWidth = 1.2;
+        ax.beginPath();
+        ax.moveTo(x, top + 5);
+        ax.lineTo(x, bottom - 5);
+        ax.stroke();
+      } else {
+        // K⁺-Kanäle: sechseckige Gate-Form.
+        ax.beginPath();
+        ax.moveTo(x, top);
+        ax.lineTo(x + width / 2, top + height * 0.24);
+        ax.lineTo(x + width / 2, top + height * 0.76);
+        ax.lineTo(x, bottom);
+        ax.lineTo(x - width / 2, top + height * 0.76);
+        ax.lineTo(x - width / 2, top + height * 0.24);
+        ax.closePath();
+        ax.fill();
+        ax.stroke();
+      }
+
+      if(inactive){
+        ax.strokeStyle = '#fff';
+        ax.lineWidth = 2;
+        ax.beginPath();
+        ax.moveTo(x - width * 0.34, top + 6);
+        ax.lineTo(x + width * 0.34, bottom - 6);
+        ax.moveTo(x + width * 0.34, top + 6);
+        ax.lineTo(x - width * 0.34, bottom - 6);
+        ax.stroke();
+      }
+
+      if(geom.segW > 42){
+        ax.font = '10px system-ui, sans-serif';
+        ax.textAlign = 'center';
+        ax.textBaseline = 'middle';
+        ax.fillStyle = outline;
+        ax.fillText(label, x, y - 20);
+      }
+    }
+
+    function drawPump(x, y){
+      const r = Math.max(5, Math.min(8, geom.segW * 0.09));
+      ax.fillStyle = '#fff';
+      ax.strokeStyle = '#3b82c4';
+      ax.lineWidth = 1.5;
+      ax.beginPath();
+      ax.arc(x, y + 6, r, 0, Math.PI * 2);
+      ax.fill();
+      ax.stroke();
+      if(geom.segW > 42){
+        ax.fillStyle = '#3b82c4';
+        ax.font = '9px system-ui, sans-serif';
+        ax.textAlign = 'center';
+        ax.textBaseline = 'middle';
+        ax.fillText('P', x, y + 6);
+      }
+    }
+
+    function drawPendingWaves(){
+      for(const ev of pendingActivations){
+        const fromX = segmentCentre(ev.from);
+        const toX = segmentCentre(ev.target);
+        const progress = clamp(1 - (ev.due - time) / propagationDelay(ev.from, ev.target), 0, 1);
+        const x = lerp(fromX, toX, progress);
+        const y = geom.y + geom.h / 2;
+
+        ax.strokeStyle = myelinLevel() > 0 ? '#2f6fdd' : '#425e93';
+        ax.fillStyle = myelinLevel() > 0 ? '#2f6fdd' : '#425e93';
+        ax.lineWidth = myelinLevel() > 0 ? 3 : 2;
+        ax.setLineDash(myelinLevel() > 0 ? [8,6] : []);
+        ax.beginPath();
+        ax.moveTo(fromX, y);
+        ax.lineTo(x, y);
+        ax.stroke();
+        ax.setLineDash([]);
+        drawArrowHead(x, y, toX > fromX ? 0 : Math.PI);
+      }
+    }
+
+    function drawBlockedEvents(){
+      for(const ev of blockedEvents){
+        const age = time - ev.t;
+        const alpha = clamp(1 - age / 1.1, 0, 1);
+        const fromX = segmentCentre(ev.from);
+        const toX = segmentCentre(ev.to);
+        const y = geom.y + geom.h / 2 - 24;
+
+        ax.globalAlpha = alpha;
+        ax.strokeStyle = '#d24b4b';
+        ax.fillStyle = '#d24b4b';
+        ax.lineWidth = 2;
+        ax.setLineDash([5,5]);
+        ax.beginPath();
+        ax.moveTo(fromX, y);
+        ax.lineTo(lerp(fromX, toX, 0.55), y);
+        ax.stroke();
+        ax.setLineDash([]);
+        if(Math.abs(fromX - toX) > 80){
+          ax.font = '12px system-ui, sans-serif';
+          ax.textAlign = 'center';
+          ax.fillText('blockiert', (fromX + toX) / 2, y - 10);
+        }
+        ax.globalAlpha = 1;
+      }
+    }
+
+    function drawArrowHead(x, y, angle){
+      ax.save();
+      ax.translate(x, y);
+      ax.rotate(angle);
+      ax.beginPath();
+      ax.moveTo(8, 0);
+      ax.lineTo(-5, -5);
+      ax.lineTo(-5, 5);
+      ax.closePath();
+      ax.fill();
+      ax.restore();
+    }
+
+    function drawParticles(){
+      if(!ionsToggle.checked) return;
+      for(const p of particles){
+        const age = time - p.t;
+        const u = clamp(age / p.dur, 0, 1);
+        const y = lerp(p.y0, p.y1, easeInOut(u));
+        ax.fillStyle = p.colour;
+        ax.beginPath();
+        ax.arc(p.x, y, 6, 0, Math.PI * 2);
+        ax.fill();
+        ax.fillStyle = '#fff';
+        ax.font = '8px system-ui, sans-serif';
+        ax.textAlign = 'center';
+        ax.textBaseline = 'middle';
+        ax.fillText(p.type.replace('⁺','+'), p.x, y);
+      }
+    }
+
+    function drawSelection(){
+      const x = geom.left + selectedSection * geom.segW;
+      ax.strokeStyle = '#111827';
+      ax.lineWidth = 2.2;
+      ax.setLineDash([6,4]);
+      ax.strokeRect(x + 2, geom.y - 30, geom.segW - 4, geom.h + 60);
+      ax.setLineDash([]);
+    }
+
+    function drawCanvasLabels(w, h){
+      ax.fillStyle = colour.text;
+      ax.font = '13px system-ui, sans-serif';
+      ax.textAlign = 'left';
+      ax.fillText('extrazellulär: viel Na⁺', 18, 28);
+      ax.fillText('intrazellulär: viel K⁺', 18, geom.y + geom.h / 2 + 5);
+
+      const phase = stateOf(selectedSection);
+      ax.fillStyle = 'rgba(255,255,255,.88)';
+      roundedRect(ax, 18, h - 54, Math.min(390, w - 36), 36, 12);
+      ax.fill();
+      ax.strokeStyle = '#dce5ef';
+      ax.stroke();
+      ax.fillStyle = '#26364c';
+      ax.font = '13px system-ui, sans-serif';
+      ax.textAlign = 'left';
+      ax.fillText('Auswahl: Abschnitt ' + (selectedSection + 1) + ' – ' + phase.phase, 32, h - 31);
+
+      if(myelinLevel() > 0){
+        ax.fillStyle = '#24436f';
+        ax.font = '12px system-ui, sans-serif';
+        ax.textAlign = 'right';
+        ax.fillText('Myelin: Signal springt zwischen Schnürringen', w - 24, h - 31);
+      }
+
+      const scaleX = Math.max(170, w - 175);
+      const scaleY = 46;
+      const scaleW = 135;
+      const grad = ax.createLinearGradient(scaleX, 0, scaleX + scaleW, 0);
+      grad.addColorStop(0, voltageColour(HYPER_MV));
+      grad.addColorStop(.35, voltageColour(RESTING_MV));
+      grad.addColorStop(.58, voltageColour(THRESHOLD_MV));
+      grad.addColorStop(1, voltageColour(PEAK_MV));
+      ax.fillStyle = grad;
+      roundedRect(ax, scaleX, scaleY, scaleW, 12, 6);
+      ax.fill();
+      ax.fillStyle = colour.muted;
+      ax.font = '10px system-ui, sans-serif';
+      ax.textAlign = 'left';
+      ax.fillText('-82', scaleX, scaleY + 27);
+      ax.textAlign = 'center';
+      ax.fillText('-55', scaleX + scaleW * .58, scaleY + 27);
+      ax.textAlign = 'right';
+      ax.fillText('+30 mV', scaleX + scaleW, scaleY + 27);
+    }
+
+    // -------------------------------
+    // Live-Diagramm
+    // -------------------------------
+    function drawGraph(){
+      resizeCanvas(graphCanvas, gx);
+      const w = graphCanvas.width / dpr;
+      const h = graphCanvas.height / dpr;
+      gx.clearRect(0, 0, w, h);
+
+      const pad = {l:52, r:18, t:18, b:34};
+      const plotW = w - pad.l - pad.r;
+      const plotH = h - pad.t - pad.b;
+      const minV = -90;
+      const maxV = 40;
+      const startT = Math.max(0, time - 12);
+      const endT = Math.max(12, time);
+
+      function xMap(t){return pad.l + (t - startT) / (endT - startT) * plotW;}
+      function yMap(v){return pad.t + (maxV - v) / (maxV - minV) * plotH;}
+
+      gx.fillStyle = '#fff';
+      gx.fillRect(0, 0, w, h);
+      gx.strokeStyle = '#e2e8f0';
+      gx.lineWidth = 1;
+      for(const v of [-90,-70,-55,0,30]){
+        const y = yMap(v);
+        gx.beginPath();
+        gx.moveTo(pad.l, y);
+        gx.lineTo(w - pad.r, y);
+        gx.stroke();
+      }
+
+      gx.strokeStyle = '#aab6c6';
+      gx.lineWidth = 1.2;
+      gx.strokeRect(pad.l, pad.t, plotW, plotH);
+
+      gx.setLineDash([5,4]);
+      gx.strokeStyle = '#6e7891';
+      gx.beginPath();
+      gx.moveTo(pad.l, yMap(RESTING_MV));
+      gx.lineTo(w - pad.r, yMap(RESTING_MV));
+      gx.stroke();
+      gx.strokeStyle = '#d65d5d';
+      gx.beginPath();
+      gx.moveTo(pad.l, yMap(THRESHOLD_MV));
+      gx.lineTo(w - pad.r, yMap(THRESHOLD_MV));
+      gx.stroke();
+      gx.setLineDash([]);
+
+      gx.fillStyle = '#536173';
+      gx.font = '12px system-ui, sans-serif';
+      gx.textAlign = 'right';
+      gx.textBaseline = 'middle';
+      for(const v of [-90,-70,-55,0,30]) gx.fillText(v + ' mV', pad.l - 8, yMap(v));
+
+      gx.textAlign = 'left';
+      gx.fillText('Ruhe', pad.l + 8, yMap(RESTING_MV) - 10);
+      gx.fillStyle = '#b94b4b';
+      gx.fillText('Schwelle', pad.l + 8, yMap(THRESHOLD_MV) - 10);
+
+      if(graphHistory.length > 1){
+        gx.strokeStyle = '#2f6fdd';
+        gx.lineWidth = 2.4;
+        gx.beginPath();
+        graphHistory.forEach((p, idx) => {
+          const x = xMap(p.t);
+          const y = yMap(p.v);
+          if(idx === 0) gx.moveTo(x, y);
+          else gx.lineTo(x, y);
+        });
+        gx.stroke();
+      }
+
+      gx.fillStyle = colour.muted;
+      gx.font = '12px system-ui, sans-serif';
+      gx.textAlign = 'right';
+      gx.textBaseline = 'alphabetic';
+      gx.fillText('letzte 12 s', w - pad.r, h - 10);
+    }
+
+    // -------------------------------
+    // Benutzerinteraktion
+    // -------------------------------
+    function showView(which){
+      const isInfo = which === 'info';
+      infoView.classList.toggle('active', isInfo);
+      simView.classList.toggle('active', !isInfo);
+      infoTab.classList.toggle('active', isInfo);
+      simTab.classList.toggle('active', !isInfo);
+      render();
+    }
+
+    function triggerStimulus(){
+      if(isRefractory(0)){
+        statusTitle = 'Kein neues Signal';
+        statusMessage = 'Der erste Abschnitt ist noch refraktär. Die Na⁺-Kanäle sind kurz blockiert.';
+      } else {
+        if(canActivate(0)) activateSection(0);
+        statusTitle = 'Aktionspotenzial gestartet';
+        statusMessage = 'Das Aktionspotenzial startet und wird abschnittsweise neu gebildet.';
+      }
+      running = true;
+      updatePauseLabel();
+      collectGraphSample();
+    }
+
+    function resetSimulation(){
+      time = 0;
+      running = false;
+      activationTimes = new Array(SECTION_COUNT).fill(Infinity);
+      propagated = new Array(SECTION_COUNT).fill(false);
+      pendingActivations = [];
+      particles = [];
+      blockedEvents = [];
+      graphHistory = [];
+      lastSampleTime = -Infinity;
+      statusTitle = 'Bereit';
+      statusMessage = 'Reiz starten. Danach wandert das Signal nach rechts.';
+      updatePauseLabel();
+      collectGraphSample();
+      render();
+    }
+
+    function updateLabels(){
+      const myelinTexts = ['kein Myelin','teilweise','stark'];
+      myelinValue.textContent = myelinTexts[myelinLevel()];
+    }
+
+    function updatePauseLabel(){
+      pauseBtn.textContent = running ? 'Pause' : (time > 0 ? 'Weiter' : 'Pause');
+    }
+
+    function updateInfoPanel(){
+      const st = stateOf(selectedSection);
+      selectedLabel.textContent = String(selectedSection + 1);
+      graphCaption.textContent = 'ausgewählter Abschnitt: ' + (selectedSection + 1);
+      voltageText.textContent = Math.round(st.voltage) + ' mV';
+      naText.textContent = st.na;
+      kText.textContent = st.k;
+      phaseText.textContent = st.phase;
+      directionText.textContent = st.direction;
+      statusBox.innerHTML = '<strong>' + statusTitle + '</strong>' + statusMessage;
+    }
+
+    function handleCanvasClick(event){
+      if(!geom) return;
+      const rect = axonCanvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      if(x < geom.left || x > geom.left + geom.width || y < geom.y - 36 || y > geom.y + geom.h + 36) return;
+      selectedSection = clamp(Math.floor((x - geom.left) / geom.segW), 0, SECTION_COUNT - 1);
+      graphHistory = [];
+      lastSampleTime = -Infinity;
+      collectGraphSample();
+      statusTitle = 'Abschnitt ausgewählt';
+      statusMessage = 'Das Diagramm zeigt jetzt Abschnitt ' + (selectedSection + 1) + '.';
+      render();
+    }
+
+    infoTab.addEventListener('click', () => showView('info'));
+    simTab.addEventListener('click', () => showView('sim'));
+    startSimBtn.addEventListener('click', () => showView('sim'));
+    infoResetBtn.addEventListener('click', resetSimulation);
+    stimulusBtn.addEventListener('click', triggerStimulus);
+    pauseBtn.addEventListener('click', () => {
+      running = !running;
+      updatePauseLabel();
+      statusTitle = running ? 'Simulation läuft' : 'Simulation pausiert';
+      statusMessage = running ? 'Die Wanderwelle läuft.' : 'Mit Schritt einzeln weitergehen.';
+      render();
+    });
+    stepBtn.addEventListener('click', () => {
+      running = false;
+      updatePauseLabel();
+      updateSimulation(0.24);
+      statusTitle = 'Ein Schritt';
+      statusMessage = 'Ein Schritt weiter.';
+      render();
+    });
+    resetBtn.addEventListener('click', resetSimulation);
+    axonCanvas.addEventListener('click', handleCanvasClick);
+
+    myelinRange.addEventListener('input', () => {
+      updateLabels();
+      if(pendingActivations.length || activationTimes.some(Number.isFinite)){
+        statusTitle = 'Myelinisierung geändert';
+        statusMessage = 'Für den Vergleich: Reset, dann neu starten.';
+      } else {
+        statusTitle = 'Myelinisierung gewählt';
+        statusMessage = myelinLevel() === 0 ? 'Jeder Abschnitt depolarisiert aktiv.' : 'Nur Schnürringe depolarisieren aktiv.';
+      }
+      render();
+    });
+
+    ionsToggle.addEventListener('input', () => {
+      if(!ionsToggle.checked) particles = [];
+      render();
+    });
+
+    window.addEventListener('resize', render);
+
+    function render(){
+      updateLabels();
+      updateInfoPanel();
+      if(simView.classList.contains('active')){
+        drawAxon();
+        drawGraph();
+      }
+    }
+
+    function frame(now){
+      const realDt = Math.min(0.05, (now - lastFrame) / 1000);
+      lastFrame = now;
+      if(running){
+        // Langsame interne Zeit, damit die Molekülschritte beobachtbar bleiben.
+        updateSimulation(realDt * 0.90);
+      } else {
+        collectGraphSample();
+      }
+      if(simView.classList.contains('active')) render();
+      requestAnimationFrame(frame);
+    }
+
+    updateLabels();
+    collectGraphSample();
+    updatePauseLabel();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
