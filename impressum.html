@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Impressum</title>
+  <meta name="description" content="Impressum von Gymi-Tools." />
+
+  <style>
+    :root{
+      --bg1:#f6f8ff;
+      --bg2:#ffffff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --border: rgba(15,23,42,.10);
+      --shadow: 0 18px 55px rgba(2,6,23,.10);
+      --shadow2: 0 10px 30px rgba(2,6,23,.08);
+      --radius: 22px;
+      --focus: rgba(59,130,246,.35);
+      --chip: rgba(2,6,23,.04);
+      --tabbg: rgba(255,255,255,.70);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+
+      background:
+        radial-gradient(900px 520px at 18% 10%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(900px 520px at 80% 15%, rgba(16,185,129,.14), transparent 60%),
+        radial-gradient(900px 520px at 55% 95%, rgba(168,85,247,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 55%, var(--bg1) 100%);
+
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+
+      line-height:1.45;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+
+    .wrap{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 34px 18px 56px;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 16px;
+      flex-wrap:wrap;
+      padding: 10px 0 18px;
+    }
+
+    .brand{ min-width: 260px; }
+    .title{
+      margin:0;
+      font-size: clamp(30px, 3.2vw, 46px);
+      letter-spacing:-0.02em;
+    }
+
+    .subtitle{
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .subtitle a{
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(15,23,42,.18);
+    }
+    .subtitle a:hover{
+      border-bottom-color: rgba(15,23,42,.35);
+    }
+
+    .intro{
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 62ch;
+      font-size: 14px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:flex-end;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+      justify-content:flex-end;
+      flex-wrap: wrap;
+      max-width: 760px;
+    }
+
+    /* Tabs */
+    .tabs{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      max-width: 100%;
+      overflow-x: auto;
+      padding: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--tabbg);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar{
+      display:none;
+    }
+
+    .tab{
+      border: 1px solid transparent;
+      background: transparent;
+      color: rgba(15,23,42,.82);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      transition: 140ms ease;
+      white-space: nowrap;
+    }
+
+    .tab:hover{
+      background: rgba(2,6,23,.04);
+      border-color: rgba(15,23,42,.08);
+    }
+
+    .tab[aria-selected="true"]{
+      background: rgba(59,130,246,.12);
+      border-color: rgba(59,130,246,.25);
+      color: rgba(15,23,42,.95);
+    }
+
+    .tab:focus{
+      outline:none;
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .controlrow{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+
+    .viewcontrols{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .viewtoggle{
+      flex: 0 0 48px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor:pointer;
+      font: inherit;
+      font-size: 14px;
+      white-space:nowrap;
+    }
+
+    .viewtoggle i{
+      width: 16px;
+      text-align:center;
+      font-size: 15px;
+    }
+
+    .viewtoggle:hover{
+      border-color: rgba(15,23,42,.22);
+    }
+
+    .viewtoggle:focus{
+      outline:none;
+      border-color: rgba(59,130,246,.35);
+      box-shadow: 0 0 0 4px var(--focus), var(--shadow2);
+    }
+
+    .search{
+      position:relative;
+      width: min(240px, 100%);
+      flex: 0 1 240px;
+      min-width: 120px;
+    }
+
+    .search input{
+      width:100%;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      outline:none;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .search input::placeholder{ color: rgba(71,85,105,.85); }
+
+    .search .icon{
+      position:absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      opacity: .65;
+      pointer-events:none;
+      color: #0f172a;
+    }
+
+    .search input:focus{
+      border-color: rgba(59,130,246,.35);
+      box-shadow: 0 0 0 4px var(--focus), var(--shadow2);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+      padding-bottom: 100px;
+    }
+
+    .card{
+      grid-column: span 4;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      position:relative;
+      cursor: pointer;
+    }
+
+    .grid.list-view .card{
+      grid-column: 1 / -1;
+      display:flex;
+      align-items:stretch;
+      min-height: 118px;
+    }
+
+    .grid.list-view .thumbwrap{
+      width: 150px;
+      min-width: 150px;
+      aspect-ratio: auto;
+    }
+
+    .grid.list-view .thumbimg{
+      width: 82%;
+      height: 82%;
+    }
+
+    .grid.list-view .content{
+      flex: 1;
+      justify-content:center;
+    }
+
+    .grid.list-view .ctitle{
+      font-size: 15px;
+    }
+
+    .grid.list-view .desc{
+      max-width: 80ch;
+    }
+
+    .card:focus-within{
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .thumbwrap{
+      aspect-ratio: 16/9;
+      width: 100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .thumbimg{
+      width: 92%;
+      height: 92%;
+      object-fit: contain;
+      display:block;
+      filter: drop-shadow(0 14px 30px rgba(2,6,23,.18));
+    }
+
+    .content{
+      padding: 14px 14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .ctitle{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:-0.01em;
+    }
+
+    .chip{
+      font-size: 12px;
+      color: rgba(15,23,42,.70);
+      background: var(--chip);
+      border: 1px solid rgba(15,23,42,.08);
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space:nowrap;
+    }
+
+    .desc{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* klar klickbar */
+    .card{ cursor: pointer; }
+
+    @media (hover: hover) and (pointer: fine){
+      .card:hover{
+        transform: translateY(-4px);
+        border-color: rgba(15,23,42,.22);
+        box-shadow: 0 22px 70px rgba(2,6,23,.12);
+      }
+
+      .card:hover .ctitle{
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .card:hover .chip{
+        border-color: rgba(15,23,42,.18);
+      }
+
+      .card::after{
+        content: "↗";
+        position:absolute;
+        top: 10px;
+        right: 12px;
+        width: 30px;
+        height: 30px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius: 999px;
+        background: rgba(255,255,255,.75);
+        border: 1px solid rgba(15,23,42,.10);
+        box-shadow: 0 10px 30px rgba(2,6,23,.08);
+        color: rgba(15,23,42,.70);
+        opacity: 0;
+        transform: translateY(-3px);
+        transition: 160ms ease;
+        pointer-events:none;
+        z-index: 6;
+      }
+
+      .card:hover::after{ opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px){
+      .card{ grid-column: span 6; }
+
+      .brand{
+        flex: 0 0 100%;
+      }
+
+      .topbar{
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+        justify-content:flex-start;
+        align-items:center;
+        margin-top: 4px;
+      }
+
+      .tabs{
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 620px){
+      .wrap{ padding-bottom: 44px; }
+      .topbar{ align-items:stretch; }
+      .card{ grid-column: span 12; }
+      .tabs{ width: 100%; border-radius: 18px; justify-content:flex-start; }
+      .tab{ padding: 9px 10px; }
+      .controlrow{ width: 100%; flex: 1 1 100%; }
+      .search{ width: auto; flex: 1 1 auto; min-width: 0; }
+      .viewcontrols{ width: auto; justify-content:flex-end; }
+      .grid.list-view .card{ min-height: 96px; }
+      .grid.list-view .thumbwrap{ width: 104px; min-width: 104px; }
+      .grid.list-view .row{ align-items:flex-start; }
+      .grid.list-view .chip{ display:none; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .card{ transition:none; }
+      .card::after{ transition:none; }
+      .tab{ transition:none; }
+    }
+
+    a.card,
+    a.card *{
+      cursor: pointer !important;
+    }
+
+    .pagination{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      margin-top: -72px;
+      padding-bottom: 72px;
+    }
+
+    .pagebtn{
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      box-shadow: var(--shadow2);
+      cursor:pointer;
+      font: inherit;
+      font-size: 13px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .pagebtn:hover{
+      border-color: rgba(15,23,42,.22);
+    }
+
+    .pagebtn[aria-current="page"]{
+      background: rgba(59,130,246,.12);
+      border-color: rgba(59,130,246,.25);
+      cursor: default;
+    }
+
+    .pagebtn:disabled{
+      cursor:not-allowed;
+      opacity:.45;
+    }
+    .footer{
+      margin-top:32px;
+      margin-bottom:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.5);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.5);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    .impressum{
+      margin-top: 14px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      max-width: 880px;
+    }
+
+    .impressum h2{
+      margin: 0 0 16px;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+
+    .impressum h3{
+      margin: 26px 0 8px;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .impressum p{
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .impressum dl{
+      display:grid;
+      grid-template-columns: 180px 1fr;
+      gap: 10px 18px;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .impressum dt{
+      color: rgba(15,23,42,.70);
+      font-weight: 700;
+    }
+
+    .impressum dd{
+      margin: 0;
+      color: var(--text);
+    }
+
+    .impressum a{
+      border-bottom: 1px solid rgba(15,23,42,.18);
+    }
+
+    .impressum a:hover{
+      border-bottom-color: rgba(15,23,42,.35);
+    }
+
+    .placeholder{
+      color: rgba(185,28,28,.86);
+      font-weight: 700;
+    }
+
+    @media (max-width: 620px){
+      .impressum{
+        padding: 18px;
+      }
+
+      .impressum dl{
+        grid-template-columns: 1fr;
+        gap: 4px 0;
+      }
+
+      .impressum dd{
+        margin-bottom: 10px;
+      }
+    }
+
+
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1 class="title">Impressum</h1>
+        <p class="subtitle">von
+          <a href="https://samueltobler.github.io" target="_blank" rel="noopener noreferrer">Samuel Tobler</a>
+        </p>
+      </div>
+    </header>
+
+    <main>
+      <article class="impressum" aria-labelledby="impressum-title">
+        <h2 id="impressum-title">Impressum</h2>
+
+        <dl>
+          <dt>Website</dt>
+          <dd>Gymi-Tools</dd>
+
+          <dt>Betreiber</dt>
+          <dd>Samuel Tobler</dd>
+
+          <dt>E-Mail</dt>
+          <dd><a href="mailto:gymitools@gmail.com">gymitools@gmail.com</a></dd>
+
+          <dt>Verantwortlich für den Inhalt</dt>
+          <dd>Samuel Tobler</dd>
+        </dl>
+
+        <h3>Haftungsausschluss</h3>
+        <p>
+          Die Inhalte dieser Website werden mit Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte wird jedoch keine Gewähr übernommen. Die Nutzung der Inhalte erfolgt auf eigene Verantwortung.
+        </p>
+
+        <h3>Externe Links</h3>
+        <p>
+          Diese Website kann Links zu externen Websites enthalten. Für deren Inhalte sind ausschliesslich die jeweiligen Betreiber verantwortlich. Eine dauerhafte Kontrolle externer Inhalte ist ohne konkrete Hinweise nicht zumutbar.
+        </p>
+
+        <h3>Urheberrechte</h3>
+        <p>
+          Inhalte, Texte, Bilder, Grafiken und sonstige Elemente dieser Website unterliegen, soweit anwendbar, dem Schweizer Urheberrecht. Eine Weiterverwendung ist nur mit Zustimmung des Rechteinhabers oder im Rahmen gesetzlich erlaubter Nutzung zulässig.
+        </p>
+
+        <h3>Datenschutz</h3>
+        <p>
+          Diese Website wird als statische Website über GitHub Pages bereitgestellt. Der Betreiber verwendet keine eigenen Analyse-, Tracking- oder Werbedienste und wertet keine personenbezogenen Daten von Besuchenden aus.
+        </p>
+        <p>
+          Beim Aufruf einer über GitHub Pages gehosteten Website kann GitHub technische Zugriffsdaten verarbeiten. Gemäss GitHub wird insbesondere die IP-Adresse von Besuchenden zu Sicherheitszwecken protokolliert, unabhängig davon, ob die besuchende Person bei GitHub angemeldet ist. Weitere Informationen finden sich in der <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection" target="_blank" rel="noopener noreferrer">Dokumentation zu GitHub Pages</a> und in der <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">Datenschutzerklärung von GitHub</a>.
+        </p>
+        <p>
+          Bei einer Kontaktaufnahme per E-Mail werden die übermittelten Angaben ausschliesslich zur Bearbeitung der Anfrage verwendet. Anfragen zum Datenschutz können an die oben genannte E-Mail-Adresse gerichtet werden.
+        </p>
+
+        <h3>Cookies</h3>
+        <p>
+          Diese Website setzt durch den Betreiber keine eigenen Cookies und enthält kein eigenes Cookie-basiertes Tracking. Da die Website über GitHub Pages ausgeliefert wird, können technische Verarbeitungen durch GitHub nicht vollständig ausgeschlossen werden; massgebend sind insoweit die <a href="https://docs.github.com/en/site-policy/privacy-policies/github-cookies" target="_blank" rel="noopener noreferrer">Cookie-Hinweise von GitHub</a>.
+        </p>
+      </article>
+
+      <div class="footer">
+        © 2026 <a href="https://samueltobler.github.io" target="_blank" rel="noopener noreferrer">Samuel Tobler </a> |
+        <a href="mailto:gymitools@gmail.com" target="_blank">Kontakt</a> | <a href="https://samueltobler.github.io/impressum" target="_blank" rel="noopener noreferrer">Impressum
+      </div>
+
+    </main>
+  </div>
+</body>
+</html>
