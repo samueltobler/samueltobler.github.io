@@ -3,32 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111827">
   <title>Pulsmesser</title>
 
   <style>
-    :root {
-      color-scheme: dark;
-      --surface: rgba(17, 24, 39, 0.86);
-      --surface-light: rgba(255, 255, 255, 0.06);
-      --border: rgba(255, 255, 255, 0.11);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --primary: #fb7185;
-      --primary-dark: #e11d48;
-      --success: #34d399;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
-      --radius-large: 28px;
-      --radius-medium: 18px;
-    }
-
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      min-height: 100%;
     }
 
     body {
@@ -37,208 +16,81 @@
       display: grid;
       place-items: center;
       padding: 20px;
-      overflow-x: hidden;
-      font-family:
-        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(
-          circle at 15% 10%,
-          rgba(225, 29, 72, 0.22),
-          transparent 34%
-        ),
-        radial-gradient(
-          circle at 90% 90%,
-          rgba(59, 130, 246, 0.17),
-          transparent 34%
-        ),
-        linear-gradient(145deg, #07111f 0%, #0f172a 52%, #111827 100%);
+      font-family: Arial, sans-serif;
+      color: #0f172a;
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
     }
 
-    button {
-      font: inherit;
+    .page {
+      width: min(100%, 420px);
     }
 
     .app {
-      width: min(100%, 460px);
-    }
-
-    .card {
-      position: relative;
-      overflow: hidden;
-      padding: clamp(22px, 6vw, 34px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-large);
-      background: var(--surface);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-    }
-
-    .card::before {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      content: "";
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.08),
-        transparent 34%
-      );
-    }
-
-    .header,
-    .measurement,
-    .controls,
-    .stats,
-    .hint {
-      position: relative;
-      z-index: 1;
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .title-group h1 {
-      margin: 0;
-      font-size: clamp(1.45rem, 5vw, 1.9rem);
-      letter-spacing: -0.04em;
-    }
-
-    .title-group p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.45;
-    }
-
-    .status {
-      display: inline-flex;
-      flex: 0 0 auto;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--muted);
-      background: var(--surface-light);
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--muted);
-    }
-
-    .status.active {
-      color: #d1fae5;
-    }
-
-    .status.active .status-dot {
-      background: var(--success);
-      animation: pulse-status 1.4s infinite;
-    }
-
-    .measurement {
-      display: grid;
-      place-items: center;
-      min-height: 188px;
-      margin-bottom: 20px;
-      border: 1px solid var(--border);
+      padding: 28px;
+      border: 1px solid #e2e8f0;
       border-radius: 24px;
-      background:
-        radial-gradient(
-          circle at center,
-          rgba(251, 113, 133, 0.13),
-          transparent 62%
-        ),
-        rgba(255, 255, 255, 0.025);
+      background: #ffffff;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+
+    .subtitle {
+      margin: 8px 0 24px;
+      color: #64748b;
       text-align: center;
     }
 
-    .bpm-value {
-      margin: 0;
-      font-size: clamp(4rem, 20vw, 6.4rem);
-      font-variant-numeric: tabular-nums;
-      font-weight: 800;
-      line-height: 0.95;
-      letter-spacing: -0.08em;
+    .display {
+      margin-bottom: 18px;
+      padding: 32px 20px;
+      border-radius: 20px;
+      background: #f8fafc;
+      text-align: center;
     }
 
-    .bpm-label {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 0.82rem;
+    .bpm {
+      margin: 0;
+      font-size: 5rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #e11d48;
+    }
+
+    .label {
+      margin-top: 10px;
+      color: #64748b;
+      font-size: 0.8rem;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
     .tap-button {
       width: 100%;
-      min-height: 128px;
+      min-height: 120px;
       border: 0;
-      border-radius: 24px;
-      color: white;
-      background:
-        linear-gradient(
-          145deg,
-          rgba(255, 255, 255, 0.16),
-          transparent 40%
-        ),
-        linear-gradient(135deg, var(--primary), var(--primary-dark));
-      box-shadow:
-        0 18px 38px rgba(225, 29, 72, 0.29),
-        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+      border-radius: 20px;
+      color: #ffffff;
+      background: linear-gradient(135deg, #fb7185, #e11d48);
       cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 700;
+      transition: transform 0.1s ease;
       touch-action: manipulation;
-      transition:
-        transform 120ms ease,
-        filter 120ms ease,
-        opacity 120ms ease;
-    }
-
-    .tap-button:hover:not(:disabled) {
-      filter: brightness(1.06);
     }
 
     .tap-button:active:not(:disabled) {
-      transform: scale(0.975);
+      transform: scale(0.97);
     }
 
     .tap-button:disabled {
       cursor: not-allowed;
-      opacity: 0.38;
-      box-shadow: none;
-    }
-
-    .tap-icon {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 2rem;
-      line-height: 1;
-    }
-
-    .tap-text {
-      display: block;
-      font-size: 1.08rem;
-      font-weight: 800;
-    }
-
-    .tap-subtext {
-      display: block;
-      margin-top: 6px;
-      font-size: 0.8rem;
-      opacity: 0.8;
+      opacity: 0.4;
     }
 
     .controls {
@@ -249,174 +101,101 @@
     }
 
     .control-button {
-      min-height: 52px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-medium);
-      color: var(--text);
-      background: var(--surface-light);
+      min-height: 50px;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      color: #0f172a;
+      background: #ffffff;
       cursor: pointer;
-      font-weight: 750;
-      transition:
-        background 120ms ease,
-        transform 120ms ease,
-        opacity 120ms ease;
-    }
-
-    .control-button:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .control-button:active:not(:disabled) {
-      transform: scale(0.98);
+      font-weight: 700;
     }
 
     .control-button:disabled {
       cursor: not-allowed;
-      opacity: 0.38;
-    }
-
-    .control-button.stop {
-      color: #fecaca;
-      border-color: rgba(248, 113, 113, 0.24);
+      opacity: 0.4;
     }
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
       margin-top: 18px;
     }
 
     .stat {
-      min-width: 0;
-      padding: 14px 10px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.035);
+      padding: 14px;
+      border-radius: 14px;
+      background: #f8fafc;
       text-align: center;
     }
 
-    .stat-value {
+    .stat strong {
       display: block;
-      overflow: hidden;
-      font-size: 1.12rem;
-      font-variant-numeric: tabular-nums;
-      font-weight: 800;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-size: 1.2rem;
     }
 
-    .stat-label {
-      display: block;
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 0.7rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+    .stat span {
+      color: #64748b;
+      font-size: 0.75rem;
     }
 
-    .hint {
-      margin: 18px 4px 0;
-      color: var(--muted);
-      font-size: 0.78rem;
-      line-height: 1.55;
+    .status {
+      margin: 18px 0 0;
+      color: #64748b;
       text-align: center;
+      font-size: 0.85rem;
     }
 
-    .tap-flash {
-      animation: tap-flash 180ms ease;
+    footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 11px;
+      color: rgba(0, 0, 0, 0.5);
     }
 
-    @keyframes tap-flash {
-      50% {
-        transform: scale(0.98);
-        filter: brightness(1.15);
-      }
+    .footer a {
+      color: rgba(0, 0, 0, 0.5);
+      text-decoration: none;
     }
 
-    @keyframes pulse-status {
-      0% {
-        box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.35);
-      }
-
-      70% {
-        box-shadow: 0 0 0 8px rgba(52, 211, 153, 0);
-      }
+    .footer a:hover {
+      text-decoration: underline;
     }
 
-    @media (max-width: 390px) {
+    @media (max-width: 420px) {
       body {
         padding: 12px;
       }
 
-      .card {
-        padding: 20px 16px;
-        border-radius: 24px;
+      .app {
+        padding: 22px 16px;
       }
 
-      .header {
-        align-items: flex-start;
-      }
-
-      .status {
-        padding: 8px 10px;
-      }
-
-      .measurement {
-        min-height: 160px;
-      }
-
-      .tap-button {
-        min-height: 114px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+      .bpm {
+        font-size: 4.3rem;
       }
     }
   </style>
 </head>
 
 <body>
-  <main class="app">
-    <section class="card" aria-labelledby="app-title">
-      <header class="header">
-        <div class="title-group">
-          <h1 id="app-title">Pulsmesser</h1>
-          <p>Puls fühlen und bei jedem Herzschlag tippen.</p>
-        </div>
+  <div class="page">
+    <main class="app">
+      <h1>Pulsmesser</h1>
+      <p class="subtitle">Bei jedem Herzschlag tippen.</p>
 
-        <div class="status" id="status" aria-live="polite">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span id="statusText">Bereit</span>
-        </div>
-      </header>
-
-      <div class="measurement" aria-live="polite">
-        <div>
-          <p class="bpm-value" id="bpmValue">--</p>
-          <div class="bpm-label">Schläge pro Minute</div>
-        </div>
-      </div>
+      <section class="display">
+        <p class="bpm" id="bpm">--</p>
+        <div class="label">Schläge pro Minute</div>
+      </section>
 
       <button
         class="tap-button"
         id="tapButton"
         type="button"
         disabled
-        aria-label="Herzschlag erfassen"
       >
-        <span class="tap-icon" aria-hidden="true">♥</span>
-        <span class="tap-text">Herzschlag</span>
-        <span class="tap-subtext">
-          Bei jedem Pulsschlag drücken
-        </span>
+        Herzschlag
       </button>
 
       <div class="controls">
@@ -429,7 +208,7 @@
         </button>
 
         <button
-          class="control-button stop"
+          class="control-button"
           id="stopButton"
           type="button"
           disabled
@@ -438,215 +217,154 @@
         </button>
       </div>
 
-      <div class="stats" aria-label="Messdetails">
+      <div class="stats">
         <div class="stat">
-          <span class="stat-value" id="tapCount">0</span>
-          <span class="stat-label">Tipps</span>
+          <strong id="tapCount">0</strong>
+          <span>Herzschläge</span>
         </div>
 
         <div class="stat">
-          <span class="stat-value" id="duration">0.0 s</span>
-          <span class="stat-label">Dauer</span>
-        </div>
-
-        <div class="stat">
-          <span class="stat-value" id="lastInterval">--</span>
-          <span class="stat-label">Letzter Abstand</span>
+          <strong id="duration">0.0 s</strong>
+          <span>Dauer</span>
         </div>
       </div>
 
-      <p class="hint">
-        Für eine stabilere Messung mindestens 8 bis 12 Herzschläge
-        erfassen. Diese Anwendung ersetzt keine medizinische Messung.
-      </p>
-    </section>
-  </main>
+      <p class="status" id="status">Bereit</p>
+    </main>
+
+    <footer class="footer">
+      by
+      <a
+        href="https://samueltobler.github.io"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Samuel Tobler
+      </a>
+      |
+      <a
+        href="https://samueltobler.github.io/gymi-tools"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Gymi-Tools
+      </a>
+    </footer>
+  </div>
 
   <script>
-    (() => {
-      "use strict";
+    const bpmElement = document.getElementById("bpm");
+    const tapButton = document.getElementById("tapButton");
+    const startButton = document.getElementById("startButton");
+    const stopButton = document.getElementById("stopButton");
+    const tapCountElement = document.getElementById("tapCount");
+    const durationElement = document.getElementById("duration");
+    const statusElement = document.getElementById("status");
 
-      const bpmValue = document.getElementById("bpmValue");
-      const tapButton = document.getElementById("tapButton");
-      const startButton = document.getElementById("startButton");
-      const stopButton = document.getElementById("stopButton");
-      const tapCount = document.getElementById("tapCount");
-      const duration = document.getElementById("duration");
-      const lastInterval = document.getElementById("lastInterval");
-      const status = document.getElementById("status");
-      const statusText = document.getElementById("statusText");
+    let running = false;
+    let startTime = 0;
+    let timestamps = [];
+    let timer = null;
 
-      let isRunning = false;
-      let startTime = 0;
-      let timestamps = [];
-      let timerId = null;
-
-      function setRunningState(running) {
-        isRunning = running;
-
-        tapButton.disabled = !running;
-        startButton.disabled = running;
-        stopButton.disabled = !running;
-
-        status.classList.toggle("active", running);
-        statusText.textContent = running
-          ? "Messung läuft"
-          : "Bereit";
+    function calculateBpm() {
+      if (timestamps.length < 2) {
+        return null;
       }
 
-      function resetMeasurement() {
-        timestamps = [];
-        bpmValue.textContent = "--";
-        tapCount.textContent = "0";
-        duration.textContent = "0.0 s";
-        lastInterval.textContent = "--";
+      const firstTap = timestamps[0];
+      const lastTap = timestamps[timestamps.length - 1];
+      const intervals = timestamps.length - 1;
+      const minutes = (lastTap - firstTap) / 60000;
+
+      if (minutes <= 0) {
+        return null;
       }
 
-      function updateDuration() {
-        if (!isRunning) {
-          return;
-        }
+      return Math.round(intervals / minutes);
+    }
 
-        const elapsedSeconds =
-          (performance.now() - startTime) / 1000;
-
-        duration.textContent =
-          `${elapsedSeconds.toFixed(1)} s`;
+    function updateDuration() {
+      if (!running) {
+        return;
       }
 
-      function calculateAverageBpm() {
-        if (timestamps.length < 2) {
-          return null;
-        }
+      const seconds = (performance.now() - startTime) / 1000;
+      durationElement.textContent = `${seconds.toFixed(1)} s`;
+    }
 
-        const first = timestamps[0];
-        const last = timestamps[timestamps.length - 1];
-        const intervalCount = timestamps.length - 1;
-        const elapsedMinutes = (last - first) / 60000;
+    function startMeasurement() {
+      running = true;
+      startTime = performance.now();
+      timestamps = [];
 
-        if (elapsedMinutes <= 0) {
-          return null;
-        }
+      bpmElement.textContent = "--";
+      tapCountElement.textContent = "0";
+      durationElement.textContent = "0.0 s";
+      statusElement.textContent = "Messung läuft";
 
-        return Math.round(intervalCount / elapsedMinutes);
+      tapButton.disabled = false;
+      startButton.disabled = true;
+      stopButton.disabled = false;
+
+      clearInterval(timer);
+      timer = setInterval(updateDuration, 100);
+    }
+
+    function registerHeartbeat() {
+      if (!running) {
+        return;
       }
 
-      function registerHeartbeat() {
-        if (!isRunning) {
-          return;
-        }
+      timestamps.push(performance.now());
+      tapCountElement.textContent = timestamps.length;
 
-        const now = performance.now();
-        timestamps.push(now);
+      const bpm = calculateBpm();
 
-        tapCount.textContent = String(timestamps.length);
-
-        if (timestamps.length > 1) {
-          const currentIndex = timestamps.length - 1;
-
-          const interval =
-            timestamps[currentIndex] -
-            timestamps[currentIndex - 1];
-
-          lastInterval.textContent =
-            `${Math.round(interval)} ms`;
-
-          const bpm = calculateAverageBpm();
-          bpmValue.textContent = bpm ?? "--";
-        } else {
-          lastInterval.textContent = "Start";
-        }
-
-        tapButton.classList.remove("tap-flash");
-
-        void tapButton.offsetWidth;
-
-        tapButton.classList.add("tap-flash");
-
-        if (navigator.vibrate) {
-          navigator.vibrate(18);
-        }
+      if (bpm !== null) {
+        bpmElement.textContent = bpm;
       }
 
-      function startMeasurement() {
-        resetMeasurement();
+      if (navigator.vibrate) {
+        navigator.vibrate(15);
+      }
+    }
 
-        startTime = performance.now();
-
-        setRunningState(true);
-
-        statusText.textContent = "Ersten Schlag tippen";
-
-        clearInterval(timerId);
-
-        timerId = setInterval(updateDuration, 100);
-
-        tapButton.focus();
+    function stopMeasurement() {
+      if (!running) {
+        return;
       }
 
-      function stopMeasurement() {
-        if (!isRunning) {
-          return;
-        }
+      running = false;
+      clearInterval(timer);
 
-        updateDuration();
-        setRunningState(false);
+      tapButton.disabled = true;
+      startButton.disabled = false;
+      stopButton.disabled = true;
 
-        clearInterval(timerId);
-        timerId = null;
+      const bpm = calculateBpm();
 
-        const bpm = calculateAverageBpm();
-
-        if (bpm !== null) {
-          bpmValue.textContent = bpm;
-          statusText.textContent = "Messung beendet";
-        } else {
-          bpmValue.textContent = "--";
-          statusText.textContent = "Zu wenige Tipps";
-        }
+      if (bpm !== null) {
+        bpmElement.textContent = bpm;
+        statusElement.textContent = "Messung beendet";
+      } else {
+        bpmElement.textContent = "--";
+        statusElement.textContent = "Zu wenige Herzschläge";
       }
+    }
 
-      startButton.addEventListener(
-        "click",
-        startMeasurement
-      );
+    startButton.addEventListener("click", startMeasurement);
+    tapButton.addEventListener("click", registerHeartbeat);
+    stopButton.addEventListener("click", stopMeasurement);
 
-      stopButton.addEventListener(
-        "click",
-        stopMeasurement
-      );
-
-      tapButton.addEventListener(
-        "click",
-        registerHeartbeat
-      );
-
-      document.addEventListener("keydown", event => {
-        const isTapKey =
-          event.code === "Space" ||
-          event.code === "Enter";
-
-        if (
-          isRunning &&
-          isTapKey &&
-          document.activeElement !== stopButton
-        ) {
-          event.preventDefault();
-          registerHeartbeat();
-        }
-
-        if (
-          event.code === "Escape" &&
-          isRunning
-        ) {
-          stopMeasurement();
-        }
-      });
-
-      window.addEventListener("beforeunload", () => {
-        clearInterval(timerId);
-      });
-    })();
+    document.addEventListener("keydown", event => {
+      if (
+        running &&
+        (event.code === "Space" || event.code === "Enter")
+      ) {
+        event.preventDefault();
+        registerHeartbeat();
+      }
+    });
   </script>
 </body>
 </html>
