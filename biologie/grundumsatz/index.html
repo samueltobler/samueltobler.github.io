@@ -1,16 +1,27 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Grundumsatz Rechner</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta
+    name="description"
+    content="Einfacher Rechner für den täglichen Grundumsatz nach der Mifflin-St.-Jeor-Formel."
+  >
+
+  <title>Grundumsatz-Rechner</title>
+
   <style>
     :root {
-      --bg: #f8f9fa;
-      --card: #ffffff;
-      --accent: #007bff;
-      --text: #212529;
-      --border: #dee2e6;
+      --background: #f4f7fb;
+      --card: rgba(255, 255, 255, 0.92);
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --accent-light: rgba(37, 99, 235, 0.12);
+      --text: #172033;
+      --text-muted: #667085;
+      --border: #d9e0ea;
+      --error: #b42318;
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
     }
 
     * {
@@ -18,127 +29,405 @@
     }
 
     body {
-      margin: 0;
-      padding: 0;
-      font-family: "Helvetica Neue", sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
+      margin: 0;
+      padding: 32px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family:
+        Inter,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(37, 99, 235, 0.16),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(14, 165, 233, 0.12),
+          transparent 32%
+        ),
+        var(--background);
+    }
+
+    .page {
+      width: 100%;
+      max-width: 440px;
     }
 
     .container {
-      background-color: var(--card);
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      max-width: 400px;
-      width: 90%;
+      padding: 32px;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .header {
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .icon {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 25px;
     }
 
     h1 {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-      text-align: center;
+      margin: 0;
+      font-size: clamp(1.65rem, 5vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: -0.035em;
+    }
+
+    .intro {
+      margin: 10px 0 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
-      margin-bottom: 0.25rem;
-      font-weight: 500;
+      margin-bottom: 7px;
+      font-size: 0.9rem;
+      font-weight: 650;
     }
 
-    input, select {
+    input,
+    select {
       width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
+      min-height: 50px;
+      padding: 12px 14px;
       border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      background-color: #fff;
-      font-size: 1rem;
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
+    }
+
+    input:hover,
+    select:hover {
+      border-color: #aeb9c8;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-light);
+    }
+
+    input::placeholder {
+      color: #98a2b3;
     }
 
     button {
       width: 100%;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 0.5rem;
-      background-color: var(--accent);
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
+      min-height: 52px;
+      margin-top: 4px;
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
       cursor: pointer;
-      transition: background-color 0.3s;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
+      transition:
+        background-color 160ms ease,
+        transform 160ms ease,
+        box-shadow 160ms ease;
     }
 
     button:hover {
-      background-color: #0056b3;
+      background: var(--accent-dark);
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.3);
+      outline-offset: 3px;
     }
 
     .result {
-      margin-top: 1rem;
-      font-weight: 500;
+      display: none;
+      margin-top: 22px;
+      padding: 18px;
+      border: 1px solid rgba(37, 99, 235, 0.18);
+      border-radius: 14px;
+      background: var(--accent-light);
       text-align: center;
+    }
+
+    .result.visible {
+      display: block;
+    }
+
+    .result-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .result-value {
+      display: block;
+      color: var(--accent-dark);
+      font-size: 1.65rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .result.error {
+      border-color: rgba(180, 35, 24, 0.2);
+      background: rgba(180, 35, 24, 0.08);
+      color: var(--error);
+    }
+
+    .result.error .result-value {
+      color: var(--error);
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
 
     .footnote {
+      margin: 20px 0 0;
+      color: var(--text-muted);
       font-size: 0.75rem;
-      color: #666;
+      line-height: 1.5;
       text-align: center;
-      margin-top: 2rem;
+    }
+
+    .footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 11px;
+      color: rgba(0, 0, 0, 0.5);
+    }
+
+    .footer a {
+      color: rgba(0, 0, 0, 0.5);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        align-items: flex-start;
+        padding-top: 20px;
+      }
+
+      .container {
+        padding: 26px 20px;
+        border-radius: 20px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>Grundumsatz Rechner</h1>
-    <form id="bmrForm">
-      <label for="geschlecht">Geschlecht</label>
-      <select id="geschlecht" required>
-        <option value="m">Männlich</option>
-        <option value="w">Weiblich</option>
-      </select>
+  <main class="page">
+    <section class="container" aria-labelledby="seitentitel">
+      <header class="header">
+        <div class="icon" aria-hidden="true">⚡</div>
 
-      <label for="alter">Alter (Jahre)</label>
-      <input type="number" id="alter" min="1" required>
+        <h1 id="seitentitel">Grundumsatz-Rechner</h1>
 
-      <label for="gewicht">Gewicht (kg)</label>
-      <input type="number" id="gewicht" min="1" step="0.1" required>
+        <p class="intro">
+          Berechne deinen ungefähren täglichen Energiebedarf im Ruhezustand.
+        </p>
+      </header>
 
-      <label for="groesse">Grösse (cm)</label>
-      <input type="number" id="groesse" min="50" required>
+      <form id="bmrForm">
+        <div class="form-group">
+          <label for="geschlecht">Biologisches Geschlecht</label>
+          <select id="geschlecht" name="geschlecht" required>
+            <option value="w" selected>Weiblich</option>
+            <option value="m">Männlich</option>
+          </select>
+        </div>
 
-      <button type="button" onclick="berechneBMR()">Berechnen</button>
-    </form>
-    <div class="result" id="ergebnis"></div>
-    <p class="footnote">Berechnung gemäss Mifflin-St.-Jeor-Formel.</p>
-  </div>
+        <div class="form-group">
+          <label for="alter">Alter in Jahren</label>
+          <input
+            type="number"
+            id="alter"
+            name="alter"
+            min="1"
+            max="120"
+            inputmode="numeric"
+            placeholder="z. B. 35"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="gewicht">Gewicht in kg</label>
+          <input
+            type="number"
+            id="gewicht"
+            name="gewicht"
+            min="1"
+            max="500"
+            step="0.1"
+            inputmode="decimal"
+            placeholder="z. B. 72.5"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="groesse">Grösse in cm</label>
+          <input
+            type="number"
+            id="groesse"
+            name="groesse"
+            min="50"
+            max="250"
+            step="0.1"
+            inputmode="decimal"
+            placeholder="z. B. 178"
+            required
+          >
+        </div>
+
+      </form>
+
+      <div
+        class="result"
+        id="ergebnis"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <p class="footnote">
+        Berechnung gemäss Mifflin-St.-Jeor-Formel. Das Ergebnis ist ein
+        Richtwert und ersetzt keine medizinische Beratung.
+      </p>
+    </section>
+
+    <div class="footer">
+      by
+      <a
+        href="https://samueltobler.github.io"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Samuel Tobler
+      </a>
+      |
+      <a
+        href="https://samueltobler.github.io/gymi-tools"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Gymi-Tools
+      </a>
+    </div>
+  </main>
 
   <script>
-    function berechneBMR() {
-      const geschlecht = document.getElementById('geschlecht').value;
-      const alter = parseFloat(document.getElementById('alter').value);
-      const gewicht = parseFloat(document.getElementById('gewicht').value);
-      const groesse = parseFloat(document.getElementById('groesse').value);
+    const form = document.getElementById("bmrForm");
+    const ergebnis = document.getElementById("ergebnis");
+    const felder = form.querySelectorAll("input, select");
 
-      if (isNaN(alter) || isNaN(gewicht) || isNaN(groesse)) {
-        document.getElementById('ergebnis').innerText = "Bitte alle Werte korrekt eingeben.";
+    felder.forEach(function (feld) {
+      feld.addEventListener("input", berechneBMR);
+      feld.addEventListener("change", berechneBMR);
+    });
+
+    function berechneBMR() {
+      const geschlecht = document.getElementById("geschlecht").value;
+      const alterFeld = document.getElementById("alter");
+      const gewichtFeld = document.getElementById("gewicht");
+      const groesseFeld = document.getElementById("groesse");
+
+      const alter = Number(alterFeld.value);
+      const gewicht = Number(gewichtFeld.value);
+      const groesse = Number(groesseFeld.value);
+
+      const alleFelderAusgefüllt =
+        alterFeld.value !== "" &&
+        gewichtFeld.value !== "" &&
+        groesseFeld.value !== "";
+
+      if (!alleFelderAusgefüllt) {
+        ergebnis.className = "result";
+        ergebnis.innerHTML = "";
         return;
       }
 
-      let bmr;
-      if (geschlecht === "m") {
-        // Männer: 10 × Gewicht + 6.25 × Grösse − 5 × Alter + 5
-        bmr = 10 * gewicht + 6.25 * groesse - 5 * alter + 5;
-      } else {
-        // Frauen: 10 × Gewicht + 6.25 × Grösse − 5 × Alter − 161
-        bmr = 10 * gewicht + 6.25 * groesse - 5 * alter - 161;
+      if (
+        !alterFeld.validity.valid ||
+        !gewichtFeld.validity.valid ||
+        !groesseFeld.validity.valid ||
+        !Number.isFinite(alter) ||
+        !Number.isFinite(gewicht) ||
+        !Number.isFinite(groesse)
+      ) {
+        ergebnis.className = "result";
+        ergebnis.innerHTML = "";
+        return;
       }
 
-      document.getElementById('ergebnis').innerText =
-        "Dein Grundumsatz beträgt ca. " + Math.round(bmr) + " kcal/Tag.";
+      const korrektur = geschlecht === "m" ? 5 : -161;
+
+      const bmr =
+        10 * gewicht +
+        6.25 * groesse -
+        5 * alter +
+        korrektur;
+
+      const formatierterBMR = Math.round(bmr).toLocaleString("de-CH");
+
+      ergebnis.className = "result visible";
+      ergebnis.innerHTML = `
+        <span class="result-label">Dein Grundumsatz</span>
+        <span class="result-value">${formatierterBMR} kcal/Tag</span>
+      `;
     }
   </script>
 </body>
