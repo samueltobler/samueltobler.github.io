@@ -13,76 +13,113 @@
       --border:rgba(0,0,0,0.10);
       --shadow:0 12px 30px rgba(0,0,0,0.08);
       --radius:16px;
-      --focus:rgba(17, 24, 39, 0.18);
+      --focus:rgba(17,24,39,0.18);
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
-      background: radial-gradient(1000px 700px at 20% 10%, #ffffff 0%, var(--bg) 55%, #eef0f7 100%);
+      background:radial-gradient(1000px 700px at 20% 10%,#fff 0%,var(--bg) 55%,#eef0f7 100%);
       min-height:100vh;
     }
     .wrap{max-width:1000px;margin:0 auto;padding:34px 18px 22px}
     header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
-    h1{margin:0;font-size:28px;letter-spacing:-0.02em;line-height:1.1}
-    .hint{margin-top:6px;font-size:13px;color:var(--muted);line-height:1.45;max-width:62ch}
+    h1{margin:0;font-size:28px;letter-spacing:-.02em;line-height:1.1}
+    .hint{margin-top:6px;font-size:13px;color:var(--muted);line-height:1.45;max-width:68ch}
     .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:16px}
-    @media (max-width:860px){.grid{grid-template-columns:1fr}header{flex-direction:column}}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+    @media(max-width:860px){.grid{grid-template-columns:1fr}header{flex-direction:column}}
     .panel{padding:18px}
     label{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}
     textarea{
       width:100%;min-height:320px;resize:vertical;border-radius:14px;border:1px solid var(--border);
-      padding:12px 12px;font-size:14px;line-height:1.5;outline:none;background:#fff
+      padding:12px;font-size:14px;line-height:1.5;outline:none;background:#fff
     }
-    textarea:focus,input:focus{border-color:rgba(17,24,39,0.22);box-shadow:0 0 0 4px var(--focus)}
+    textarea:focus,input:focus,select:focus{border-color:rgba(17,24,39,.22);box-shadow:0 0 0 4px var(--focus)}
     .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:12px}
     .field{flex:1;min-width:180px}
-    input[type="number"]{
-      width:100%;border-radius:12px;border:1px solid var(--border);padding:10px 10px;font-size:14px;outline:none;background:#fff
+    .field.animation-field{min-width:210px}
+    input[type="number"],select{
+      width:100%;border-radius:12px;border:1px solid var(--border);padding:10px;font-size:14px;outline:none;background:#fff;color:var(--text)
     }
     .btn{
       appearance:none;border:none;border-radius:12px;padding:11px 14px;font-size:14px;cursor:pointer;background:var(--text);color:#fff;
-      transition:transform .06s ease, opacity .12s ease;white-space:nowrap
+      transition:transform .06s ease,opacity .12s ease;white-space:nowrap
     }
     .btn:active{transform:translateY(1px)}
     .btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .meta{margin-top:10px;font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
-    .pill{border:1px solid var(--border);padding:5px 10px;border-radius:999px;background:rgba(255,255,255,0.6)}
+    .pill{border:1px solid var(--border);padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.6)}
     .out{padding:18px;min-height:420px;display:flex;flex-direction:column}
     .out-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-    .out-title{margin:0;font-size:16px;letter-spacing:-0.01em}
+    .out-title{margin:0;font-size:16px;letter-spacing:-.01em}
     .groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:6px}
-    @media (max-width:560px){.groups{grid-template-columns:1fr}}
-    .group{border:1px solid var(--border);border-radius:14px;padding:12px 12px 10px;background:rgba(255,255,255,0.75)}
-    .group h3{margin:0 0 8px;font-size:13px;color:rgba(0,0,0,0.72);letter-spacing:0.02em;text-transform:uppercase}
+    @media(max-width:560px){.groups{grid-template-columns:1fr}}
+    .group{border:1px solid var(--border);border-radius:14px;padding:12px 12px 10px;background:rgba(255,255,255,.75)}
+    .group h3{margin:0 0 8px;font-size:13px;color:rgba(0,0,0,.72);letter-spacing:.02em;text-transform:uppercase}
     .names{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
     .tag{display:inline-flex;align-items:center;border:1px solid var(--border);background:#fff;border-radius:999px;padding:6px 10px;font-size:13px;line-height:1}
-    .empty{
-      margin-top:18px;color:var(--muted);font-size:13px;line-height:1.45;border:1px dashed rgba(0,0,0,0.18);
-      border-radius:14px;padding:14px;background:rgba(255,255,255,0.55)
-    }
-    .toast{
-      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(17,24,39,0.94);color:#fff;
-      padding:10px 12px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease
-    }
+    .empty{margin-top:18px;color:var(--muted);font-size:13px;line-height:1.45;border:1px dashed rgba(0,0,0,.18);border-radius:14px;padding:14px;background:rgba(255,255,255,.55)}
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(17,24,39,.94);color:#fff;padding:10px 12px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(-2px)}
 
-    .footer{
-      margin-top:32px;
-      text-align:center;
-      font-size:11px;
-      color:rgba(0,0,0,0.5);
+    /* Gemeinsame Animationsfläche */
+    .animation-stage{
+      min-height:330px;border:1px dashed rgba(0,0,0,.16);border-radius:14px;padding:18px;
+      background:rgba(255,255,255,.58);overflow:hidden;position:relative
     }
-    .footer a{
-      color:rgba(0,0,0,0.5);
-      text-decoration:none;
+    .animation-head{text-align:center;margin-bottom:14px}
+    .animation-title{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(0,0,0,.68)}
+    .animation-note{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+    .progress{height:7px;border-radius:999px;background:rgba(17,24,39,.08);overflow:hidden;margin-top:14px}
+    .progress>span{display:block;height:100%;width:0;background:var(--text);border-radius:inherit;transition:width .08s linear}
+
+    /* Lostrommel */
+    .drum-wrap{display:flex;justify-content:center;align-items:center;min-height:220px}
+    .drum{width:min(280px,80vw);height:210px;border:2px solid rgba(17,24,39,.22);border-radius:48% 48% 42% 42%;background:rgba(255,255,255,.86);position:relative;overflow:hidden}
+    .drum::before{content:"";position:absolute;left:50%;top:50%;width:110px;height:110px;border:1px dashed rgba(17,24,39,.15);border-radius:50%;transform:translate(-50%,-50%);animation:spinRing 1s linear infinite}
+    .drum-ball{position:absolute;left:50%;top:50%;max-width:110px;padding:6px 9px;border:1px solid var(--border);border-radius:999px;background:#fff;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 12px rgba(0,0,0,.06);animation:drumBounce .7s ease-in-out infinite alternate}
+    .drawn-name{text-align:center;min-height:28px;margin-top:8px;font-size:14px;font-weight:700}
+    @keyframes spinRing{to{transform:translate(-50%,-50%) rotate(360deg)}}
+    @keyframes drumBounce{from{transform:translate(var(--x1),var(--y1)) rotate(-4deg)}to{transform:translate(var(--x2),var(--y2)) rotate(4deg)}}
+
+    /* Fliegende Namen */
+    .fly-board{position:relative;min-height:250px}
+    .fly-source{position:absolute;left:50%;top:12px;transform:translateX(-50%);border:1px solid var(--border);border-radius:999px;padding:8px 12px;background:#fff;font-size:13px;font-weight:600;z-index:3}
+    .fly-targets{position:absolute;left:0;right:0;bottom:4px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .fly-target{min-height:80px;border:1px solid var(--border);border-radius:12px;padding:8px;background:rgba(255,255,255,.82);font-size:11px;text-align:center}
+    .fly-target strong{display:block;margin-bottom:5px;font-size:11px;text-transform:uppercase}
+    .fly-mini{display:inline-block;margin:2px;padding:3px 6px;border:1px solid var(--border);border-radius:999px;background:#fff;font-size:10px}
+    .fly-chip{position:absolute;z-index:5;padding:7px 10px;border:1px solid var(--border);border-radius:999px;background:#fff;font-size:12px;font-weight:600;box-shadow:0 7px 16px rgba(0,0,0,.1);pointer-events:none;transition:left .42s cubic-bezier(.2,.8,.2,1),top .42s cubic-bezier(.2,.8,.2,1),transform .42s ease,opacity .2s ease}
+
+    /* Karten */
+    .cards-area{min-height:245px;display:flex;align-items:center;justify-content:center;position:relative}
+    .card-stack{position:relative;width:150px;height:190px}
+    .name-card{position:absolute;inset:0;border:1px solid rgba(17,24,39,.16);border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;padding:15px;text-align:center;font-size:14px;font-weight:650;box-shadow:0 8px 22px rgba(0,0,0,.08);transition:transform .18s ease,opacity .18s ease}
+    .name-card small{display:block;font-size:10px;color:var(--muted);font-weight:500;margin-top:7px}
+    .card-stack.shuffling .name-card:nth-child(1){animation:cardOne .55s ease-in-out infinite alternate}
+    .card-stack.shuffling .name-card:nth-child(2){animation:cardTwo .63s ease-in-out infinite alternate}
+    .card-stack.shuffling .name-card:nth-child(3){animation:cardThree .48s ease-in-out infinite alternate}
+    .card-stack.shuffling .name-card:nth-child(4){animation:cardFour .70s ease-in-out infinite alternate}
+    @keyframes cardOne{to{transform:translate(-34px,-5px) rotate(-9deg)}}
+    @keyframes cardTwo{to{transform:translate(31px,7px) rotate(8deg)}}
+    @keyframes cardThree{to{transform:translate(-18px,18px) rotate(5deg)}}
+    @keyframes cardFour{to{transform:translate(20px,-18px) rotate(-6deg)}}
+
+    @media(max-width:520px){
+      .fly-targets{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .animation-stage{padding:14px}
     }
-    .footer a:hover{
-      text-decoration:underline;
+    @media(prefers-reduced-motion:reduce){
+      .drum::before,.drum-ball,.card-stack.shuffling .name-card{animation:none!important}
+      .fly-chip{transition:none}
     }
+
+    .footer{margin-top:32px;text-align:center;font-size:11px;color:rgba(0,0,0,.5)}
+    .footer a{color:rgba(0,0,0,.5);text-decoration:none}
+    .footer a:hover{text-decoration:underline}
   </style>
 </head>
 <body>
@@ -90,7 +127,7 @@
     <header>
       <div>
         <h1>Gruppen-Generator</h1>
-        <div class="hint">Ein Tool, um automatisch zufällige Gruppen zu generieren. </div>
+        <div class="hint">Ein Tool, um automatisch zufällige Gruppen zu generieren. Die Animation zeigt nur die Auslosung; das Resultat wird vorher einmal zufällig bestimmt.</div>
       </div>
     </header>
 
@@ -104,7 +141,18 @@
             <label for="groupCount">Anzahl Gruppen</label>
             <input id="groupCount" type="number" min="1" step="1" inputmode="numeric" value="3" />
           </div>
+          <div class="field animation-field">
+            <label for="animationMode">Animation</label>
+            <select id="animationMode">
+              <option value="fly" selected>Fliegende Namen</option>
+              <option value="drum">Lostrommel</option>
+              <option value="cards">Karten mischen</option>
+              <option value="none">Keine Animation</option>
+            </select>
+          </div>
+        </div>
 
+        <div class="row">
           <button class="btn" id="makeBtn">Gruppen bilden</button>
           <button class="btn secondary" id="shuffleBtn" title="Nur neu mischen; gleiche Anzahl Gruppen">Neu mischen</button>
           <button class="btn secondary" id="clearBtn">Leeren</button>
@@ -113,6 +161,7 @@
         <div class="meta" aria-live="polite">
           <span class="pill" id="countPill">0 Namen</span>
           <span class="pill" id="statusPill">Bereit</span>
+          <span class="pill" id="modePill">Animation: Fliegende Namen</span>
         </div>
       </section>
 
@@ -143,6 +192,7 @@
 
     const namesEl = $("names");
     const groupCountEl = $("groupCount");
+    const animationModeEl = $("animationMode");
     const makeBtn = $("makeBtn");
     const shuffleBtn = $("shuffleBtn");
     const clearBtn = $("clearBtn");
@@ -150,12 +200,13 @@
     const outputEl = $("output");
     const countPill = $("countPill");
     const statusPill = $("statusPill");
+    const modePill = $("modePill");
     const toastEl = $("toast");
 
     let lastGroups = null;
+    let activeTimers = [];
 
     function normaliseNames(raw){
-      // Unterstützt Zeilen und Kommas (auch gemischt)
       return raw
         .split(/\r?\n/)
         .flatMap(line => line.split(","))
@@ -169,20 +220,26 @@
       return Math.max(1, k);
     }
 
+    function cryptoRandomInt(max){
+      if(max <= 1) return 0;
+      const limit = Math.floor(0x100000000 / max) * max;
+      const buf = new Uint32Array(1);
+      do{ crypto.getRandomValues(buf); }while(buf[0] >= limit);
+      return buf[0] % max;
+    }
+
     function cryptoShuffle(arr){
       const a = arr.slice();
       for(let i = a.length - 1; i > 0; i--){
-        const buf = new Uint32Array(1);
-        crypto.getRandomValues(buf);
-        const j = buf[0] % (i + 1);
+        const j = cryptoRandomInt(i + 1);
         [a[i], a[j]] = [a[j], a[i]];
       }
       return a;
     }
 
     function distribute(names, k){
-      const groups = Array.from({length: k}, () => []);
-      names.forEach((name, idx) => groups[idx % k].push(name));
+      const groups = Array.from({length:k},() => []);
+      names.forEach((name,idx) => groups[idx % k].push(name));
       return groups;
     }
 
@@ -192,37 +249,26 @@
         copyBtn.disabled = true;
         return;
       }
-
-      const html = `
+      outputEl.innerHTML = `
         <div class="groups">
-          ${groups.map((g, i) => `
+          ${groups.map((g,i) => `
             <div class="group">
               <h3>Gruppe ${i + 1}</h3>
               ${g.length
                 ? `<ul class="names">${g.map(n => `<li class="tag">${escapeHtml(n)}</li>`).join("")}</ul>`
-                : `<div class="empty" style="margin:0; padding:10px; font-size:12px">Leer</div>`
+                : '<div class="empty" style="margin:0;padding:10px;font-size:12px">Leer</div>'
               }
             </div>
           `).join("")}
-        </div>
-      `;
-      outputEl.innerHTML = html;
+        </div>`;
       copyBtn.disabled = false;
     }
 
     function escapeHtml(s){
-      return s.replace(/[&<>"']/g, (m) => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#39;"
-      }[m]));
+      return s.replace(/[&<>"']/g,m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
     }
 
-    function setStatus(text){
-      statusPill.textContent = text;
-    }
+    function setStatus(text){ statusPill.textContent = text; }
 
     function updateCount(){
       const names = normaliseNames(namesEl.value);
@@ -234,13 +280,212 @@
       toastEl.textContent = msg;
       toastEl.classList.add("show");
       window.clearTimeout(toastEl._t);
-      toastEl._t = window.setTimeout(() => toastEl.classList.remove("show"), 1400);
+      toastEl._t = window.setTimeout(() => toastEl.classList.remove("show"),1400);
     }
 
-    function buildGroups(){
+    function setBusy(busy){
+      makeBtn.disabled = busy;
+      shuffleBtn.disabled = busy;
+      clearBtn.disabled = busy;
+      groupCountEl.disabled = busy;
+      animationModeEl.disabled = busy;
+      namesEl.disabled = busy;
+    }
+
+    function later(fn,ms){
+      const id = window.setTimeout(fn,ms);
+      activeTimers.push(id);
+      return id;
+    }
+
+    function clearTimers(){
+      activeTimers.forEach(id => window.clearTimeout(id));
+      activeTimers = [];
+    }
+
+    function modeLabel(mode){
+      return {fly:"Fliegende Namen",drum:"Lostrommel",cards:"Karten mischen",none:"Keine"}[mode] || "Keine";
+    }
+
+    function finishAnimation(groups,statusText){
+      clearTimers();
+      setBusy(false);
+      lastGroups = groups;
+      setStatus(statusText);
+      render(groups);
+    }
+
+    function assignmentSequence(shuffled,k){
+      return shuffled.map((name,index) => ({name,groupIndex:index % k}));
+    }
+
+    function animateNone(groups,statusText){
+      finishAnimation(groups,statusText);
+    }
+
+    function animateDrum(shuffled,groups,k,statusText){
+      setBusy(true);
+      copyBtn.disabled = true;
+      setStatus("Lostrommel läuft …");
+
+      const sample = shuffled.slice(0,Math.min(shuffled.length,10));
+      outputEl.innerHTML = `
+        <div class="animation-stage" role="status" aria-live="polite">
+          <div class="animation-head">
+            <div class="animation-title">Lostrommel</div>
+            <div class="animation-note">Die Namen werden durcheinandergewirbelt und danach in der zufälligen Reihenfolge gezogen.</div>
+          </div>
+          <div class="drum-wrap">
+            <div>
+              <div class="drum" id="drum">
+                ${sample.map((name,i) => {
+                  const x1 = -105 + (i * 37) % 190;
+                  const y1 = -80 + (i * 53) % 145;
+                  const x2 = -95 + (i * 71) % 180;
+                  const y2 = -72 + (i * 31) % 135;
+                  return `<span class="drum-ball" style="--x1:${x1}px;--y1:${y1}px;--x2:${x2}px;--y2:${y2}px;animation-delay:${i * 45}ms">${escapeHtml(name)}</span>`;
+                }).join("")}
+              </div>
+              <div class="drawn-name" id="drawnName">Mischen …</div>
+            </div>
+          </div>
+          <div class="progress"><span id="animationProgress"></span></div>
+        </div>`;
+
+      const drawnEl = $("drawnName");
+      const progressEl = $("animationProgress");
+      const sequence = assignmentSequence(shuffled,k);
+      const initialMix = 650;
+      const drawStep = Math.max(105,Math.min(210,1200 / Math.max(1,sequence.length)));
+
+      later(() => {
+        sequence.forEach((item,index) => {
+          later(() => {
+            if(drawnEl) drawnEl.textContent = `${item.name} → Gruppe ${item.groupIndex + 1}`;
+            if(progressEl) progressEl.style.width = `${((index + 1) / sequence.length) * 100}%`;
+          },index * drawStep);
+        });
+        later(() => finishAnimation(groups,statusText),sequence.length * drawStep + 350);
+      },initialMix);
+    }
+
+    function animateFly(shuffled,groups,k,statusText){
+      setBusy(true);
+      copyBtn.disabled = true;
+      setStatus("Namen werden zufällig verteilt …");
+
+      outputEl.innerHTML = `
+        <div class="animation-stage" role="status" aria-live="polite">
+          <div class="animation-head">
+            <div class="animation-title">Fliegende Namen</div>
+            <div class="animation-note">Die zufällige Reihenfolge steht fest; jetzt wird Person für Person auf die Gruppen verteilt.</div>
+          </div>
+          <div class="fly-board" id="flyBoard" style="min-height:${Math.max(250, 110 + Math.ceil(k / Math.min(k,4)) * 88)}px">
+            <div class="fly-source">Zufällig gezogener Name</div>
+            <div class="fly-targets" id="flyTargets" style="grid-template-columns:repeat(${Math.min(k,4)},minmax(0,1fr))">
+              ${Array.from({length:k},(_,i) => `<div class="fly-target" data-group="${i}"><strong>Gruppe ${i + 1}</strong><span class="fly-members"></span></div>`).join("")}
+            </div>
+          </div>
+          <div class="progress"><span id="animationProgress"></span></div>
+        </div>`;
+
+      const board = $("flyBoard");
+      const targets = Array.from(outputEl.querySelectorAll(".fly-target"));
+      const progressEl = $("animationProgress");
+      const sequence = assignmentSequence(shuffled,k);
+      const step = Math.max(150,Math.min(330,2100 / Math.max(1,sequence.length)));
+
+      sequence.forEach((item,index) => {
+        later(() => {
+          if(!board || !targets[item.groupIndex]) return;
+          const chip = document.createElement("div");
+          chip.className = "fly-chip";
+          chip.textContent = item.name;
+          board.appendChild(chip);
+
+          const boardRect = board.getBoundingClientRect();
+          const targetRect = targets[item.groupIndex].getBoundingClientRect();
+          const startLeft = board.clientWidth / 2 - chip.offsetWidth / 2;
+          const startTop = 52;
+          chip.style.left = `${startLeft}px`;
+          chip.style.top = `${startTop}px`;
+
+          requestAnimationFrame(() => {
+            const targetLeft = targetRect.left - boardRect.left + targetRect.width / 2 - chip.offsetWidth / 2;
+            const targetTop = targetRect.top - boardRect.top + 34;
+            chip.style.left = `${targetLeft}px`;
+            chip.style.top = `${targetTop}px`;
+            chip.style.transform = "scale(.88)";
+          });
+
+          later(() => {
+            const memberBox = targets[item.groupIndex].querySelector(".fly-members");
+            if(memberBox){
+              const mini = document.createElement("span");
+              mini.className = "fly-mini";
+              mini.textContent = item.name;
+              memberBox.appendChild(mini);
+            }
+            chip.style.opacity = "0";
+            later(() => chip.remove(),180);
+          },440);
+
+          if(progressEl) progressEl.style.width = `${((index + 1) / sequence.length) * 100}%`;
+        },index * step);
+      });
+
+      later(() => finishAnimation(groups,statusText),sequence.length * step + 650);
+    }
+
+    function animateCards(shuffled,groups,k,statusText){
+      setBusy(true);
+      copyBtn.disabled = true;
+      setStatus("Karten werden gemischt …");
+
+      const visible = shuffled.slice(0,Math.min(4,shuffled.length));
+      outputEl.innerHTML = `
+        <div class="animation-stage" role="status" aria-live="polite">
+          <div class="animation-head">
+            <div class="animation-title">Karten mischen</div>
+            <div class="animation-note">Jeder Name ist eine Karte. Nach dem Mischen wird die zufällige Reihenfolge auf die Gruppen verteilt.</div>
+          </div>
+          <div class="cards-area">
+            <div class="card-stack shuffling" id="cardStack">
+              ${visible.map((name,i) => `<div class="name-card" style="z-index:${10-i};transform:rotate(${(i-1.5)*2}deg)"><div>${escapeHtml(name)}<small>Name ${i + 1}</small></div></div>`).join("")}
+            </div>
+          </div>
+          <div class="drawn-name" id="cardMessage">Mischen …</div>
+          <div class="progress"><span id="animationProgress"></span></div>
+        </div>`;
+
+      const stack = $("cardStack");
+      const msg = $("cardMessage");
+      const progressEl = $("animationProgress");
+      const sequence = assignmentSequence(shuffled,k);
+
+      later(() => {
+        if(stack) stack.classList.remove("shuffling");
+        if(msg) msg.textContent = "Gemischt. Die Reihenfolge wird aufgedeckt …";
+        sequence.forEach((item,index) => {
+          later(() => {
+            if(msg) msg.textContent = `${index + 1}. ${item.name} → Gruppe ${item.groupIndex + 1}`;
+            if(progressEl) progressEl.style.width = `${((index + 1) / sequence.length) * 100}%`;
+            if(stack){
+              const cards = stack.querySelectorAll(".name-card");
+              cards.forEach((card,cardIndex) => {
+                card.style.transform = `translate(${(cardIndex-index%3)*3}px,${cardIndex*2}px) rotate(${(cardIndex-index%2)*1.5}deg)`;
+              });
+            }
+          },index * 150);
+        });
+        later(() => finishAnimation(groups,statusText),sequence.length * 150 + 420);
+      },850);
+    }
+
+    function runGrouping(statusKind){
+      clearTimers();
       const names = normaliseNames(namesEl.value);
       const k = getGroupCount();
-
       updateCount();
 
       if(names.length === 0){
@@ -250,59 +495,42 @@
         return;
       }
 
-      if(k === 1){
-        setStatus("1 Gruppe erstellt");
-      }else if(k > names.length){
-        setStatus(`Mehr Gruppen als Namen; es werden ${k} Gruppen erstellt`);
-      }else{
-        setStatus(`${k} Gruppen erstellt`);
-      }
-
+      // Wichtig für die Demonstration: Das endgültige Resultat wird genau einmal zufällig bestimmt.
+      // Die gewählte Animation visualisiert anschliessend genau diese Reihenfolge.
       const shuffled = cryptoShuffle(names);
-      lastGroups = distribute(shuffled, k);
-      render(lastGroups);
-    }
+      const groups = distribute(shuffled,k);
+      const statusText = statusKind === "reshuffle"
+        ? "Neu gemischt"
+        : k === 1
+          ? "1 Gruppe erstellt"
+          : k > names.length
+            ? `Mehr Gruppen als Namen; es werden ${k} Gruppen erstellt`
+            : `${k} Gruppen erstellt`;
 
-    function reshuffle(){
-      const names = normaliseNames(namesEl.value);
-      const k = getGroupCount();
-
-      if(names.length === 0){
-        setStatus("Bitte Namen eingeben");
-        return;
-      }
-
-      const shuffled = cryptoShuffle(names);
-      lastGroups = distribute(shuffled, k);
-      setStatus("Neu gemischt");
-      render(lastGroups);
+      const mode = animationModeEl.value;
+      if(mode === "drum") animateDrum(shuffled,groups,k,statusText);
+      else if(mode === "fly") animateFly(shuffled,groups,k,statusText);
+      else if(mode === "cards") animateCards(shuffled,groups,k,statusText);
+      else animateNone(groups,statusText);
     }
 
     function copyAsText(){
       if(!lastGroups) return;
-      const lines = lastGroups.map((g, i) => {
-        const members = g.length ? g.join(", ") : "—";
-        return `Gruppe ${i + 1}: ${members}`;
-      }).join("\n");
-
-      navigator.clipboard.writeText(lines).then(() => {
-        toast("Kopiert");
-      }).catch(() => {
+      const lines = lastGroups.map((g,i) => `Gruppe ${i + 1}: ${g.length ? g.join(", ") : "—"}`).join("\n");
+      navigator.clipboard.writeText(lines).then(() => toast("Kopiert")).catch(() => {
         const tmp = document.createElement("textarea");
         tmp.value = lines;
         document.body.appendChild(tmp);
         tmp.select();
-        try{
-          document.execCommand("copy");
-          toast("Kopiert");
-        }catch(e){
-          toast("Kopieren nicht möglich");
-        }
+        try{ document.execCommand("copy"); toast("Kopiert"); }
+        catch(e){ toast("Kopieren nicht möglich"); }
         document.body.removeChild(tmp);
       });
     }
 
     function clearAll(){
+      clearTimers();
+      setBusy(false);
       namesEl.value = "";
       groupCountEl.value = "3";
       lastGroups = null;
@@ -312,30 +540,33 @@
       namesEl.focus();
     }
 
-    // Inputs härten: wenn leer/ungültig, sofort auf 1 setzen
-    groupCountEl.addEventListener("input", () => {
+    groupCountEl.addEventListener("input",() => {
       const k = getGroupCount();
       groupCountEl.value = String(k);
       setStatus("Bereit");
     });
 
-    makeBtn.addEventListener("click", buildGroups);
-    shuffleBtn.addEventListener("click", reshuffle);
-    clearBtn.addEventListener("click", clearAll);
-    copyBtn.addEventListener("click", copyAsText);
+    animationModeEl.addEventListener("change",() => {
+      modePill.textContent = `Animation: ${modeLabel(animationModeEl.value)}`;
+      toast(`Animation: ${modeLabel(animationModeEl.value)}`);
+    });
 
-    namesEl.addEventListener("input", () => {
+    makeBtn.addEventListener("click",() => runGrouping("build"));
+    shuffleBtn.addEventListener("click",() => runGrouping("reshuffle"));
+    clearBtn.addEventListener("click",clearAll);
+    copyBtn.addEventListener("click",copyAsText);
+
+    namesEl.addEventListener("input",() => {
       updateCount();
       setStatus("Bereit");
     });
 
-    namesEl.addEventListener("keydown", (e) => {
-      if((e.ctrlKey || e.metaKey) && e.key === "Enter"){
-        buildGroups();
-      }
+    namesEl.addEventListener("keydown",e => {
+      if((e.ctrlKey || e.metaKey) && e.key === "Enter") runGrouping("build");
     });
 
     updateCount();
+    modePill.textContent = `Animation: ${modeLabel(animationModeEl.value)}`;
   </script>
 </body>
 </html>
