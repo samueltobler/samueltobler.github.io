@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Schulgong</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #17191f;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #4f46e5;
+      --accent-soft: #eef2ff;
+      --danger: #b91c1c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(79,70,229,.10), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+
+    .hero {
+      margin-bottom: 22px;
+    }
+
+    .hero-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .hero-row > div {
+      min-width: 0;
+    }
+
+    .kus-top-btn {
+      flex: 0 0 auto;
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 6vw, 4rem);
+      letter-spacing: -.04em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .clock-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(220px, .8fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .next-inline {
+      padding-left: 24px;
+      border-left: 1px solid var(--border);
+    }
+
+    .card {
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(17,24,39,.06);
+      backdrop-filter: blur(10px);
+    }
+
+    .clock {
+      font-size: clamp(2.5rem, 9vw, 5rem);
+      font-weight: 800;
+      letter-spacing: -.05em;
+      font-variant-numeric: tabular-nums;
+      margin: 4px 0 0;
+    }
+
+    .date {
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+
+    .form {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+
+    input[type="time"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      padding: 13px 14px;
+      font: inherit;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input[type="time"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .primary {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .secondary {
+      color: var(--text);
+      background: #f3f4f6;
+    }
+
+    .danger {
+      color: var(--danger);
+      background: #fee2e2;
+    }
+
+    .message {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 8px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .section-title h2,
+    .side h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .times {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+
+    .time-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .empty {
+      margin-top: 12px;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .next-time {
+      margin-top: 6px;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+
+    .countdown {
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+
+
+
+
+
+
+
+
+    .bottom-test {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .bottom-test .message {
+      margin: 0;
+      min-height: 0;
+    }
+
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.16);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.16);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    @media (max-width: 820px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .clock-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .next-inline {
+        padding-left: 0;
+        padding-top: 18px;
+        border-left: 0;
+        border-top: 1px solid var(--border);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .kus-top-btn {
+        width: 100%;
+        margin-top: 0;
+      }
+
+      .wrap {
+        width: min(100% - 20px, 1100px);
+        padding: 24px 0;
+      }
+
+      .card {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .form {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        min-height: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero hero-row">
+      <div>
+        <h1>Schulgong</h1>
+      </div>
+      <button id="kusBtn" class="primary kus-top-btn" type="button">KUS-Gong aktivieren</button>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="clock-grid">
+          <div>
+            <div class="muted">Aktuelle Zeit</div>
+            <div id="clock" class="clock">--:--:--</div>
+            <div id="date" class="date"></div>
+          </div>
+          <div class="next-inline">
+            <div class="muted">Nächster Gong</div>
+            <div id="nextTime" class="next-time">Keine Zeit</div>
+            <div id="countdown" class="countdown">Füge eine Uhrzeit hinzu.</div>
+          </div>
+        </div>
+
+        <form id="timeForm" class="form">
+          <input id="timeInput" type="time" required />
+          <button class="primary" type="submit">Zeit hinzufügen</button>
+        </form>
+        <div id="formMessage" class="message" aria-live="polite"></div>
+
+        <div class="section-title">
+          <h2>Gong-Zeiten</h2>
+          <button id="clearBtn" class="danger" type="button">Alle löschen</button>
+        </div>
+
+        <div id="timesList" class="times"></div>
+        <div id="emptyState" class="empty">Noch keine Zeiten eingetragen.</div>
+      </section>
+    </div>
+
+
+    <div class="bottom-test">
+      <button id="testBtn" class="secondary" type="button">Gong testen</button>
+      <span id="audioMessage" class="message" aria-live="polite"></span>
+    </div>
+
+    <div class="footer">
+<a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a>
+    </div>
+  </main>
+
+  <script>
+    const KUS_TIMES = [
+      '07:30', '08:15', '08:25', '09:10', '09:20',
+      '10:05', '10:25', '11:10', '11:20', '12:05'
+    ];
+
+    const clockEl = document.getElementById('clock');
+    const dateEl = document.getElementById('date');
+    const form = document.getElementById('timeForm');
+    const timeInput = document.getElementById('timeInput');
+    const formMessage = document.getElementById('formMessage');
+    const timesList = document.getElementById('timesList');
+    const emptyState = document.getElementById('emptyState');
+    const clearBtn = document.getElementById('clearBtn');
+    const kusBtn = document.getElementById('kusBtn');
+    const nextTimeEl = document.getElementById('nextTime');
+    const countdownEl = document.getElementById('countdown');
+    const testBtn = document.getElementById('testBtn');
+    const audioMessage = document.getElementById('audioMessage');
+
+    let times = JSON.parse(localStorage.getItem('gongTimes') || '[]');
+    let audioContext = null;
+    let active = true;
+    let lastTriggeredKey = '';
+
+    function saveTimes() {
+      localStorage.setItem('gongTimes', JSON.stringify(times));
+    }
+
+    function formatClock(date) {
+      return new Intl.DateTimeFormat('de-CH', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).format(date);
+    }
+
+    function formatDate(date) {
+      return new Intl.DateTimeFormat('de-CH', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      }).format(date);
+    }
+
+    function minutesOfTime(value) {
+      const [h, m] = value.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function renderTimes() {
+      times = [...new Set(times)].sort((a, b) => minutesOfTime(a) - minutesOfTime(b));
+      saveTimes();
+
+      timesList.innerHTML = '';
+      emptyState.style.display = times.length ? 'none' : 'block';
+      clearBtn.disabled = times.length === 0;
+
+      times.forEach(time => {
+        const row = document.createElement('div');
+        row.className = 'time-row';
+
+        const value = document.createElement('div');
+        value.className = 'time-value';
+        value.textContent = time;
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'secondary';
+        remove.textContent = 'Löschen';
+        remove.addEventListener('click', () => {
+          times = times.filter(t => t !== time);
+          // Browser blockieren Ton oft bis zur ersten Benutzerinteraktion.
+    // Der Gong ist logisch immer aktiv; der erste Klick/Tastendruck entsperrt nur Audio.
+    const unlockOnce = () => {
+      unlockAudio();
+      document.removeEventListener('pointerdown', unlockOnce);
+      document.removeEventListener('keydown', unlockOnce);
+    };
+    document.addEventListener('pointerdown', unlockOnce, { once: true });
+    document.addEventListener('keydown', unlockOnce, { once: true });
+
+    renderTimes();
+          updateNext(new Date());
+        });
+
+        row.append(value, remove);
+        timesList.appendChild(row);
+      });
+    }
+
+    function getNextOccurrence(now) {
+      if (!times.length) return null;
+
+      let best = null;
+
+      for (const time of times) {
+        const [h, m] = time.split(':').map(Number);
+        const candidate = new Date(now);
+        candidate.setHours(h, m, 0, 0);
+
+        if (candidate <= now) {
+          candidate.setDate(candidate.getDate() + 1);
+        }
+
+        if (!best || candidate < best.date) {
+          best = { time, date: candidate };
+        }
+      }
+
+      return best;
+    }
+
+    function updateNext(now) {
+      const next = getNextOccurrence(now);
+
+      if (!next) {
+        nextTimeEl.textContent = 'Keine Zeit';
+        countdownEl.textContent = 'Füge eine Uhrzeit hinzu.';
+        return;
+      }
+
+      nextTimeEl.textContent = next.time;
+
+      const totalSeconds = Math.max(0, Math.floor((next.date - now) / 1000));
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      countdownEl.textContent = `in ${hours} h ${minutes} min ${seconds} s`;
+    }
+
+    async function ensureAudio() {
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+
+        if (!Ctx) {
+          throw new Error('Dieser Browser unterstützt die Audio-Funktion nicht.');
+        }
+
+        if (!audioContext) {
+          audioContext = new Ctx();
+        }
+
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
+
+        return true;
+      } catch (error) {
+        audioMessage.textContent = error.message || 'Audio konnte nicht aktiviert werden.';
+        return false;
+      }
+    }
+
+    function createNoiseBuffer(durationSeconds) {
+      const length = Math.max(1, Math.floor(audioContext.sampleRate * durationSeconds));
+      const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < length; i++) {
+        const t = i / audioContext.sampleRate;
+        const env = Math.exp(-t * 30);
+        data[i] = (Math.random() * 2 - 1) * env;
+      }
+
+      return buffer;
+    }
+
+    function playGongStrike(fundamental, startTime, strength = 1) {
+      const master = audioContext.createGain();
+      const compressor = audioContext.createDynamicsCompressor();
+      const lowpass = audioContext.createBiquadFilter();
+      const bass = audioContext.createBiquadFilter();
+
+      compressor.threshold.setValueAtTime(-12, startTime);
+      compressor.knee.setValueAtTime(18, startTime);
+      compressor.ratio.setValueAtTime(2.2, startTime);
+      compressor.attack.setValueAtTime(0.006, startTime);
+      compressor.release.setValueAtTime(0.8, startTime);
+
+      lowpass.type = 'lowpass';
+      lowpass.frequency.setValueAtTime(3200, startTime);
+      lowpass.Q.setValueAtTime(0.55, startTime);
+
+      bass.type = 'lowshelf';
+      bass.frequency.setValueAtTime(260, startTime);
+      bass.gain.setValueAtTime(2, startTime);
+
+      master.gain.setValueAtTime(0.0001, startTime);
+      master.gain.exponentialRampToValueAtTime(1.20 * strength, startTime + 0.018);
+      master.gain.exponentialRampToValueAtTime(0.46 * strength, startTime + 0.32);
+      master.gain.exponentialRampToValueAtTime(0.0001, startTime + 6.6);
+
+      master.connect(lowpass);
+      lowpass.connect(bass);
+      bass.connect(compressor);
+      compressor.connect(audioContext.destination);
+
+      // Harmonischere Teiltöne: weniger metallisch-schräg, mehr warmer Gong.
+      const partials = [
+        [0.50, 0.10, 5.8],
+        [1.00, 0.46, 5.8],
+        [1.50, 0.23, 4.6],
+        [2.00, 0.20, 4.1],
+        [2.50, 0.13, 3.5],
+        [3.00, 0.10, 3.0],
+        [4.00, 0.055, 2.2]
+      ];
+
+      partials.forEach(([ratio, level, decay], index) => {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(fundamental * ratio, startTime);
+
+        gain.gain.setValueAtTime(0.0001, startTime);
+        gain.gain.exponentialRampToValueAtTime(level * strength, startTime + 0.02 + index * 0.002);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + decay);
+
+        osc.connect(gain);
+        gain.connect(master);
+
+        osc.start(startTime);
+        osc.stop(startTime + decay + 0.1);
+      });
+
+      // Sehr kurzer, dunkler Schlägelimpuls.
+      const noise = audioContext.createBufferSource();
+      const noiseFilter = audioContext.createBiquadFilter();
+      const noiseGain = audioContext.createGain();
+
+      noise.buffer = createNoiseBuffer(0.075);
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.setValueAtTime(1150, startTime);
+      noiseFilter.Q.setValueAtTime(1.0, startTime);
+
+      noiseGain.gain.setValueAtTime(0.42 * strength, startTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.075);
+
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(master);
+      noise.start(startTime);
+    }
+
+    function strikeGong() {
+      if (!audioContext) return;
+
+      const now = audioContext.currentTime + 0.04;
+
+      // Drei klar gestimmte Gongschläge: H – Gis – E.
+      playGongStrike(246.94, now, 1.08);        // H3
+      playGongStrike(207.65, now + 1.15, 1.10); // Gis3
+      playGongStrike(164.81, now + 2.30, 1.16); // E3
+    }
+
+    async function unlockAudio() {
+      const ok = await ensureAudio();
+      if (ok) {
+        audioMessage.textContent = '';
+      }
+    }
+
+    async function checkTrigger(now) {
+      if (!active || !times.length) return;
+
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const current = `${hh}:${mm}`;
+
+      if (!times.includes(current)) return;
+
+      const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${current}`;
+
+      if (lastTriggeredKey === key) return;
+
+      const ok = await ensureAudio();
+      if (!ok) return;
+
+      lastTriggeredKey = key;
+      strikeGong();
+      audioMessage.textContent = `Gong um ${current} ausgelöst.`;
+    }
+
+    function tick() {
+      const now = new Date();
+
+      const clockText = formatClock(now);
+      const dateText = formatDate(now);
+      clockEl.textContent = clockText;
+      dateEl.textContent = dateText;
+      updateNext(now);
+      checkTrigger(now);
+    }
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+
+      const value = timeInput.value;
+
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) {
+        formMessage.textContent = 'Bitte eine gültige Uhrzeit eingeben.';
+        return;
+      }
+
+      if (times.includes(value)) {
+        formMessage.textContent = 'Diese Uhrzeit ist bereits eingetragen.';
+        return;
+      }
+
+      times.push(value);
+      renderTimes();
+      updateNext(new Date());
+
+      formMessage.textContent = `Gong um ${value} hinzugefügt.`;
+      timeInput.value = '';
+    });
+
+    kusBtn.addEventListener('click', () => {
+      times = [...KUS_TIMES];
+      renderTimes();
+      updateNext(new Date());
+      formMessage.textContent = 'KUS-Gong wurde aktiviert.';
+    });
+
+    clearBtn.addEventListener('click', () => {
+      times = [];
+      lastTriggeredKey = '';
+      renderTimes();
+      updateNext(new Date());
+      formMessage.textContent = 'Alle Gong-Zeiten wurden gelöscht.';
+    });
+
+    testBtn.addEventListener('click', async () => {
+      const ok = await ensureAudio();
+      if (!ok) return;
+
+      strikeGong();
+      audioMessage.textContent = 'Gong getestet.';
+    });
+
+
+    renderTimes();
+    tick();
+    setInterval(tick, 500);
+  </script>
+</body>
+</html>
