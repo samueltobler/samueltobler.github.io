@@ -810,30 +810,15 @@
     function openFullscreenView() {
       fullscreenOverlay.hidden = false;
       document.body.style.overflow = 'hidden';
-
-      if (fullscreenOverlay.requestFullscreen) {
-        fullscreenOverlay.requestFullscreen().catch(() => {});
-      }
     }
 
     function closeFullscreenView() {
       fullscreenOverlay.hidden = true;
       document.body.style.overflow = '';
-
-      if (document.fullscreenElement && document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
     }
 
     fullscreenBtn.addEventListener('click', openFullscreenView);
     closeFullscreenBtn.addEventListener('click', closeFullscreenView);
-
-    document.addEventListener('fullscreenchange', () => {
-      if (!document.fullscreenElement && !fullscreenOverlay.hidden) {
-        fullscreenOverlay.hidden = true;
-        document.body.style.overflow = '';
-      }
-    });
 
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && !fullscreenOverlay.hidden) {
