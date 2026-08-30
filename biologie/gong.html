@@ -246,9 +246,74 @@
       flex-wrap: wrap;
     }
 
+    .bottom-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     .bottom-test .message {
       margin: 0;
       min-height: 0;
+    }
+
+    .fullscreen-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: #0d0f14;
+      color: #fff;
+    }
+
+    .fullscreen-overlay[hidden] {
+      display: none;
+    }
+
+    .fullscreen-content {
+      width: min(900px, 100%);
+      text-align: center;
+    }
+
+    .fullscreen-current {
+      margin-bottom: 18px;
+      font-size: clamp(1.1rem, 3vw, 1.7rem);
+      font-weight: 600;
+      color: rgba(255,255,255,.5);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .fullscreen-label {
+      margin-bottom: 10px;
+      font-size: clamp(1.5rem, 5vw, 3rem);
+      font-weight: 700;
+      color: rgba(255,255,255,.78);
+    }
+
+    .fullscreen-next {
+      font-size: clamp(5rem, 22vw, 13rem);
+      line-height: .95;
+      font-weight: 800;
+      letter-spacing: -.06em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .fullscreen-countdown {
+      margin-top: 22px;
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      color: rgba(255,255,255,.45);
+    }
+
+    .fullscreen-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      color: #fff;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.16);
     }
 
     .footer{
@@ -358,8 +423,21 @@
 
 
     <div class="bottom-test">
-      <button id="testBtn" class="secondary" type="button">Gong testen</button>
+      <div class="bottom-actions">
+        <button id="testBtn" class="secondary" type="button">Gong testen</button>
+        <button id="fullscreenBtn" class="secondary" type="button">Fullscreen</button>
+      </div>
       <span id="audioMessage" class="message" aria-live="polite"></span>
+    </div>
+
+    <div id="fullscreenOverlay" class="fullscreen-overlay" hidden>
+      <button id="closeFullscreenBtn" class="fullscreen-close" type="button">Schliessen</button>
+      <div class="fullscreen-content">
+        <div id="fullscreenCurrentTime" class="fullscreen-current">--:--:--</div>
+        <div class="fullscreen-label">Nächster Gong</div>
+        <div id="fullscreenNextTime" class="fullscreen-next">Keine Zeit</div>
+        <div id="fullscreenCountdown" class="fullscreen-countdown"></div>
+      </div>
     </div>
 
     <div class="footer">
@@ -370,7 +448,11 @@
   <script>
     const KUS_TIMES = [
       '07:30', '08:15', '08:25', '09:10', '09:20',
-      '10:05', '10:25', '11:10', '11:20', '12:05'
+      '10:05', '10:25', '11:10', '11:20', '12:05',
+      '12:15', '13:00', '13:10', '13:55', '14:05',
+      '14:50', '15:00', '15:45', '15:50', '16:35',
+      '16:40', '17:15', '17:25', '17:30', '18:20',
+      '19:05'
     ];
 
     const clockEl = document.getElementById('clock');
@@ -385,6 +467,12 @@
     const nextTimeEl = document.getElementById('nextTime');
     const countdownEl = document.getElementById('countdown');
     const testBtn = document.getElementById('testBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const fullscreenOverlay = document.getElementById('fullscreenOverlay');
+    const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
+    const fullscreenCurrentTime = document.getElementById('fullscreenCurrentTime');
+    const fullscreenNextTime = document.getElementById('fullscreenNextTime');
+    const fullscreenCountdown = document.getElementById('fullscreenCountdown');
     const audioMessage = document.getElementById('audioMessage');
 
     let times = JSON.parse(localStorage.getItem('gongTimes') || '[]');
@@ -488,17 +576,22 @@
       if (!next) {
         nextTimeEl.textContent = 'Keine Zeit';
         countdownEl.textContent = 'Füge eine Uhrzeit hinzu.';
+        fullscreenNextTime.textContent = 'Keine Zeit';
+        fullscreenCountdown.textContent = '';
         return;
       }
 
       nextTimeEl.textContent = next.time;
+      fullscreenNextTime.textContent = next.time;
 
       const totalSeconds = Math.max(0, Math.floor((next.date - now) / 1000));
       const hours = Math.floor(totalSeconds / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
+      const countdownText = `in ${hours} h ${minutes} min ${seconds} s`;
 
-      countdownEl.textContent = `in ${hours} h ${minutes} min ${seconds} s`;
+      countdownEl.textContent = countdownText;
+      fullscreenCountdown.textContent = countdownText;
     }
 
     async function ensureAudio() {
@@ -661,6 +754,7 @@
       const clockText = formatClock(now);
       const dateText = formatDate(now);
       clockEl.textContent = clockText;
+      fullscreenCurrentTime.textContent = clockText;
       dateEl.textContent = dateText;
       updateNext(now);
       checkTrigger(now);
@@ -712,6 +806,40 @@
       audioMessage.textContent = 'Gong getestet.';
     });
 
+
+    function openFullscreenView() {
+      fullscreenOverlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+
+      if (fullscreenOverlay.requestFullscreen) {
+        fullscreenOverlay.requestFullscreen().catch(() => {});
+      }
+    }
+
+    function closeFullscreenView() {
+      fullscreenOverlay.hidden = true;
+      document.body.style.overflow = '';
+
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    fullscreenBtn.addEventListener('click', openFullscreenView);
+    closeFullscreenBtn.addEventListener('click', closeFullscreenView);
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && !fullscreenOverlay.hidden) {
+        fullscreenOverlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !fullscreenOverlay.hidden) {
+        closeFullscreenView();
+      }
+    });
 
     renderTimes();
     tick();
