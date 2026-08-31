@@ -637,9 +637,9 @@
       const lowpass = audioContext.createBiquadFilter();
       const bass = audioContext.createBiquadFilter();
 
-      compressor.threshold.setValueAtTime(-12, startTime);
+      compressor.threshold.setValueAtTime(-18, startTime);
       compressor.knee.setValueAtTime(18, startTime);
-      compressor.ratio.setValueAtTime(2.2, startTime);
+      compressor.ratio.setValueAtTime(3.2, startTime);
       compressor.attack.setValueAtTime(0.006, startTime);
       compressor.release.setValueAtTime(0.8, startTime);
 
@@ -652,8 +652,8 @@
       bass.gain.setValueAtTime(2, startTime);
 
       master.gain.setValueAtTime(0.0001, startTime);
-      master.gain.exponentialRampToValueAtTime(1.20 * strength, startTime + 0.018);
-      master.gain.exponentialRampToValueAtTime(0.46 * strength, startTime + 0.32);
+      master.gain.exponentialRampToValueAtTime(1.85 * strength, startTime + 0.018);
+      master.gain.exponentialRampToValueAtTime(0.68 * strength, startTime + 0.32);
       master.gain.exponentialRampToValueAtTime(0.0001, startTime + 6.6);
 
       master.connect(lowpass);
@@ -700,7 +700,7 @@
       noiseFilter.frequency.setValueAtTime(1150, startTime);
       noiseFilter.Q.setValueAtTime(1.0, startTime);
 
-      noiseGain.gain.setValueAtTime(0.42 * strength, startTime);
+      noiseGain.gain.setValueAtTime(0.68 * strength, startTime);
       noiseGain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.075);
 
       noise.connect(noiseFilter);
@@ -715,9 +715,9 @@
       const now = audioContext.currentTime + 0.04;
 
       // Drei klar gestimmte Gongschläge: H – Gis – E.
-      playGongStrike(246.94, now, 1.08);        // H3
-      playGongStrike(207.65, now + 1.15, 1.10); // Gis3
-      playGongStrike(164.81, now + 2.30, 1.16); // E3
+      playGongStrike(246.94, now, 1.28);        // H3
+      playGongStrike(207.65, now + 1.15, 1.30); // Gis3
+      playGongStrike(164.81, now + 2.30, 1.36); // E3
     }
 
     async function unlockAudio() {
