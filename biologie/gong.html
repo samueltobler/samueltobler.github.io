@@ -267,6 +267,24 @@
       padding: 24px;
       background: #0d0f14;
       color: #fff;
+      transition: background-color .45s ease, color .45s ease;
+    }
+
+    .fullscreen-overlay.gong-alert {
+      background: #efb3b3;
+      color: #2a1717;
+    }
+
+    .fullscreen-overlay.gong-alert .fullscreen-current,
+    .fullscreen-overlay.gong-alert .fullscreen-label,
+    .fullscreen-overlay.gong-alert .fullscreen-countdown {
+      color: rgba(42,23,23,.62);
+    }
+
+    .fullscreen-overlay.gong-alert .fullscreen-close {
+      color: #2a1717;
+      background: rgba(255,255,255,.36);
+      border-color: rgba(42,23,23,.12);
     }
 
     .fullscreen-overlay[hidden] {
@@ -425,6 +443,7 @@
     <div class="bottom-test">
       <div class="bottom-actions">
         <button id="testBtn" class="secondary" type="button">Gong testen</button>
+        <button id="muteBtn" class="secondary" type="button" aria-pressed="false">Stumm</button>
         <button id="fullscreenBtn" class="secondary" type="button">Fullscreen</button>
       </div>
       <span id="audioMessage" class="message" aria-live="polite"></span>
@@ -467,6 +486,7 @@
     const nextTimeEl = document.getElementById('nextTime');
     const countdownEl = document.getElementById('countdown');
     const testBtn = document.getElementById('testBtn');
+    const muteBtn = document.getElementById('muteBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const fullscreenOverlay = document.getElementById('fullscreenOverlay');
     const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
@@ -478,6 +498,8 @@
     let times = JSON.parse(localStorage.getItem('gongTimes') || '[]');
     let audioContext = null;
     let active = true;
+    let isMuted = false;
+    let gongAlertTimer = null;
     let lastTriggeredKey = '';
 
     function saveTimes() {
@@ -709,8 +731,23 @@
       noise.start(startTime);
     }
 
+    function triggerGongVisual() {
+      fullscreenOverlay.classList.add('gong-alert');
+
+      if (gongAlertTimer) {
+        clearTimeout(gongAlertTimer);
+      }
+
+      gongAlertTimer = setTimeout(() => {
+        fullscreenOverlay.classList.remove('gong-alert');
+        gongAlertTimer = null;
+      }, 30000);
+    }
+
     function strikeGong() {
-      if (!audioContext) return;
+      triggerGongVisual();
+
+      if (isMuted || !audioContext) return;
 
       const now = audioContext.currentTime + 0.04;
 
@@ -740,12 +777,16 @@
 
       if (lastTriggeredKey === key) return;
 
-      const ok = await ensureAudio();
-      if (!ok) return;
+      if (!isMuted) {
+        const ok = await ensureAudio();
+        if (!ok) return;
+      }
 
       lastTriggeredKey = key;
       strikeGong();
-      audioMessage.textContent = `Gong um ${current} ausgelöst.`;
+      audioMessage.textContent = isMuted
+        ? `Gong um ${current} stumm ausgelöst.`
+        : `Gong um ${current} ausgelöst.`;
     }
 
     function tick() {
@@ -799,11 +840,24 @@
     });
 
     testBtn.addEventListener('click', async () => {
+      if (isMuted) {
+        triggerGongVisual();
+        audioMessage.textContent = 'Gong ist stummgeschaltet.';
+        return;
+      }
+
       const ok = await ensureAudio();
       if (!ok) return;
 
       strikeGong();
       audioMessage.textContent = 'Gong getestet.';
+    });
+
+    muteBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      muteBtn.setAttribute('aria-pressed', String(isMuted));
+      muteBtn.textContent = isMuted ? 'Ton an' : 'Stumm';
+      audioMessage.textContent = isMuted ? 'Gong stummgeschaltet.' : 'Gongton aktiviert.';
     });
 
 
