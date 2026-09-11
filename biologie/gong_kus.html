@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Schulgong</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0d0f14;
+      color: #fff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: #0d0f14;
+      color: #fff;
+      transition: background-color .45s ease, color .45s ease;
+    }
+
+    .screen.gong-alert {
+      background: #efb3b3;
+      color: #2a1717;
+    }
+
+    .content {
+      width: min(1200px, 100%);
+      text-align: center;
+    }
+
+    .current-time {
+      margin-bottom: 22px;
+      font-size: clamp(1rem, 2.4vw, 1.5rem);
+      font-weight: 600;
+      color: rgba(255,255,255,.48);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .screen.gong-alert .current-time {
+      color: rgba(42,23,23,.58);
+    }
+
+    .next-time {
+      font-size: clamp(5rem, 20vw, 13rem);
+      line-height: .92;
+      font-weight: 800;
+      letter-spacing: -.06em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown {
+      margin-top: 34px;
+      font-size: clamp(3rem, 10vw, 7rem);
+      line-height: 1;
+      font-weight: 750;
+      letter-spacing: -.04em;
+      color: rgba(255,255,255,.58);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .screen.gong-alert .countdown {
+      color: rgba(42,23,23,.62);
+    }
+  </style>
+</head>
+<body>
+  <main id="screen" class="screen">
+    <div class="content">
+      <div id="currentTime" class="current-time">Aktuelle Uhrzeit: --:--:--</div>
+      <div id="nextTime" class="next-time">--:--</div>
+      <div id="countdown" class="countdown">--</div>
+    </div>
+  </main>
+
+  <script>
+    const KUS_TIMES = [
+      '07:30', '08:15', '08:25', '09:10', '09:20',
+      '10:05', '10:25', '11:10', '11:20', '12:05',
+      '12:15', '13:00', '13:10', '13:55', '14:05',
+      '14:50', '15:00', '15:45', '15:50', '16:35',
+      '16:40', '17:15', '17:25', '17:30', '18:20',
+      '19:05'
+    ];
+
+    const times = [...KUS_TIMES];
+    const screen = document.getElementById('screen');
+    const currentTimeEl = document.getElementById('currentTime');
+    const nextTimeEl = document.getElementById('nextTime');
+    const countdownEl = document.getElementById('countdown');
+
+    let audioContext = null;
+    let lastTriggeredKey = '';
+    let gongAlertTimer = null;
+
+    function minutesOfTime(value) {
+      const [h, m] = value.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    times.sort((a, b) => minutesOfTime(a) - minutesOfTime(b));
+
+    function getNextOccurrence(now) {
+      let best = null;
+
+      for (const time of times) {
+        const [h, m] = time.split(':').map(Number);
+        const candidate = new Date(now);
+        candidate.setHours(h, m, 0, 0);
+
+        if (candidate <= now) {
+          candidate.setDate(candidate.getDate() + 1);
+        }
+
+        if (!best || candidate < best.date) {
+          best = { time, date: candidate };
+        }
+      }
+
+      return best;
+    }
+
+    function updateNext(now) {
+      const next = getNextOccurrence(now);
+      if (!next) return;
+
+      nextTimeEl.textContent = next.time;
+
+      const totalSeconds = Math.max(0, Math.floor((next.date - now) / 1000));
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      const parts = [];
+      if (hours > 0) parts.push(`${hours} h`);
+      if (minutes > 0) parts.push(`${minutes} min`);
+      parts.push(`${seconds} s`);
+
+      countdownEl.textContent = parts.join(' ');
+    }
+
+    async function ensureAudio() {
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return false;
+
+        if (!audioContext) {
+          audioContext = new Ctx();
+        }
+
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
+
+        return audioContext.state === 'running';
+      } catch {
+        return false;
+      }
+    }
+
+    function createNoiseBuffer(durationSeconds) {
+      const length = Math.max(1, Math.floor(audioContext.sampleRate * durationSeconds));
+      const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < length; i++) {
+        const t = i / audioContext.sampleRate;
+        const env = Math.exp(-t * 30);
+        data[i] = (Math.random() * 2 - 1) * env;
+      }
+
+      return buffer;
+    }
+
+    function playGongStrike(fundamental, startTime, strength = 1) {
+      const master = audioContext.createGain();
+      const compressor = audioContext.createDynamicsCompressor();
+      const lowpass = audioContext.createBiquadFilter();
+      const bass = audioContext.createBiquadFilter();
+
+      compressor.threshold.setValueAtTime(-18, startTime);
+      compressor.knee.setValueAtTime(18, startTime);
+      compressor.ratio.setValueAtTime(3.2, startTime);
+      compressor.attack.setValueAtTime(0.006, startTime);
+      compressor.release.setValueAtTime(0.8, startTime);
+
+      lowpass.type = 'lowpass';
+      lowpass.frequency.setValueAtTime(3200, startTime);
+      lowpass.Q.setValueAtTime(0.55, startTime);
+
+      bass.type = 'lowshelf';
+      bass.frequency.setValueAtTime(260, startTime);
+      bass.gain.setValueAtTime(2, startTime);
+
+      master.gain.setValueAtTime(0.0001, startTime);
+      master.gain.exponentialRampToValueAtTime(1.85 * strength, startTime + 0.018);
+      master.gain.exponentialRampToValueAtTime(0.68 * strength, startTime + 0.32);
+      master.gain.exponentialRampToValueAtTime(0.0001, startTime + 6.6);
+
+      master.connect(lowpass);
+      lowpass.connect(bass);
+      bass.connect(compressor);
+      compressor.connect(audioContext.destination);
+
+      const partials = [
+        [0.50, 0.10, 5.8],
+        [1.00, 0.46, 5.8],
+        [1.50, 0.23, 4.6],
+        [2.00, 0.20, 4.1],
+        [2.50, 0.13, 3.5],
+        [3.00, 0.10, 3.0],
+        [4.00, 0.055, 2.2]
+      ];
+
+      partials.forEach(([ratio, level, decay], index) => {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(fundamental * ratio, startTime);
+
+        gain.gain.setValueAtTime(0.0001, startTime);
+        gain.gain.exponentialRampToValueAtTime(level * strength, startTime + 0.02 + index * 0.002);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + decay);
+
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(startTime);
+        osc.stop(startTime + decay + 0.1);
+      });
+
+      const noise = audioContext.createBufferSource();
+      const noiseFilter = audioContext.createBiquadFilter();
+      const noiseGain = audioContext.createGain();
+
+      noise.buffer = createNoiseBuffer(0.075);
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.setValueAtTime(1150, startTime);
+      noiseFilter.Q.setValueAtTime(1.0, startTime);
+
+      noiseGain.gain.setValueAtTime(0.68 * strength, startTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.075);
+
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(master);
+      noise.start(startTime);
+    }
+
+    function triggerGongVisual() {
+      screen.classList.add('gong-alert');
+
+      if (gongAlertTimer) clearTimeout(gongAlertTimer);
+
+      gongAlertTimer = setTimeout(() => {
+        screen.classList.remove('gong-alert');
+        gongAlertTimer = null;
+      }, 30000);
+    }
+
+    async function strikeGong() {
+      triggerGongVisual();
+
+      const ok = await ensureAudio();
+      if (!ok) return;
+
+      const now = audioContext.currentTime + 0.04;
+      playGongStrike(246.94, now, 1.28);
+      playGongStrike(207.65, now + 1.15, 1.30);
+      playGongStrike(164.81, now + 2.30, 1.36);
+    }
+
+    async function checkTrigger(now) {
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const current = `${hh}:${mm}`;
+
+      if (!times.includes(current)) return;
+
+      const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${current}`;
+      if (lastTriggeredKey === key) return;
+
+      lastTriggeredKey = key;
+      await strikeGong();
+    }
+
+    function tick() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      currentTimeEl.textContent = `Aktuelle Uhrzeit: ${hh}:${mm}:${ss}`;
+      updateNext(now);
+      checkTrigger(now);
+    }
+
+    // Versucht Audio sofort zu aktivieren. Falls der Browser Autoplay blockiert,
+    // wird Audio bei der ersten beliebigen Interaktion entsperrt, ohne UI-Button.
+    ensureAudio();
+
+    const unlockOnce = () => {
+      ensureAudio();
+      document.removeEventListener('pointerdown', unlockOnce);
+      document.removeEventListener('keydown', unlockOnce);
+      document.removeEventListener('touchstart', unlockOnce);
+    };
+
+    document.addEventListener('pointerdown', unlockOnce, { once: true });
+    document.addEventListener('keydown', unlockOnce, { once: true });
+    document.addEventListener('touchstart', unlockOnce, { once: true });
+
+    tick();
+    setInterval(tick, 500);
+  </script>
+</body>
+</html>
