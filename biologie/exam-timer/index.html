@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="de-CH">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Exam Time</title>
+
   <style>
     :root {
       --bg-dark: #212529;
@@ -11,118 +13,266 @@
       --fg: #fff;
       --muted: #adb5bd;
       --accent-2: #1a1d20;
+
+      --clock-size: 11rem;
+      --small-clock-size: 4rem;
+      --countdown-size: 2rem;
+      --date-size: 1.25rem;
     }
+
+    * { box-sizing: border-box; }
+
     html, body { height: 100%; }
+
     body {
       margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
       background: var(--bg-dark);
       color: var(--fg);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      height: 100vh;
-      transition: background 0.3s ease;
-      position: relative;
+      transition: background-color 0.3s ease;
     }
-    .wrap { width: 100%; text-align: center; margin: auto 0; }
+
+    .wrap {
+      flex: 1;
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
     .date {
-      font-size: clamp(1rem, 2vw, 1.4rem);
-      letter-spacing: 0.03em;
+      margin-bottom: 12px;
       color: var(--muted);
+      font-size: var(--date-size);
+      font-weight: 400;
+      letter-spacing: 0.03em;
       font-variant-numeric: tabular-nums;
-      margin-bottom: 14px;
     }
+
     .time {
-      font-size: clamp(5rem, 15vw, 12rem);
-      line-height: 1.05;
+      font-size: var(--clock-size);
       font-weight: 700;
-      letter-spacing: 0.02em;
+      line-height: 0.95;
+      letter-spacing: 0.01em;
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
-    .seconds { font-size: 0.25em; opacity: 0.6; margin-left: 4px; }
+
+    .seconds {
+      margin-left: 5px;
+      font-size: 0.25em;
+      font-weight: 500;
+      opacity: 0.55;
+    }
+
     .countdown-line {
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      margin-top: 20px;
+      margin-top: 32px;
       display: flex;
       justify-content: center;
       align-items: baseline;
+      flex-wrap: wrap;
       gap: 8px;
+      font-size: var(--countdown-size);
+      line-height: 1.2;
     }
-    .controls {
-      padding: 8px;
-      background: var(--accent-2);
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      font-size: 0.8rem;
-    }
-    .row { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
-    input[type="number"], textarea {
-      background: none; color: var(--fg);
-      border: none; border-bottom: 1px solid var(--muted);
-      padding: 4px 2px; outline: none;
-    }
-    input[type="number"] {
-      font-size: 0.9rem;
-      text-align: right; width: 50px;
-      -moz-appearance: textfield;
-    }
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-    button {
-      background: none; color: var(--fg);
-      border: 1px solid var(--muted);
-      border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer;
-    }
-    button:disabled { opacity: .5; cursor: default; }
-
-    .hidden { display: none !important; }
-
-    .icon-btn {
-      position: absolute; bottom: 10px;
-      background: none; border: none; color: var(--fg);
-      font-size: 1.1rem; padding: 4px 6px; cursor: pointer; opacity: .8;
-      line-height: 1; user-select: none;
-    }
-    .icon-btn:hover { opacity: 1; }
-    #toggleLayout { left: 10px; }
-    #toggleSeconds { right: 10px; }
-
-    body.alt-layout .time { font-size: clamp(2rem, 6vw, 4rem); }
-    body.alt-layout .date { font-size: clamp(0.9rem, 1.6vw, 1.1rem); }
-    body.alt-layout .countdown-line { font-size: clamp(1rem, 2.5vw, 1.4rem); gap: 10px; }
-    body.alt-layout #countdown {
-      font-size: clamp(5rem, 15vw, 12rem);
+    #countdown {
       font-weight: 700;
-      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
+
+    body.alt-layout .time {
+      font-size: var(--small-clock-size);
+      font-weight: 600;
+    }
+
+    body.alt-layout .date { font-size: 1rem; }
+
+    body.alt-layout .countdown-line {
+      margin-top: 24px;
+      font-size: 1.35rem;
+      gap: 10px;
+    }
+
+    body.alt-layout #countdown {
+      font-size: var(--clock-size);
+      font-weight: 700;
+      line-height: 0.95;
       font-variant-numeric: tabular-nums;
     }
 
     .notes-panel {
-      width: min(720px, calc(100% - 24px));
-      margin: 10px auto 0;
-      background: rgba(0,0,0,0.15);
-      border: 1px solid rgba(255,255,255,0.15);
+      width: min(720px, 100%);
+      margin-top: 28px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 8px;
-      padding: 10px;
       text-align: left;
     }
+
     .notes-panel textarea {
+      display: block;
       width: 100%;
       min-height: 110px;
-      border-bottom: 1px solid rgba(255,255,255,0.0);
+      padding: 8px 6px;
+      background: none;
+      color: var(--fg);
+      border: none;
+      outline: none;
       resize: vertical;
       font-family: inherit;
       font-size: 1.1rem;
-      line-height: 1.35;
-      padding: 8px 6px;
+      line-height: 1.4;
+    }
+
+    .notes-panel textarea::placeholder { color: var(--muted); }
+
+    .controls {
+      position: relative;
+      flex-shrink: 0;
+      padding: 10px 70px;
+      background: var(--accent-2);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.85rem;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    input[type="number"] {
+      width: 58px;
+      padding: 5px 3px;
+      background: none;
+      color: var(--fg);
+      border: none;
+      border-bottom: 1px solid var(--muted);
+      outline: none;
+      font: inherit;
+      font-size: 0.95rem;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]:focus { border-bottom-color: var(--fg); }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+
+    button {
+      padding: 5px 10px;
+      background: none;
+      color: var(--fg);
+      border: 1px solid var(--muted);
+      border-radius: 5px;
+      font: inherit;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--fg);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .hidden { display: none !important; }
+
+    .icon-btn {
+      position: absolute;
+      bottom: 8px;
+      padding: 6px;
+      background: none;
+      color: var(--fg);
+      border: none;
+      font-size: 1.15rem;
+      line-height: 1;
+      opacity: 0.65;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .icon-btn:hover {
+      background: none;
+      opacity: 1;
+    }
+
+    #toggleLayout { left: 10px; }
+    #toggleSeconds { right: 10px; }
+
+    @media (max-width: 900px) {
+      :root {
+        --clock-size: 9rem;
+        --small-clock-size: 3.5rem;
+      }
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --clock-size: 7rem;
+        --small-clock-size: 3rem;
+        --countdown-size: 1.65rem;
+        --date-size: 1.1rem;
+      }
+
+      .wrap { padding: 24px 16px; }
+      .countdown-line { margin-top: 24px; }
+    }
+
+    @media (max-width: 520px) {
+      :root {
+        --clock-size: 5rem;
+        --small-clock-size: 2.5rem;
+        --countdown-size: 1.35rem;
+        --date-size: 1rem;
+      }
+
+      .wrap {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .countdown-line { gap: 5px; }
+
+      .controls {
+        padding-left: 52px;
+        padding-right: 52px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      :root { --clock-size: 4.25rem; }
+      .countdown-line { font-size: 1.15rem; }
     }
   </style>
 </head>
+
 <body>
   <main class="wrap" role="main">
     <div class="date" id="date"></div>
+
     <div class="time" id="clock" aria-live="polite">--:--</div>
 
     <div class="countdown-line" aria-live="polite">
@@ -139,7 +289,9 @@
   <section class="controls" aria-label="Minuten-Timer">
     <div class="row">
       <label for="minutes" class="hidden">Minuten</label>
-      <input id="minutes" type="number" min="0" step="1" placeholder="0" inputmode="numeric" />
+
+      <input id="minutes" type="number" min="0" step="1" placeholder="0" inputmode="numeric">
+
       <button id="start">Start</button>
       <button id="reset" class="hidden">Reset</button>
 
@@ -151,111 +303,154 @@
   <button class="icon-btn" id="toggleSeconds" title="Sekunden ein-/ausblenden" aria-label="Sekunden ein- oder ausblenden">⧖</button>
 
   <script>
-    function pad(n){ return String(n).padStart(2, '0'); }
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
 
     let showSeconds = false;
 
-    function tickClock(){
+    const clockEl = document.getElementById("clock");
+    const dateEl = document.getElementById("date");
+
+    function tickClock() {
       const now = new Date();
-      document.getElementById('clock').innerHTML =
+
+      clockEl.innerHTML =
         `${pad(now.getHours())}:${pad(now.getMinutes())}` +
-        (showSeconds ? `<span class="seconds">:${pad(now.getSeconds())}</span>` : '');
-      document.getElementById('date').textContent =
-        now.toLocaleDateString('de-CH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        (showSeconds ? `<span class="seconds">:${pad(now.getSeconds())}</span>` : "");
+
+      dateEl.textContent =
+        now.toLocaleDateString("de-CH", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
     }
+
     tickClock();
     setInterval(tickClock, 250);
 
-    const minutesInput = document.getElementById('minutes');
-    const startBtn = document.getElementById('start');
-    const resetBtn = document.getElementById('reset');
-    const cdEl = document.getElementById('countdown');
-    const toggleSecondsBtn = document.getElementById('toggleSeconds');
-    const layoutBtn = document.getElementById('toggleLayout');
+    const minutesInput = document.getElementById("minutes");
+    const startBtn = document.getElementById("start");
+    const resetBtn = document.getElementById("reset");
+    const countdownEl = document.getElementById("countdown");
+    const toggleSecondsBtn = document.getElementById("toggleSeconds");
+    const layoutBtn = document.getElementById("toggleLayout");
+    const toggleNotesBtn = document.getElementById("toggleNotes");
+    const notesPanel = document.getElementById("notesPanel");
+    const notes = document.getElementById("notes");
 
-    const toggleNotesBtn = document.getElementById('toggleNotes');
-    const notesPanel = document.getElementById('notesPanel');
-    const notes = document.getElementById('notes');
+    let countdownTimer = null;
+    let countdownEnd = null;
+    let displayedMinutes = 0;
 
-    let cdMinutes = 0;
-    let cdTimer = null;
-
-    function setCountdownDisplay(mins){
-      cdEl.textContent = mins;
-      document.title = `${mins} min — Exam Time`;
+    function setCountdownDisplay(minutes) {
+      displayedMinutes = minutes;
+      countdownEl.textContent = minutes;
+      document.title = `${minutes} min — Exam Time`;
     }
 
-    function setBackgroundDark(){
+    function setBackgroundDark() {
       document.body.style.backgroundColor =
-        getComputedStyle(document.documentElement).getPropertyValue('--bg-dark');
-    }
-    function setBackgroundAlert(){
-      document.body.style.backgroundColor =
-        getComputedStyle(document.documentElement).getPropertyValue('--bg-alert');
+        getComputedStyle(document.documentElement).getPropertyValue("--bg-dark");
     }
 
-    function startCountdown(){
-      const mins = parseInt(minutesInput.value, 10);
-      if (isNaN(mins) || mins <= 0) return;
-      cdMinutes = mins;
+    function setBackgroundAlert() {
+      document.body.style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue("--bg-alert");
+    }
+
+    function updateCountdown() {
+      if (!countdownEnd) return;
+
+      const remainingMs = countdownEnd.getTime() - Date.now();
+
+      if (remainingMs <= 0) {
+        setCountdownDisplay(0);
+        stopCountdown(true);
+        flashDone();
+        return;
+      }
+
+      const remainingMinutes = Math.ceil(remainingMs / 60000);
+
+      if (remainingMinutes !== displayedMinutes) {
+        setCountdownDisplay(remainingMinutes);
+      }
+    }
+
+    function startCountdown() {
+      const minutes = parseInt(minutesInput.value, 10);
+
+      if (Number.isNaN(minutes) || minutes <= 0) return;
+
+      countdownEnd = new Date(Date.now() + minutes * 60 * 1000);
+
       startBtn.disabled = true;
       minutesInput.disabled = true;
-      resetBtn.classList.add('hidden');
+      resetBtn.classList.add("hidden");
+
       setBackgroundDark();
-      setCountdownDisplay(cdMinutes);
-      cdTimer = setInterval(() => {
-        cdMinutes--;
-        setCountdownDisplay(cdMinutes);
-        if (cdMinutes <= 0){
-          stopCountdown(true);
-          flashDone();
-        }
-      }, 60000);
+      setCountdownDisplay(minutes);
+
+      countdownTimer = setInterval(updateCountdown, 500);
     }
 
-    function stopCountdown(completed=false){
-      if (cdTimer){
-        clearInterval(cdTimer);
-        cdTimer = null;
+    function stopCountdown(completed = false) {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
       }
+
+      countdownEnd = null;
       startBtn.disabled = false;
       minutesInput.disabled = false;
-      if (!completed) setCountdownDisplay(cdMinutes);
+
+      if (completed) return;
     }
 
-    function flashDone(){
+    function flashDone() {
       setBackgroundAlert();
-      resetBtn.classList.remove('hidden');
+      resetBtn.classList.remove("hidden");
     }
 
-    resetBtn.addEventListener('click', () => {
+    startBtn.addEventListener("click", () => {
+      if (!countdownTimer) startCountdown();
+    });
+
+    resetBtn.addEventListener("click", () => {
       setBackgroundDark();
-      resetBtn.classList.add('hidden');
+      resetBtn.classList.add("hidden");
     });
 
-    startBtn.addEventListener('click', () => {
-      if (cdTimer) return;
-      startCountdown();
+    minutesInput.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !countdownTimer) {
+        startCountdown();
+      }
+
+      if (event.key === "Escape") {
+        stopCountdown();
+      }
     });
 
-    minutesInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { if (!cdTimer) startCountdown(); }
-      if (e.key === 'Escape') { stopCountdown(); }
-    });
-
-    toggleSecondsBtn.addEventListener('click', () => {
+    toggleSecondsBtn.addEventListener("click", () => {
       showSeconds = !showSeconds;
       tickClock();
     });
 
-    layoutBtn.addEventListener('click', () => {
-      document.body.classList.toggle('alt-layout');
+    layoutBtn.addEventListener("click", () => {
+      document.body.classList.toggle("alt-layout");
     });
 
-    toggleNotesBtn.addEventListener('click', () => {
-      const isHidden = notesPanel.classList.toggle('hidden');
-      toggleNotesBtn.setAttribute('aria-expanded', String(!isHidden));
-      if (!isHidden) notes.focus();
+    toggleNotesBtn.addEventListener("click", () => {
+      const isHidden = notesPanel.classList.toggle("hidden");
+
+      toggleNotesBtn.setAttribute("aria-expanded", String(!isHidden));
+
+      if (!isHidden) {
+        notes.focus();
+      }
     });
 
     setCountdownDisplay(0);
