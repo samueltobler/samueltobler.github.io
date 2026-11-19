@@ -662,8 +662,8 @@
     const nodes = {
       root: {
         title: 'Art der Daten',
-        prompt: 'Welche Art von Zielvariable willst du auswerten?',
-        neutral: 'Entscheide zuerst, ob die Zielvariable Kategorien, Rangwerte oder metrische Messwerte enthält.',
+        prompt: 'Welche Art von Daten willst du auswerten?',
+        neutral: 'Bei Gruppenvergleichen wählst du die Zielvariable. Bei einem Zusammenhang wählst du eine der beiden Variablen; die zweite wird später berücksichtigt.',
         options: [
           {
             id: 'cat',
@@ -684,8 +684,8 @@
             summary: 'Werte haben eine Reihenfolge, aber keine sicheren gleichen Abstände.',
             meaning: 'Ordinale Daten lassen sich sortieren. Die Abstände zwischen den Stufen sind aber nicht zwingend gleich gross.',
             examples: 'Schulnoten, Ranglisten, Likert-Skalen, Schmerzstufen, Entwicklungsstadien.',
-            asks: 'Danach wird entschieden, wie viele unabhängige oder verbundene Gruppen verglichen werden.',
-            next: 'ordGroups'
+            asks: 'Danach wählst du zwischen Gruppenvergleich und Zusammenhang zweier Variablen.',
+            next: 'ordQuestion'
           },
           {
             id: 'metric',
@@ -695,11 +695,181 @@
             summary: 'Werte sind Zahlen auf einer Messskala.',
             meaning: 'Metrische Daten sind numerische Messwerte. Abstände, Mittelwerte und Standardabweichungen sind sinnvoll interpretierbar.',
             examples: 'Temperatur, Grösse, Masse, Dichte, Enzymaktivität, Puls.',
-            asks: 'Danach wird entschieden, wie viele Gruppen oder Bedingungen verglichen werden.',
-            next: 'metricGroups'
+            asks: 'Danach wählst du zwischen Gruppenvergleich und Zusammenhang zweier Variablen.',
+            next: 'metricQuestion'
           }
         ]
       },
+
+
+  "metricQuestion": {
+    "title": "Fragestellung",
+    "prompt": "Was möchtest du untersuchen?",
+    "neutral": "Unterscheide zwischen Unterschieden in Gruppen und dem Zusammenhang zweier Variablen. Zwei Variablen sind nicht dasselbe wie zwei Gruppen.",
+    "options": [
+      {
+        "id": "compare",
+        "label": "Unterschiede zwischen Gruppen",
+        "tag": "Vergleich",
+        "tone": "metric",
+        "summary": "Eine Zielvariable wird zwischen Gruppen, Bedingungen oder mit einem Referenzwert verglichen.",
+        "meaning": "Du untersuchst, ob sich Gruppen oder Bedingungen in einer Zielvariable unterscheiden.",
+        "examples": "Pflanzenhöhe bei verschiedenen Düngemitteln; Puls vor und nach Belastung.",
+        "asks": "Danach wählst du die Anzahl der Gruppen oder Bedingungen.",
+        "next": "metricGroups"
+      },
+      {
+        "id": "association",
+        "label": "Zusammenhang zwischen zwei Variablen",
+        "tag": "Korrelation",
+        "tone": "metric",
+        "summary": "Für jede Untersuchungseinheit liegen zwei zusammengehörige Werte vor.",
+        "meaning": "Du untersuchst, ob höhere Werte einer Variable mit höheren oder tieferen Werten der anderen einhergehen. Die Wertepaare müssen zu denselben Einheiten gehören.",
+        "examples": "Körpergrösse und Körpermasse derselben Personen; zwei Rangmerkmale derselben Tiere.",
+        "asks": "Danach werden die zweite Variable und die Form des Zusammenhangs berücksichtigt.",
+        "next": "metricPartner"
+      }
+    ]
+  },
+  "ordQuestion": {
+    "title": "Fragestellung",
+    "prompt": "Was möchtest du untersuchen?",
+    "neutral": "Unterscheide zwischen Unterschieden in Gruppen und dem Zusammenhang zweier Variablen. Zwei Variablen sind nicht dasselbe wie zwei Gruppen.",
+    "options": [
+      {
+        "id": "compare",
+        "label": "Unterschiede zwischen Gruppen",
+        "tag": "Vergleich",
+        "tone": "ord",
+        "summary": "Eine Zielvariable wird zwischen Gruppen, Bedingungen oder mit einem Referenzwert verglichen.",
+        "meaning": "Du untersuchst, ob sich Gruppen oder Bedingungen in einer Zielvariable unterscheiden.",
+        "examples": "Pflanzenhöhe bei verschiedenen Düngemitteln; Puls vor und nach Belastung.",
+        "asks": "Danach wählst du die Anzahl der Gruppen oder Bedingungen.",
+        "next": "ordGroups"
+      },
+      {
+        "id": "association",
+        "label": "Zusammenhang zwischen zwei Variablen",
+        "tag": "Korrelation",
+        "tone": "ord",
+        "summary": "Für jede Untersuchungseinheit liegen zwei zusammengehörige Werte vor.",
+        "meaning": "Du untersuchst, ob höhere Werte einer Variable mit höheren oder tieferen Werten der anderen einhergehen. Die Wertepaare müssen zu denselben Einheiten gehören.",
+        "examples": "Körpergrösse und Körpermasse derselben Personen; zwei Rangmerkmale derselben Tiere.",
+        "asks": "Danach werden die zweite Variable und die Form des Zusammenhangs berücksichtigt.",
+        "next": "ordinalShape"
+      }
+    ]
+  },
+  "metricPartner": {
+    "title": "Zweite Variable",
+    "prompt": "Welche Skala hat die zweite Variable?",
+    "neutral": "Jede Zeile muss ein Wertepaar derselben Untersuchungseinheit enthalten. Zwei getrennte Stichproben lassen sich nicht beliebig zu Wertepaaren zusammenfügen.",
+    "options": [
+      {
+        "id": "metric",
+        "label": "Ebenfalls metrisch",
+        "tag": "Zwei Messgrössen",
+        "tone": "metric",
+        "summary": "Beide Variablen sind numerische Messwerte.",
+        "meaning": "Für zwei metrische Variablen kommen Pearson oder Spearman infrage. Die Fragestellung und der Verlauf entscheiden mit.",
+        "examples": "Körpergrösse und Körpermasse; Temperatur und Enzymaktivität.",
+        "asks": "Prüfe als Nächstes ein Streudiagramm.",
+        "next": "metricShape"
+      },
+      {
+        "id": "ordinal",
+        "label": "Ordinal",
+        "tag": "Mindestens ordinal",
+        "tone": "ord",
+        "summary": "Die zweite Variable besteht aus Rangwerten oder geordneten Stufen.",
+        "meaning": "Beide Variablen lassen sich ordnen. Für einen monotonen Zusammenhang eignet sich eine Rangkorrelation.",
+        "examples": "Körpermasse und Rang in einer Dominanzhierarchie.",
+        "asks": "Prüfe die Richtung des Zusammenhangs.",
+        "next": "ordinalShape"
+      },
+      {
+        "id": "categorical",
+        "label": "Kategorial ohne Rangfolge",
+        "tag": "Andere Fragestellung",
+        "tone": "cat",
+        "summary": "Die zweite Variable enthält ungeordnete Kategorien.",
+        "meaning": "Eine gewöhnliche Rangkorrelation passt nicht zu ungeordneten Kategorien. Werden metrische Werte zwischen Kategorien verglichen, ist der Gruppenvergleich passend.",
+        "examples": "Pflanzenhöhe und Düngemitteltyp.",
+        "asks": "Gehe bei einer Vergleichsfrage zurück zu «Unterschiede zwischen Gruppen».",
+        "result": "mixedAssociation"
+      }
+    ]
+  },
+  "metricShape": {
+    "title": "Form des Zusammenhangs",
+    "prompt": "Welche Form möchtest du untersuchen? Prüfe dazu ein Streudiagramm.",
+    "neutral": "Pearson beschreibt lineare Zusammenhänge. Spearman beschreibt monotone Zusammenhänge über Ränge. Eine Normalverteilungsprüfung allein entscheidet nicht über diese Wahl.",
+    "options": [
+      {
+        "id": "linear",
+        "label": "Linearer Zusammenhang",
+        "tag": "Pearson",
+        "tone": "metric",
+        "summary": "Ein geradliniger Zusammenhang der Messwerte ist die Fragestellung.",
+        "meaning": "Pearson-r beschreibt Richtung und Stärke eines linearen Zusammenhangs. Prüfe das Streudiagramm insbesondere auf einflussreiche Ausreisser.",
+        "examples": "Körpergrösse und Armspannweite.",
+        "asks": "Prüfe die Voraussetzungen für Schätzung und Signifikanztest.",
+        "result": "pearson"
+      },
+      {
+        "id": "monotonic",
+        "label": "Monotoner Zusammenhang über Ränge",
+        "tag": "Spearman",
+        "tone": "ord",
+        "summary": "Die Werte steigen oder fallen tendenziell gemeinsam; der Verlauf darf gekrümmt sein.",
+        "meaning": "Spearman vergleicht Ränge. Monoton bedeutet: Der Zusammenhang verläuft tendenziell durchgehend in dieselbe Richtung. Auch bei metrischen Daten kann diese Fragestellung sinnvoll sein.",
+        "examples": "Eine Messgrösse steigt mit einer anderen und nähert sich dabei einer Sättigung.",
+        "asks": "Prüfe unabhängige Wertepaare und Rangbindungen.",
+        "result": "spearman"
+      },
+      {
+        "id": "other",
+        "label": "Nicht monoton oder noch unklar",
+        "tag": "Streudiagramm",
+        "tone": "metric",
+        "summary": "Zum Beispiel ein U-förmiger Verlauf oder noch kein geprüfter Verlauf.",
+        "meaning": "Ein Koeffizient nahe null schliesst einen starken nicht monotonen Zusammenhang nicht aus. Ohne erkennbaren Trend sind Pearson und Spearman dennoch berechenbar, aber ihre Interpretation braucht die passende Fragestellung.",
+        "examples": "Enzymaktivität steigt bis zu einer optimalen Temperatur und fällt danach wieder.",
+        "asks": "Untersuche zuerst das Streudiagramm und einen fachlich passenden Verlauf.",
+        "result": "inspectAssociation"
+      }
+    ]
+  },
+  "ordinalShape": {
+    "title": "Zusammenhang mit Rangdaten",
+    "prompt": "Sind beide Variablen mindestens ordinal und ist ein monotoner Zusammenhang die Fragestellung?",
+    "neutral": "Die zweite Variable muss ebenfalls geordnet oder metrisch sein. Wertepaare stammen von denselben Einheiten; verschiedene Einheiten sollen unabhängig sein.",
+    "options": [
+      {
+        "id": "monotonic",
+        "label": "Ja, monotoner Zusammenhang",
+        "tag": "Spearman",
+        "tone": "ord",
+        "summary": "Höhere Werte gehen tendenziell mit höheren oder tieferen Werten einher.",
+        "meaning": "Eine Rangkorrelation beschreibt einen monotonen Zusammenhang, ohne gleiche Abstände zwischen Rangstufen vorauszusetzen.",
+        "examples": "Dominanzrang und Körpermasse derselben Tiere.",
+        "asks": "Prüfe Rangbindungen und die Unabhängigkeit der Wertepaare.",
+        "result": "spearman"
+      },
+      {
+        "id": "other",
+        "label": "Nein oder noch unklar",
+        "tag": "Zuerst prüfen",
+        "tone": "ord",
+        "summary": "Der Verlauf ist nicht monoton, die zweite Variable ist ungeordnet oder die Fragestellung ist noch offen.",
+        "meaning": "Spearman ist kein allgemeines Mass für jede Form eines Zusammenhangs. Prüfe die Skalen und eine geeignete Darstellung.",
+        "examples": "Ein U-förmiger Verlauf; ungeordnete Kategorien als zweite Variable.",
+        "asks": "Kläre Skalen und Fragestellung vor der Testwahl.",
+        "result": "inspectAssociation"
+      }
+    ]
+  }
+,
 
       catQuestion: {
         title: 'Kategoriale Fragestellung',
@@ -1227,6 +1397,45 @@
     };
 
     const results = {
+  "pearson": {
+    "title": "Pearson-Korrelation",
+    "tone": "metric",
+    "use": "Für den linearen Zusammenhang zweier metrischer Variablen. Pearson-r liegt zwischen −1 und +1.",
+    "question": "Wie stark und in welche Richtung hängen die beiden Messgrössen linear zusammen?",
+    "assumptions": "Zusammengehörige Wertepaare, unabhängige Untersuchungseinheiten, Variation in beiden Variablen und keine dominierenden Ausreisser. Für den klassischen exakten p-Wert und Konfidenzintervalle wird eine bivariate Normalverteilung angenommen.",
+    "alternative": "Bei einer monotonen Fragestellung über Ränge: Spearman prüfen. r = 0 bedeutet keinen linearen Zusammenhang, nicht zwingend keinen Zusammenhang. Korrelation belegt keine Kausalität.",
+    "notice": "Streudiagramm, Ausreisser, Unabhängigkeit der Wertepaare und Stichprobengrösse prüfen. Koeffizient, Konfidenzintervall und gegebenenfalls p-Wert berichten. Messwiederholungen erfordern ein angepasstes Verfahren."
+  },
+  "spearman": {
+    "title": "Spearman-Rangkorrelation",
+    "tone": "ord",
+    "use": "Für den monotonen Zusammenhang zweier mindestens ordinaler Variablen, auch bei metrischen Messwerten. Spearman-rho liegt zwischen −1 und +1.",
+    "question": "Gehen höhere Ränge einer Variable tendenziell mit höheren oder tieferen Rängen der anderen einher?",
+    "assumptions": "Zusammengehörige Wertepaare, unabhängige Untersuchungseinheiten, mindestens ordinale Skalen und Variation in beiden Variablen. Für die Interpretation als gerichteter Trend einen monotonen Verlauf prüfen. Keine Normalverteilung erforderlich.",
+    "alternative": "Bei vielen Rangbindungen oder kleinen Stichproben kann Kendall-tau-b sinnvoll sein. Geeignete Signifikanzverfahren für Stichprobengrösse und Rangbindungen wählen. Korrelation belegt keine Kausalität.",
+    "notice": "Verlauf, Rangbindungen und Unabhängigkeit der Wertepaare prüfen. Koeffizient, Konfidenzintervall und gegebenenfalls p-Wert berichten. Messwiederholungen erfordern ein angepasstes Verfahren."
+  },
+  "inspectAssociation": {
+    "title": "Zusammenhang zuerst genauer prüfen",
+    "tone": "metric",
+    "label": "Nächster Schritt",
+    "use": "Bei unklarer Fragestellung, ungeeigneten Skalen oder einem nicht monotonen Verlauf.",
+    "question": "Welche Form hat der Zusammenhang und welche Skalen haben beide Variablen?",
+    "assumptions": "Die Darstellung muss zu beiden Skalen passen. Für zwei Messgrössen ein Streudiagramm erstellen und Messdesign sowie Ausreisser berücksichtigen.",
+    "alternative": "Bei linearem Ziel: Pearson prüfen. Bei monotonem Ziel und mindestens ordinalen Variablen: Spearman prüfen. Bei U-förmigem Verlauf ein fachlich begründetes nichtlineares Modell erwägen.",
+    "notice": "Ein Korrelationskoeffizient nahe null schliesst einen nicht monotonen Zusammenhang nicht aus. Die Wahl eines Modells braucht eine passende fachliche Fragestellung."
+  },
+  "mixedAssociation": {
+    "title": "Fragestellung für gemischte Skalen klären",
+    "tone": "cat",
+    "label": "Nächster Schritt",
+    "use": "Für eine metrische und eine ungeordnet kategoriale Variable.",
+    "question": "Sollen Messwerte zwischen den Kategorien verglichen werden?",
+    "assumptions": "Skalen, Anzahl Kategorien und Unabhängigkeit beziehungsweise Paarung der Beobachtungen klären.",
+    "alternative": "Für Gruppenvergleiche gehe bei der Fragestellung zu «Unterschiede zwischen Gruppen» zurück. Spearman ist für ungeordnete Kategorien ungeeignet.",
+    "notice": "Ein Zusammenhang zwischen gemischten Skalen kann weitere Verfahren erfordern, die dieser vereinfachte Baum nicht vollständig abdeckt."
+  }
+,
       binomial: {
         title: 'Exakter Binomialtest',
         tone: 'cat',
@@ -1426,7 +1635,11 @@
       try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
         const parsed = raw ? JSON.parse(raw) : {};
-        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+        // Bestehende Gruppenvergleichspfade um den neuen Frageschritt ergänzen.
+        if (parsed.root === 'metric' && parsed.metricGroups && !parsed.metricQuestion) parsed.metricQuestion = 'compare';
+        if (parsed.root === 'ord' && parsed.ordGroups && !parsed.ordQuestion) parsed.ordQuestion = 'compare';
+        return parsed;
       } catch (error) {
         return {};
       }
@@ -1637,7 +1850,7 @@
       const result = results[resultId];
       return `
         <article class="result-card ${escapeHtml(result.tone)}" aria-labelledby="result-title">
-          <p class="result-label">Empfohlener Test</p>
+          <p class="result-label">${escapeHtml(result.label || 'Empfohlener Test')}</p>
           <h2 class="result-title" id="result-title">${escapeHtml(result.title)}</h2>
           <div class="result-grid">
             <div class="mini-box">
@@ -1659,7 +1872,7 @@
           </div>
           <section class="notice-card" aria-label="Methodischer Hinweis">
             <strong>Zusätzlich prüfen</strong>
-            <span>Stichprobengrösse, Studiendesign, Ausreisser, Unabhängigkeit, Verteilung, Varianzhomogenität und geplante Post-hoc-Vergleiche können die endgültige Testwahl beeinflussen. Der Entscheidungsbaum ersetzt keine vollständige statistische Prüfung.</span>
+            <span>${escapeHtml(result.notice || 'Stichprobengrösse, Studiendesign, Ausreisser, Unabhängigkeit, Verteilung, Varianzhomogenität und geplante Post-hoc-Vergleiche können die endgültige Testwahl beeinflussen. Der Entscheidungsbaum ersetzt keine vollständige statistische Prüfung.')}</span>
           </section>
           <section class="external-card" aria-label="Test online durchführen">
             <div>
