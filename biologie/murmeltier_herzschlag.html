@@ -180,6 +180,21 @@
 
       .heart { width: 120px; height: 120px; }
     }
+    .footer{
+      margin-top:32px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(0,0,0,0.3);
+    }
+
+    .footer a{
+      color:rgba(0,0,0,0.3);
+      text-decoration:none;
+    }
+
+    .footer a:hover{
+      text-decoration:underline;
+    }
   </style>
 </head>
 <body>
@@ -213,6 +228,9 @@
       </div>
     </section>
   </main>
+  <div class="footer">
+      by <a href="https://samueltobler.github.io/gymi-tools" target="_blank">Gymi-Tools</a><br><br>
+    </div>
 
   <script>
     function startHeartbeat(heartId, intervalMs) {
